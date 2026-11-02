@@ -195,8 +195,9 @@ def trend(closes, px, tolpct):
 
 
 def history(c, sym):
-    j = sget(c, "/pricehistory", symbol=sym, periodType="day", period=10, frequencyType="minute",
-             frequency=5, needExtendedHoursData="false")
+    end = int(time.time() * 1000)
+    j = sget(c, "/pricehistory", symbol=sym, periodType="day", frequencyType="minute", frequency=5,
+             startDate=end - 14 * 24 * 3600 * 1000, endDate=end, needExtendedHoursData="false")
     return j.get("candles", [])
 
 
@@ -252,6 +253,8 @@ def build_ticker(c, tk, q, manual, today, state, vixinfo, macro):
     bars = history(c, sym)
     cut = (t_now - dt.timedelta(minutes=5)).timestamp() * 1000
     closed = [b for b in bars if b["datetime"] <= cut]
+    if bars:
+        state["_ultima_" + tk] = dt.datetime.fromtimestamp(bars[-1]["datetime"] / 1000, MX).strftime("%Y-%m-%d %H:%M")
     todays = [b for b in closed if dt.datetime.fromtimestamp(b["datetime"] / 1000, MX).date().isoformat() == today]
     before = [b for b in closed if dt.datetime.fromtimestamp(b["datetime"] / 1000, MX).date().isoformat() < today]
     c5 = [b["close"] for b in closed]
@@ -385,7 +388,7 @@ def cycle(c, tok, state):
     ok = gh_put(tok, json.dumps(out, separators=(",", ":"), ensure_ascii=False))
     s = out.get("SPX", {}).get("read", {})
     print(f"{out['ts']}  SPX {s.get('px')}  rango {s.get('rem')}  techo {s.get('techo')}  piso {s.get('piso')}  "
-          f"IC {s.get('ic')}  {'publicado' if ok else 'NO publicado'}")
+          f"IC {s.get('ic')}  velas hoy {len(out.get('SPX', {}).get('c', []))} (última {state.get('_ultima_SPX')})  {'publicado' if ok else 'NO publicado'}")
 
 
 def main():

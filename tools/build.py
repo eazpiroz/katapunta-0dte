@@ -70,7 +70,7 @@ runtime = r'''
     for (const tk of ['SPX', 'SPY', 'QQQ']) {
       const x = a[tk]; if (!x || !x.read) continue;
       const L = d[tk] || (d[tk] = { o: [], h: [], l: [], c: [], v: [], reads: [], rows: [] });
-      ['o', 'h', 'l', 'c', 'v'].forEach(k => { L[k] = x[k] || []; });
+      if (x.c && x.c.length >= (L.c || []).length) ['o', 'h', 'l', 'c', 'v'].forEach(k => { L[k] = x[k]; });
       if (x.pre) L.pre = x.pre;
       if (x.rows && x.rows.length) L.rows = [x.rows];
       const manual = DATA.date === a.date ? (L.reads || []) : [];
