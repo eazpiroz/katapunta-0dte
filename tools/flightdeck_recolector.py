@@ -32,6 +32,9 @@ STEP = {"SPX": 10, "SPY": 1, "QQQ": 1}               # paso del perfil
 SPAN = {"SPX": 150, "SPY": 14, "QQQ": 14}            # strikes alrededor del precio
 TOL = {"SPX": 10, "SPY": 1, "QQQ": 1}                # tolerancia de agrupación
 WING = {"SPX": 10, "SPY": 1, "QQQ": 1}               # ancho de alas del IC de referencia
+GTOL = {"SPX": 3, "SPY": 0.3, "QQQ": 0.3}             # banda del zero γ para decir positiva/negativa
+SKEW = (1.6, 0.9)                                     # IC ajustado: lado débil 1.6× straddle, lado fuerte 0.9× (backtest 2-nov)
+HIST = Path(__file__).resolve().parent / "historial"  # una línea por minuto, para backtest (sin llaves)
 DIAS = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
 MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
 
@@ -194,6 +197,55 @@ def trend(closes, px, tolpct):
     return pos if pos == tr else 0
 
 
+def emas(xs, n):
+    if not xs:
+        return []
+    k = 2 / (n + 1); e = xs[0]; out = []
+    for x in xs:
+        e = x * k + e * (1 - k); out.append(e)
+    return out
+
+
+def trend2(closes, px, vw):
+    """Regla nueva (en prueba): alcista si precio > EMA9 > SMA20 y precio > VWAP; bajista al revés."""
+    xs = closes + [px]
+    if len(xs) < 21:
+        return 0
+    e9, s20 = emas(xs, 9)[-1], sum(xs[-20:]) / 20
+    if px > e9 > s20 and px > vw:
+        return 1
+    if px < e9 < s20 and px < vw:
+        return -1
+    return 0
+
+
+def vwap(bars):
+    """VWAP del día con precio típico; si el índice no trae volumen, promedio simple del precio típico."""
+    if not bars:
+        return None
+    tp = [(b["high"] + b["low"] + b["close"]) / 3 for b in bars]
+    v = [b.get("volume", 0) or 0 for b in bars]
+    return sum(a * w for a, w in zip(tp, v)) / sum(v) if sum(v) else sum(tp) / len(tp)
+
+
+def fuerza(bars5, px, edges):
+    """En un extremo (borde del rango, techo o piso): acelerado si la EMA9 de 5m sigue empujando hacia él, frenado si se aplanó o volteó."""
+    if len(bars5) < 16:
+        return None
+    up = [(abs(px - v), lab) for v, lab in edges["up"] if v and abs(px - v) <= edges["tol"] or (v and px > v)]
+    dn = [(abs(px - v), lab) for v, lab in edges["dn"] if v and abs(px - v) <= edges["tol"] or (v and px < v)]
+    if not up and not dn:
+        return None
+    side, lab = (1, min(up)[1]) if up and (not dn or min(up) <= min(dn)) else (-1, min(dn)[1])
+    cs = [b["close"] for b in bars5] + [px]
+    e = emas(cs, 9)
+    tr = [max(b["high"], p["close"]) - min(b["low"], p["close"]) for p, b in zip(bars5[-15:-1], bars5[-14:])]
+    atr = sum(tr) / len(tr) or 1
+    slope = (e[-1] - e[-4]) / 3 / atr * side
+    est = "acelerado" if slope >= 0.3 else "frenado"
+    return f"En extremo ({lab}): llega {est} · pendiente EMA 9 de 5m {slope:+.2f} ATR."
+
+
 def history(c, sym):
     end = int(time.time() * 1000)
     j = sget(c, "/pricehistory", symbol=sym, periodType="day", frequencyType="minute", frequency=5,
@@ -261,6 +313,8 @@ def build_ticker(c, tk, q, manual, today, state, vixinfo, macro):
     c15 = [b["close"] for b in resample(closed, 15)]
     c60 = [b["close"] for b in resample(closed, 60)]
     tf = [trend(c5, px, 0.0005), trend(c15, px, 0.0005), trend(c60, px, 0.0005)]
+    vw = vwap(todays) or px
+    tf2 = [trend2(c5, px, vw), trend2(c15, px, vw), trend2(c60, px, vw)]
     tech = {"5m SMA200": sma(c5, 200), "15m SMA100": sma(c15, 100), "15m SMA200": sma(c15, 200),
             "15m EMA100": ema(c15, 100), "15m EMA200": ema(c15, 200)}
 
@@ -338,12 +392,32 @@ def build_ticker(c, tk, q, manual, today, state, vixinfo, macro):
         except KeyError:
             ic = [ps, cs, 0, w]
 
+    ic2 = None
+    if strad and ks:
+        w = WING[tk]
+        stepk = 5 if tk == "SPX" else 1
+        dz = px - zg
+        lo_m, hi_m = (SKEW[0], SKEW[1]) if dz < -GTOL[tk] else (SKEW[1], SKEW[0]) if dz > GTOL[tk] else (1.25, 1.25)
+        ps = math.floor((px - lo_m * strad) / stepk) * stepk
+        cs = math.ceil((px + hi_m * strad) / stepk) * stepk
+        try:
+            cr = (mid(m[ps]["p"]) - mid(m[ps - w]["p"])) + (mid(m[cs]["c"]) - mid(m[cs + w]["c"]))
+            ic2 = [ps, cs, round(cr, 2), w]
+        except KeyError:
+            ic2 = [ps, cs, 0, w]
+
+    edges = {"tol": TOL[tk] * 0.5,
+             "up": [(em[1], "borde superior del rango"), (techo[0], "techo")],
+             "dn": [(em[0], "borde inferior del rango"), (piso[0], "piso")]}
+    fz = fuerza(closed, px, edges)
+
     r2 = lambda x: round(x, 2) if isinstance(x, float) else x
     read = {"t": t_now.strftime("%-H:%M") if os.name != "nt" else t_now.strftime("%#H:%M"),
             "px": r2(px), "chg": fmt_pct(chg), "vix": vixinfo[tk], "macro": macro, "tf": tf,
             "zg": r2(zg), "mp": r2(mp), "mn": r2(mn), "em": [em[0], em[1]], "strad": em[2] if len(em) > 2 else strad,
             "rem": rem, "techo": [r2(techo[0]), techo[1]], "pin": [r2(pin[0]), pin[1]] if pin else None,
             "piso": [r2(piso[0]), piso[1]], "cw": [cw[0], cw[1]], "pw": [pw[0], pw[1]], "ic": ic,
+            "tf2": tf2, "vw": r2(vw), "ic2": ic2, "fz": fz,
             "auto": True, "gt": gt}
     return {"o": [b["open"] for b in todays], "h": [b["high"] for b in todays], "l": [b["low"] for b in todays],
             "c": [b["close"] for b in todays], "v": [b.get("volume", 0) for b in todays],
@@ -386,9 +460,15 @@ def cycle(c, tok, state):
     out["day"] = {"title": f"Lectura del {DIAS[d.weekday()]} {d.day} de {MESES[d.month - 1]}",
                   "prev": {k: round(v, 2) for k, v in prev.items() if v}}
     ok = gh_put(tok, json.dumps(out, separators=(",", ":"), ensure_ascii=False))
+    try:  # historial local por minuto (solo lecturas, sin velas ni llaves)
+        HIST.mkdir(exist_ok=True)
+        with open(HIST / f"{today}.jsonl", "a", encoding="utf-8") as f:
+            f.write(json.dumps({"ts": out["ts"], **{k: out[k]["read"] for k in TICKERS if k in out}}, ensure_ascii=False) + "\n")
+    except Exception as e:
+        print("  historial:", e)
     s = out.get("SPX", {}).get("read", {})
     print(f"{out['ts']}  SPX {s.get('px')}  rango {s.get('rem')}  techo {s.get('techo')}  piso {s.get('piso')}  "
-          f"IC {s.get('ic')}  velas hoy {len(out.get('SPX', {}).get('c', []))} (última {state.get('_ultima_SPX')})  {'publicado' if ok else 'NO publicado'}")
+          f"IC {s.get('ic2')}  tend {s.get('tf')}/{s.get('tf2')}  velas hoy {len(out.get('SPX', {}).get('c', []))} (última {state.get('_ultima_SPX')})  {'publicado' if ok else 'NO publicado'}")
 
 
 def main():
