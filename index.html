@@ -401,7 +401,7 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
 </div>
 </div>
 </template>
-<script>
+<script>window.BUILD='0f21cc62';
 (function(){
   const tpl = document.getElementById('tpl');
   const mount = document.getElementById('app');
@@ -440,7 +440,9 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
   let last = '';
   async function load() {
     try { const r = await fetch('data.json?t=' + Date.now(), { cache: 'no-store' }); const t = await r.text();
-      if (t !== last) { last = t; window.LIVE_DATA = JSON.parse(t); paint(); } } catch (e) { console.error(e); }
+      if (t !== last) { last = t; const d = JSON.parse(t);
+        if (d.build && d.build !== window.BUILD && !location.search.includes(d.build)) { location.replace(location.pathname + '?v=' + d.build); return; }
+        window.LIVE_DATA = d; paint(); } } catch (e) { console.error(e); }
   }
   window.__load = load;
   setInterval(load, 60000);

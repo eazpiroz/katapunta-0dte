@@ -2,7 +2,7 @@
 """Genera index.html a partir de Main.dc.html (fuente de diseño).
 Uso: python3 tools/build.py RUTA/Main.dc.html
 """
-import re, sys, pathlib
+import re, sys, pathlib, json, hashlib, time
 src = pathlib.Path(sys.argv[1]).read_text()
 root = pathlib.Path(__file__).resolve().parent.parent
 
@@ -60,7 +60,9 @@ runtime = r'''
   let last = '';
   async function load() {
     try { const r = await fetch('data.json?t=' + Date.now(), { cache: 'no-store' }); const t = await r.text();
-      if (t !== last) { last = t; window.LIVE_DATA = JSON.parse(t); paint(); } } catch (e) { console.error(e); }
+      if (t !== last) { last = t; const d = JSON.parse(t);
+        if (d.build && d.build !== window.BUILD && !location.search.includes(d.build)) { location.replace(location.pathname + '?v=' + d.build); return; }
+        window.LIVE_DATA = d; paint(); } } catch (e) { console.error(e); }
   }
   window.__load = load;
   setInterval(load, 60000);
@@ -68,6 +70,7 @@ runtime = r'''
 })();
 '''
 
+build = hashlib.sha1((body+script+str(time.time())).encode()).hexdigest()[:8]
 html = f'''<!doctype html>
 <html lang="es">
 <head>
@@ -80,7 +83,7 @@ html = f'''<!doctype html>
 <body>
 <div id="app"><div style="color:#8A94A3;font-family:Inter,system-ui,sans-serif;padding:24px">Cargando lectura…</div></div>
 <template id="tpl">{body}</template>
-<script>{runtime}</script>
+<script>window.BUILD='{build}';{runtime}</script>
 <script>
 {script}
 window.__boot(Component);
@@ -90,4 +93,7 @@ window.__load();
 </html>
 '''
 (root / 'index.html').write_text(html)
+dp = root / 'data.json'
+if dp.exists():
+    d = json.loads(dp.read_text()); d['build'] = build; dp.write_text(json.dumps(d, separators=(',', ':')))
 print('index.html', len(html))
