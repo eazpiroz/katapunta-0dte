@@ -58,7 +58,7 @@ runtime = r'''
     try { render(tpl.content, comp.renderVals(), f); mount.replaceChildren(f); } catch (e) { console.error(e); } }
   window.__boot = C => { comp = new C({}); paint(); };
   let lastD = '', lastA = '', DATA = null, AUTO = null;
-  const AUTO_URLS = ['https://api.github.com/repos/eazpiroz/katapunta-0dte/contents/auto.json?ref=live'];
+  const AUTO_URLS = ['https://api.github.com/repos/eazpiroz/katapunta-0dte/contents/auto.json?ref=live', 'https://raw.githubusercontent.com/eazpiroz/katapunta-0dte/live/auto.json'];
   const todayMX = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Mexico_City' }).format(new Date());
   function merge() {
     if (!DATA) return null;
