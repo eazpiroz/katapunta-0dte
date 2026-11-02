@@ -57,15 +57,44 @@ runtime = r'''
   function paint() { if (!comp || !window.LIVE_DATA) return; const f = document.createDocumentFragment();
     try { render(tpl.content, comp.renderVals(), f); mount.replaceChildren(f); } catch (e) { console.error(e); } }
   window.__boot = C => { comp = new C({}); paint(); };
-  let last = '';
+  let lastD = '', lastA = '', DATA = null, AUTO = null;
+  const AUTO_URLS = ['https://api.github.com/repos/eazpiroz/katapunta-0dte/contents/auto.json?ref=live'];
+  const todayMX = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Mexico_City' }).format(new Date());
+  function merge() {
+    if (!DATA) return null;
+    const d = JSON.parse(JSON.stringify(DATA));
+    const a = AUTO;
+    if (!a || a.date !== todayMX()) return d;
+    d.on = true;
+    d.day = Object.assign({}, d.day || {}, a.day || {});
+    for (const tk of ['SPX', 'SPY', 'QQQ']) {
+      const x = a[tk]; if (!x || !x.read) continue;
+      const L = d[tk] || (d[tk] = { o: [], h: [], l: [], c: [], v: [], reads: [], rows: [] });
+      ['o', 'h', 'l', 'c', 'v'].forEach(k => { L[k] = x[k] || []; });
+      if (x.pre) L.pre = x.pre;
+      if (x.rows && x.rows.length) L.rows = [x.rows];
+      const manual = DATA.date === a.date ? (L.reads || []) : [];
+      L.reads = manual.concat([x.read]);
+    }
+    return d;
+  }
   async function load() {
-    try { const r = await fetch('data.json?t=' + Date.now(), { cache: 'no-store' }); const t = await r.text();
-      if (t !== last) { last = t; const d = JSON.parse(t);
+    try {
+      const r = await fetch('data.json?t=' + Date.now(), { cache: 'no-store' }); const t = await r.text();
+      if (t !== lastD) { lastD = t; const d = JSON.parse(t);
         if (d.build && d.build !== window.BUILD && !location.search.includes(d.build)) { location.replace(location.pathname + '?v=' + d.build); return; }
-        window.LIVE_DATA = d; paint(); } } catch (e) { console.error(e); }
+        DATA = d; }
+    } catch (e) { console.error(e); }
+    for (const u of AUTO_URLS) {
+      try {
+        const r = await fetch(u, { headers: { Accept: 'application/vnd.github.raw+json' }, cache: 'no-cache' });
+        if (r.ok) { const t = await r.text(); if (t !== lastA) { lastA = t; AUTO = JSON.parse(t); } break; }
+      } catch (e) { console.error(e); }
+    }
+    const m = merge(); if (m) { window.LIVE_DATA = m; paint(); }
   }
   window.__load = load;
-  setInterval(load, 60000);
+  setInterval(load, 75000);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) load(); });
 })();
 '''

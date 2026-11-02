@@ -9,6 +9,8 @@ root = pathlib.Path(__file__).resolve().parent.parent
 d = json.loads((root / 'data.json').read_text())
 new = json.loads(pathlib.Path(sys.argv[1]).read_text())
 d['on'] = True
+import datetime
+d.setdefault('date', datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=-6))).date().isoformat())
 for tk, x in new.items():
     L = d[tk]
     for k in 'ohlcv':

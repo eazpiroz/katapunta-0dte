@@ -24,7 +24,7 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
 <header style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px 24px; padding-bottom: 12px; border-bottom: 1px solid #232A35">
 <div style="display: flex; flex-direction: column; gap: 2px; flex: 1 1 280px; min-width: 0">
 <div style="font-size: 11px; font-weight: 500; letter-spacing: 0.14em; color: #F2B544">FLIGHT DECK · 0DTE</div>
-<h1 style="margin: 0; font-size: 20px; font-weight: 600; letter-spacing: -0.02em">Lectura del lunes 2 de noviembre</h1>
+<h1 style="margin: 0; font-size: 20px; font-weight: 600; letter-spacing: -0.02em">{{dayTitle}}</h1>
 <div style="font-size: 12px; color: #8A94A3">{{d.subtitle}}</div>
 </div>
 <div role="group" aria-label="Elegir subyacente" style="display: flex; flex-wrap: wrap; background: #12161D; border: 1px solid #232A35; border-radius: 10px; padding: 3px; gap: 3px">
@@ -194,7 +194,7 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
 <div style="{{chart.emStyle}}"></div>
 <div style="{{chart.zoneStyle}}"></div>
 <span style="{{chart.zoneLabelStyle}}">{{chart.zoneLabel}}</span>
-<span style="{{chart.emLabel}}">EM lun</span>
+<span style="{{chart.emLabel}}">{{emTag}}</span>
 <svg viewBox="0 0 1000 400" preserveAspectRatio="none" aria-hidden="true" style="position: absolute; inset: 0; width: 100%; height: 100%">
 <path d="{{chart.wickUp}}" fill="none" stroke="#26A69A" stroke-width="1" vector-effect="non-scaling-stroke"></path>
 <path d="{{chart.wickDn}}" fill="none" stroke="#EF5350" stroke-width="1" vector-effect="non-scaling-stroke"></path>
@@ -401,7 +401,7 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
 </div>
 </div>
 </template>
-<script>window.BUILD='0f21cc62';
+<script>window.BUILD='b5ad179f';
 (function(){
   const tpl = document.getElementById('tpl');
   const mount = document.getElementById('app');
@@ -437,15 +437,44 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
   function paint() { if (!comp || !window.LIVE_DATA) return; const f = document.createDocumentFragment();
     try { render(tpl.content, comp.renderVals(), f); mount.replaceChildren(f); } catch (e) { console.error(e); } }
   window.__boot = C => { comp = new C({}); paint(); };
-  let last = '';
+  let lastD = '', lastA = '', DATA = null, AUTO = null;
+  const AUTO_URLS = ['https://api.github.com/repos/eazpiroz/katapunta-0dte/contents/auto.json?ref=live'];
+  const todayMX = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Mexico_City' }).format(new Date());
+  function merge() {
+    if (!DATA) return null;
+    const d = JSON.parse(JSON.stringify(DATA));
+    const a = AUTO;
+    if (!a || a.date !== todayMX()) return d;
+    d.on = true;
+    d.day = Object.assign({}, d.day || {}, a.day || {});
+    for (const tk of ['SPX', 'SPY', 'QQQ']) {
+      const x = a[tk]; if (!x || !x.read) continue;
+      const L = d[tk] || (d[tk] = { o: [], h: [], l: [], c: [], v: [], reads: [], rows: [] });
+      ['o', 'h', 'l', 'c', 'v'].forEach(k => { L[k] = x[k] || []; });
+      if (x.pre) L.pre = x.pre;
+      if (x.rows && x.rows.length) L.rows = [x.rows];
+      const manual = DATA.date === a.date ? (L.reads || []) : [];
+      L.reads = manual.concat([x.read]);
+    }
+    return d;
+  }
   async function load() {
-    try { const r = await fetch('data.json?t=' + Date.now(), { cache: 'no-store' }); const t = await r.text();
-      if (t !== last) { last = t; const d = JSON.parse(t);
+    try {
+      const r = await fetch('data.json?t=' + Date.now(), { cache: 'no-store' }); const t = await r.text();
+      if (t !== lastD) { lastD = t; const d = JSON.parse(t);
         if (d.build && d.build !== window.BUILD && !location.search.includes(d.build)) { location.replace(location.pathname + '?v=' + d.build); return; }
-        window.LIVE_DATA = d; paint(); } } catch (e) { console.error(e); }
+        DATA = d; }
+    } catch (e) { console.error(e); }
+    for (const u of AUTO_URLS) {
+      try {
+        const r = await fetch(u, { headers: { Accept: 'application/vnd.github.raw+json' }, cache: 'no-cache' });
+        if (r.ok) { const t = await r.text(); if (t !== lastA) { lastA = t; AUTO = JSON.parse(t); } break; }
+      } catch (e) { console.error(e); }
+    }
+    const m = merge(); if (m) { window.LIVE_DATA = m; paint(); }
   }
   window.__load = load;
-  setInterval(load, 60000);
+  setInterval(load, 75000);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) load(); });
 })();
 </script>
@@ -459,6 +488,7 @@ class Component extends DCLogic {
   renderVals() {
     const LIVE = window.LIVE_DATA;
     const up = '#4C9AFF', dn = '#FF7A45', neu = '#E8ECF1', cyan = '#F2B544', yel = '#C9D1DC';
+    const DAY = LIVE.day || {};
     const view = LIVE.on ? 'simple' : (this.state.view || 'simple');
     const isSimple = view === 'simple';
     const tk = (isSimple && this.state.tk === 'NDX') ? 'QQQ' : this.state.tk, mode = this.state.mode;
@@ -938,7 +968,7 @@ class Component extends DCLogic {
           ['Compra de calls', cl(1 + (gneg ? 1 : 0) + (bullA ? 1 : 0) + (vt < 0 ? 1 : 0)), gTxt + ' · ' + (bullA ? 'alcista' : 'sin tendencia alcista'), 'Objetivo ' + fv2(lr.techo[0])]
         ]
       };
-      const prevClose = { SPX: 7580.07, SPY: 755.72, QQQ: 690.49 }[tk];
+      const prevClose = (DAY.prev && DAY.prev[tk]) || { SPX: 7580.07, SPY: 755.72, QQQ: 690.49 }[tk];
       LS[tk] = [
         { v: lr.techo[0], c: LC.up, s: 'dash', t: 'Techo ' + fv2(lr.techo[0]) + ' · ' + lr.techo[1] + ' fuentes' },
         lr.pin ? { v: lr.pin[0], c: '#E8ECF1', s: 'solid', t: 'PIN ' + fv2(lr.pin[0]) + ' · ' + lr.pin[1] + ' fuentes' } : null,
@@ -965,11 +995,12 @@ class Component extends DCLogic {
       const offs = [];
       if (lr.cw && lr.cw[0] > hi) offs.push({ t: '↑ Muro call ' + fv2(lr.cw[0]), dir: 'up', c: LC.up });
       if (lr.pw && lr.pw[0] < lo) offs.push({ t: '↓ Muro put ' + fv2(lr.pw[0]), dir: 'down', c: LC.dn });
-      liveCfg = { live: true, start: 510, lo, hi, ticks, em: lr.em, ohlc: { o: L.o, h: L.h, l: L.l, c: L.c, v: L.v }, pre: (PRE[tk] || []).concat(CH[tk].ohlc.c), off: offs, events: evs };
+      liveCfg = { live: true, start: 510, lo, hi, ticks, em: lr.em, ohlc: { o: L.o, h: L.h, l: L.l, c: L.c, v: L.v }, pre: (L.pre && L.pre.length ? L.pre : (PRE[tk] || []).concat(CH[tk].ohlc.c)), off: offs, events: evs };
       if (L.rows.length) liveRows = L.rows[L.rows.length - 1];
       d.subtitle = d.sym + ' · vencimiento 0DTE de hoy · lecturas cada 15 min · lectura neutral, no es recomendación';
+      if (lr.auto) { d.subtitle = d.sym + ' · vencimiento 0DTE de hoy · cadena Schwab cada minuto · lectura neutral, no es recomendación'; d.stripNote = 'Fuente: Schwab · cadena 0DTE en tiempo real · escala común a puts y calls'; }
     }
-    const AG = [[540, '9:00 · ISM manufactura'], [615, '10:15 · Goolsbee (Fed)']];
+    const AG = DAY.agenda || [[540, '9:00 · ISM manufactura'], [615, '10:15 · Goolsbee (Fed)']];
     const nowMin = lr ? toMin(lr.t) : 0;
     const nextAg = AG.find(a => a[0] > nowMin);
     const nextEv = nextAg ? nextAg[1] : 'Sin más eventos hoy';
@@ -977,7 +1008,7 @@ class Component extends DCLogic {
       ? { txt: (nowMin < 510 ? 'Pre-market' : (nowMin >= 900 ? 'Cierre' : 'En vivo')) + ' · lectura ' + lr.t + ' CDMX', chip: 'display: flex; align-items: center; gap: 8px; border: 1px solid #1F4D47; background: #0F2421; color: #5FD4C4; padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 500', dot: 'width: 7px; height: 7px; border-radius: 50%; background: #26A69A' }
       : { txt: 'Mercado cerrado · cierre vie 30-oct', chip: 'display: flex; align-items: center; gap: 8px; border: 1px solid #6B2E2C; background: #24151A; color: #F08A84; padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 500', dot: 'width: 7px; height: 7px; border-radius: 50%; background: #F08A84' };
     const nxt = lr ? nowMin + 15 : 0;
-    const readTxt = lr ? (nowMin >= 900 ? 'Sesión cerrada' : 'Próxima lectura ~' + Math.floor(nxt / 60) + ':' + String(nxt % 60).padStart(2, '0')) : 'Lectura manual · dom 1-nov CDMX';
+    const readTxt = lr && lr.auto ? 'Cadena Schwab cada minuto' + (lr.gt ? ' · perfil γ ' + lr.gt : '') : lr ? (nowMin >= 900 ? 'Sesión cerrada' : 'Próxima lectura ~' + Math.floor(nxt / 60) + ':' + String(nxt % 60).padStart(2, '0')) : 'Lectura manual · dom 1-nov CDMX';
     const GEXS = {
       SPX: {7450:-240,7460:-57,7470:-31,7480:-40,7490:-241,7500:-729,7510:-78,7520:-110,7530:-62,7540:-152,7550:-514,7560:-93,7570:-316,7580:-138,7590:-272,7600:-1156,7610:-183,7620:-263,7630:-88,7640:-142,7650:-374,7660:54,7670:-4,7680:-36,7690:-7,7700:-161,7710:-9,7720:9},
       SPY: {743:-4.2,744:-7.0,745:-36.1,746:-18.0,747:-7.5,748:-7.8,749:-5.4,750:-123.5,751:-12.9,752:-14.0,753:-22.8,754:-32.9,755:-100.7,756:-36.1,757:-107.6,758:-28.2,759:-61.0,760:-169.4,761:-8.5,762:-11.4,763:-19.0,764:-22.4,765:-97.8,766:-4.0,767:13.5,768:0.5,769:8.1,770:13.9},
@@ -1042,6 +1073,7 @@ class Component extends DCLogic {
       gexBtnStyle: mode === 'gex' ? on : off,
       chart: buildChart(liveCfg || CH[tk], tk, isSimple),
       status, nextEv, readTxt, showToggle: !LIVE.on,
+      dayTitle: DAY.title || 'Lectura del lunes 2 de noviembre', emTag: LIVE.on ? 'EM hoy' : 'EM lun',
       isSimple, isFull: !isSimple,
       showSimple: () => this.setState({ view: 'simple' }),
       showFull: () => this.setState({ view: 'full' }),
