@@ -1,0 +1,93 @@
+#!/usr/bin/env python3
+"""Genera index.html a partir de Main.dc.html (fuente de diseño).
+Uso: python3 tools/build.py RUTA/Main.dc.html
+"""
+import re, sys, pathlib
+src = pathlib.Path(sys.argv[1]).read_text()
+root = pathlib.Path(__file__).resolve().parent.parent
+
+helmet = re.search(r'<helmet>(.*?)</helmet>', src, re.S).group(1)
+body = re.search(r'</helmet>(.*?)</x-dc>', src, re.S).group(1)
+script = re.search(r'<script type="text/x-dc"[^>]*>(.*?)</script>', src, re.S).group(1)
+
+# sc-for / sc-if -> <template> (válido dentro de tablas)
+body = re.sub(r'<sc-(for|if)\b', lambda m: '<template data-k="%s"' % m.group(1), body)
+body = re.sub(r'</sc-(for|if)>', '</template>', body)
+
+# LIVE viene de data.json
+script, n = re.subn(r'const LIVE = \{.*?\n    \};', 'const LIVE = window.LIVE_DATA;', script, count=1, flags=re.S)
+assert n == 1, 'no encontré el bloque LIVE'
+
+pub = lambda s: s.replace('Gexbot', 'Perfil γ')
+body, script = pub(body), pub(script)
+
+runtime = r'''
+(function(){
+  const tpl = document.getElementById('tpl');
+  const mount = document.getElementById('app');
+  const lookup = (path, sc) => path.trim().split('.').reduce((o, k) => o == null ? undefined : o[k], sc);
+  const ONE = /^\{\{([^}]+)\}\}$/;
+  const val = (s, sc) => { const m = s.match(ONE); if (m) return lookup(m[1], sc);
+    return s.replace(/\{\{([^}]+)\}\}/g, (_, p) => { const v = lookup(p, sc); return v == null ? '' : String(v); }); };
+  const child = (sc, k, v) => { const o = Object.create(sc); Object.defineProperty(o, k, { value: v, enumerable: true }); return o; };
+  function render(node, sc, out) {
+    for (const n of node.childNodes) {
+      if (n.nodeType === 3) { out.appendChild(document.createTextNode(n.data.includes('{{') ? val(n.data, sc) ?? '' : n.data)); continue; }
+      if (n.nodeType !== 1) continue;
+      if (n.localName === 'template') {
+        const k = n.getAttribute('data-k');
+        if (k === 'for') { const list = val(n.getAttribute('list'), sc) || []; const as = n.getAttribute('as');
+          list.forEach(it => render(n.content, child(sc, as, it), out)); }
+        else if (k === 'if') { if (val(n.getAttribute('value'), sc)) render(n.content, sc, out); }
+        continue;
+      }
+      const el = document.createElementNS(n.namespaceURI, n.localName);
+      for (const a of n.attributes) {
+        if (a.name.startsWith('hint-')) continue;
+        if (a.name.startsWith('on')) { const f = val(a.value, sc); if (typeof f === 'function') el.addEventListener(a.name.slice(2), f); continue; }
+        const v = a.value.includes('{{') ? val(a.value, sc) : a.value;
+        el.setAttribute(a.name, v == null ? '' : String(v));
+      }
+      render(n, sc, el); out.appendChild(el);
+    }
+  }
+  class DCLogic { constructor(p) { this.props = p || {}; this.state = {}; } setState(s) { Object.assign(this.state, s); paint(); } }
+  window.DCLogic = DCLogic;
+  let comp;
+  function paint() { if (!comp || !window.LIVE_DATA) return; const f = document.createDocumentFragment();
+    try { render(tpl.content, comp.renderVals(), f); mount.replaceChildren(f); } catch (e) { console.error(e); } }
+  window.__boot = C => { comp = new C({}); paint(); };
+  let last = '';
+  async function load() {
+    try { const r = await fetch('data.json?t=' + Date.now(), { cache: 'no-store' }); const t = await r.text();
+      if (t !== last) { last = t; window.LIVE_DATA = JSON.parse(t); paint(); } } catch (e) { console.error(e); }
+  }
+  window.__load = load;
+  setInterval(load, 60000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) load(); });
+})();
+'''
+
+html = f'''<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Flight Deck 0DTE</title>
+{helmet}
+</head>
+<body>
+<div id="app"><div style="color:#8A94A3;font-family:Inter,system-ui,sans-serif;padding:24px">Cargando lectura…</div></div>
+<template id="tpl">{body}</template>
+<script>{runtime}</script>
+<script>
+{script}
+window.__boot(Component);
+window.__load();
+</script>
+</body>
+</html>
+'''
+(root / 'index.html').write_text(html)
+print('index.html', len(html))

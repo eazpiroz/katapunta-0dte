@@ -1,0 +1,1084 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Flight Deck 0DTE</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0B0E13;font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
+svg text{font-variant-numeric:tabular-nums}
+a{color:#4C9AFF}a:hover{color:#8BBEFF}
+</style>
+
+</head>
+<body>
+<div id="app"><div style="color:#8A94A3;font-family:Inter,system-ui,sans-serif;padding:24px">Cargando lectura…</div></div>
+<template id="tpl">
+<div style="background: #0B0E13; color: #E8ECF1; font-family: 'Inter', system-ui, sans-serif; min-height: 100vh; padding: 16px 20px 40px; box-sizing: border-box">
+<div style="max-width: 1440px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px">
+
+<header style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px 24px; padding-bottom: 12px; border-bottom: 1px solid #232A35">
+<div style="display: flex; flex-direction: column; gap: 2px; flex: 1 1 280px; min-width: 0">
+<div style="font-size: 11px; font-weight: 500; letter-spacing: 0.14em; color: #F2B544">FLIGHT DECK · 0DTE</div>
+<h1 style="margin: 0; font-size: 20px; font-weight: 600; letter-spacing: -0.02em">Lectura del lunes 2 de noviembre</h1>
+<div style="font-size: 12px; color: #8A94A3">{{d.subtitle}}</div>
+</div>
+<div role="group" aria-label="Elegir subyacente" style="display: flex; flex-wrap: wrap; background: #12161D; border: 1px solid #232A35; border-radius: 10px; padding: 3px; gap: 3px">
+<template data-k="for" list="{{tabs}}" as="t" hint-placeholder-count="4">
+<button type="button" onClick="{{t.pick}}" aria-pressed="{{t.pressed}}" style="{{t.style}}">
+<span style="font-size: 14px; font-weight: 600">{{t.sym}}</span>
+<span style="font-size: 11px; color: {{t.subColor}}">{{t.sub}}</span>
+</button>
+</template>
+</div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; flex: 1 1 280px">
+<template data-k="if" value="{{showToggle}}" hint-placeholder-val="{{true}}">
+<div role="group" aria-label="Vista" style="display: flex; border: 1px solid #232A35; border-radius: 8px; overflow: hidden">
+<button type="button" onClick="{{showSimple}}" aria-pressed="{{simplePressed}}" style="{{simpleBtnStyle}}">Simple</button>
+<button type="button" onClick="{{showFull}}" aria-pressed="{{fullPressed}}" style="{{fullBtnStyle}}">Completa</button>
+</div>
+</template>
+<div style="display: flex; align-items: center; gap: 8px; border: 1px solid #232A35; background: #12161D; padding: 6px 12px; border-radius: 999px; font-size: 12px">
+<span style="color: #8A94A3">Próximo evento</span>
+<span style="font-weight: 600; color: #E8ECF1">{{nextEv}}</span>
+</div>
+<div style="{{status.chip}}">
+<span style="{{status.dot}}"></span>
+{{status.txt}}
+</div>
+<span style="font-size: 11px; color: #808A99">{{readTxt}}</span>
+</div>
+</header>
+
+<template data-k="if" value="{{isSimple}}" hint-placeholder-val="{{true}}">
+<section aria-label="Lectura del día" style="display: flex; flex-direction: column; gap: 6px">
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px">
+<template data-k="for" list="{{lect}}" as="lc" hint-placeholder-count="4">
+<div style="background: #12161D; border: 1px solid #232A35; border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px">
+<div style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; color: #8A94A3">{{lc.label}}</div>
+<div style="font-size: 22px; font-weight: 500; letter-spacing: -0.02em; color: {{lc.color}}">{{lc.value}}</div>
+<template data-k="if" value="{{lc.hasDots}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; gap: 14px">
+<template data-k="for" list="{{lc.dots}}" as="dt" hint-placeholder-count="3">
+<span style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #C9D1DC"><span style="width: 10px; height: 10px; border-radius: 50%; background: {{dt.col}}"></span>{{dt.tf}}</span>
+</template>
+</div>
+</template>
+<template data-k="if" value="{{lc.hasBar}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<div style="position: relative; height: 8px; background: #2A2414; border: 1px solid #4A3D1C; border-radius: 4px">
+<div style="{{lc.barMark}}"></div>
+</div>
+<div style="display: flex; justify-content: space-between; font-size: 11px; color: #808A99"><span>{{lc.barL}}</span><span>{{lc.barR}}</span></div>
+</div>
+</template>
+<div style="font-size: 12px; color: #8A94A3; line-height: 1.4">{{lc.note}}</div>
+</div>
+</template>
+</div>
+<div style="font-size: 11px; color: #808A99">{{simple.macro}}</div>
+</section>
+</template>
+
+<template data-k="if" value="{{isFull}}" hint-placeholder-val="{{false}}">
+<section aria-label="Cotizaciones con semáforo de dirección" style="display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; flex-wrap: wrap; background: #12161D; border: 1px solid #232A35; border-radius: 10px; overflow: hidden">
+<template data-k="for" list="{{tape}}" as="t" hint-placeholder-count="6">
+<div style="flex: 1 1 200px; min-width: 0; padding: 10px 14px; display: flex; flex-direction: column; gap: 5px; border-right: 1px solid #232A35; border-bottom: 1px solid #232A35; margin-bottom: -1px">
+<div style="display: flex; align-items: center; gap: 8px">
+<span style="font-size: 12px; font-weight: 600; color: #C9D1DC">{{t.sym}}</span>
+<span style="font-size: 11px; color: #808A99; border: 1px solid #232A35; border-radius: 4px; padding: 0 5px; white-space: nowrap">{{t.feed}}</span>
+<span role="img" aria-label="{{t.aria}}" style="margin-left: auto; display: flex; align-items: center; gap: 6px">
+<span style="display: flex; gap: 3px; padding: 3px 4px; background: #0B0E13; border: 1px solid #232A35; border-radius: 999px">
+<span style="width: 8px; height: 8px; border-radius: 50%; background: {{t.l1}}"></span>
+<span style="width: 8px; height: 8px; border-radius: 50%; background: {{t.l2}}"></span>
+<span style="width: 8px; height: 8px; border-radius: 50%; background: {{t.l3}}"></span>
+</span>
+<span style="font-size: 11px; font-weight: 600; white-space: nowrap; color: {{t.dirColor}}">{{t.dirLabel}}</span>
+</span>
+</div>
+<div style="display: flex; align-items: baseline; gap: 8px">
+<span style="font-size: 17px; font-weight: 500">{{t.px}}</span>
+<span style="font-size: 12px; color: {{t.chgColor}}">{{t.chg}}</span>
+</div>
+<div style="font-size: 11px; color: #808A99; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{t.why}}</div>
+</div>
+</template>
+</div>
+<div style="font-size: 11px; color: #808A99">Semáforo sobre el precio del índice (SPX o NDX): verde = alcista, rojo = bajista, gris = neutral. VIX, VXN, DXY y la tasa a 10 años cuentan al revés: si suben, se pinta rojo. La línea de abajo dice qué hace el propio instrumento. Regla en 15m: precio vs EMA 20 y EMA 20 vs EMA 50. Es lectura, no señal de entrada.</div>
+</section>
+
+<template data-k="if" value="{{d.hasWarn}}" hint-placeholder-val="{{false}}">
+<div role="note" style="display: flex; gap: 10px; align-items: flex-start; background: #24151A; border: 1px solid #6B2E2C; border-radius: 10px; padding: 12px 16px; font-size: 13px; color: #F2C9C6">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F08A84" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 1px"><path d="M12 9v4"></path><path d="M12 17h.01"></path><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path></svg>
+<span>{{d.warn}}</span>
+</div>
+</template>
+
+<section aria-label="Niveles clave" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px">
+<template data-k="for" list="{{kpis}}" as="k" hint-placeholder-count="4">
+<div style="background: #12161D; border: 1px solid #232A35; border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px">
+<div style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; color: #8A94A3">{{k.label}}</div>
+<div style="font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 500; letter-spacing: -0.02em"><span style="color: {{k.c1}}">{{k.v1}}</span><span style="color: #5C6573">{{k.sep}}</span><span style="color: {{k.c2}}">{{k.v2}}</span></div>
+<template data-k="if" value="{{k.hasChip}}" hint-placeholder-val="{{false}}">
+<span style="{{k.chipStyle}}">{{k.chip}}</span>
+</template>
+<template data-k="if" value="{{k.hasBar}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 4px; padding-top: 2px">
+<div style="position: relative; height: 8px; background: #2A2414; border: 1px solid #4A3D1C; border-radius: 4px">
+<div style="{{k.barMark}}"></div>
+</div>
+<div style="display: flex; justify-content: space-between; gap: 6px; font-size: 11px; color: #808A99"><span>{{k.barL}}</span><span style="color: #C9D1DC">{{k.barMid}}</span><span>{{k.barR}}</span></div>
+</div>
+</template>
+<div style="font-size: 13px; color: #8A94A3; line-height: 1.4">{{k.note}}</div>
+<div style="margin-top: auto; font-size: 11px; color: #808A99; border-top: 1px solid #232A35; padding-top: 8px">{{k.src}}</div>
+</div>
+</template>
+</section>
+</template>
+
+<section style="display: flex; flex-wrap: wrap; gap: 12px; align-items: stretch">
+<div style="flex: 999 1 640px; min-width: 0; display: flex; flex-direction: column; gap: 12px">
+<div style="background: #12161D; border: 1px solid #232A35; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; align-items: baseline">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.01em">Mapa de niveles · {{d.sym}}</h2>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px">
+<span style="font-size: 12px; color: #8A94A3">Perfil por strike</span>
+<div role="group" aria-label="Métrica del perfil por strike" style="display: flex; border: 1px solid #232A35; border-radius: 8px; overflow: hidden">
+<button type="button" onClick="{{showOI}}" aria-pressed="{{oiPressed}}" style="{{oiBtnStyle}}">Open interest</button>
+<button type="button" onClick="{{showVol}}" aria-pressed="{{volPressed}}" style="{{volBtnStyle}}">Volumen</button>
+<button type="button" onClick="{{showGex}}" aria-pressed="{{gexPressed}}" style="{{gexBtnStyle}}">GEX</button>
+</div>
+</div>
+</div>
+
+<template data-k="if" value="{{isSimple}}" hint-placeholder-val="{{true}}">
+<div style="display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 11px; color: #8A94A3">
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 4px; height: 10px; background: #26A69A"></span><span style="width: 4px; height: 10px; background: #EF5350"></span>Velas 5m</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px solid #E879A6"></span>EMA 9</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px solid #F5A35C"></span>EMA 21</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; height: 9px; background: #2A2414; border: 1px dashed #7A6230"></span>Rango esperado</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px dashed #4C9AFF"></span>Techo</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px solid #E8ECF1"></span>PIN / zona de convergencia</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px dotted #C9D1DC"></span>Zero γ</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px solid #FF7A45"></span>Piso</span>
+</div>
+</template>
+<template data-k="if" value="{{isFull}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 11px; color: #8A94A3">
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 4px; height: 10px; background: #26A69A"></span><span style="width: 4px; height: 10px; background: #EF5350"></span>Velas 5m vie</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px solid #E879A6"></span>EMA 9</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px solid #F5A35C"></span>EMA 21</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px solid #A78BFA"></span>SMA 200</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; height: 9px; background: #2A2414; border: 1px dashed #7A6230"></span>EM lun</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px dashed #4C9AFF"></span>Gamma +</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px dotted #C9D1DC"></span>Zero γ</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px dashed #FF7A45"></span><span style="width: 16px; border-top: 2px solid #FF7A45"></span>Gamma − · muro put</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px dotted #F2B544"></span>Cierre vie</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 1px solid #5C6573"></span>Máx / mín vie</span>
+</div>
+<div style="font-size: 11px; color: #808A99">Los puntos sobre el viernes marcan cuándo cambió un major en las lecturas de 15 min (Perfil γ, vencimiento 10/30); el detalle va abajo de la gráfica. En la zona del lunes, los niveles del vencimiento 11/02.</div>
+</template>
+
+<div role="img" aria-label="{{chart.aria}}" style="display: grid; grid-template-columns: 52px minmax(0, 1fr) 160px minmax(200px, 22%); height: 400px">
+<div style="position: relative">
+<template data-k="for" list="{{chart.ticks}}" as="tk" hint-placeholder-count="4"><span style="{{tk.style}}">{{tk.label}}</span></template>
+</div>
+<div style="position: relative; overflow: hidden; border-left: 1px solid #232A35; border-bottom: 1px solid #232A35">
+<template data-k="for" list="{{chart.ticks}}" as="tk" hint-placeholder-count="4"><div style="{{tk.grid}}"></div></template>
+<div style="{{chart.emStyle}}"></div>
+<div style="{{chart.zoneStyle}}"></div>
+<span style="{{chart.zoneLabelStyle}}">{{chart.zoneLabel}}</span>
+<span style="{{chart.emLabel}}">EM lun</span>
+<svg viewBox="0 0 1000 400" preserveAspectRatio="none" aria-hidden="true" style="position: absolute; inset: 0; width: 100%; height: 100%">
+<path d="{{chart.wickUp}}" fill="none" stroke="#26A69A" stroke-width="1" vector-effect="non-scaling-stroke"></path>
+<path d="{{chart.wickDn}}" fill="none" stroke="#EF5350" stroke-width="1" vector-effect="non-scaling-stroke"></path>
+<path d="{{chart.bodyUp}}" fill="#26A69A"></path>
+<path d="{{chart.bodyDn}}" fill="#EF5350"></path>
+<path d="{{chart.sma200}}" fill="none" stroke="#A78BFA" stroke-width="1.5" vector-effect="non-scaling-stroke"></path>
+<path d="{{chart.ema21}}" fill="none" stroke="#F5A35C" stroke-width="1.5" vector-effect="non-scaling-stroke"></path>
+<path d="{{chart.ema9}}" fill="none" stroke="#E879A6" stroke-width="1.5" vector-effect="non-scaling-stroke"></path>
+</svg>
+<template data-k="for" list="{{chart.levels}}" as="lv" hint-placeholder-count="7"><div style="{{lv.lineStyle}}"></div></template>
+<template data-k="for" list="{{chart.off}}" as="o" hint-placeholder-count="1"><span style="{{o.style}}">{{o.t}}</span></template>
+<template data-k="for" list="{{chart.events}}" as="ev" hint-placeholder-count="6"><span title="{{ev.title}}" style="{{ev.dot}}"></span></template>
+</div>
+<div style="position: relative">
+<template data-k="for" list="{{chart.levels}}" as="lv" hint-placeholder-count="7"><span style="{{lv.labelStyle}}">{{lv.t}}</span></template>
+</div>
+<div style="position: relative; overflow: hidden; background: #0F1318; border-left: 1px solid #232A35; border-bottom: 1px solid #232A35">
+<div style="position: absolute; top: 0; bottom: 0; left: 50%; border-left: 1px solid #2A313C"></div>
+<template data-k="for" list="{{chart.levels}}" as="lv" hint-placeholder-count="7"><div style="{{lv.profLine}}"></div></template>
+<template data-k="for" list="{{prof}}" as="pr" hint-placeholder-count="20">
+<div style="{{pr.row}}">
+<div style="display: flex; justify-content: flex-end; align-items: center; gap: 4px; min-width: 0">
+<span style="font-size: 11px; color: #E8ECF1; white-space: nowrap">{{pr.lL}}</span>
+<div style="{{pr.lBar}}"></div>
+</div>
+<div style="display: flex; align-items: center; gap: 4px; min-width: 0">
+<div style="{{pr.rBar}}"></div>
+<span style="font-size: 11px; color: #E8ECF1; white-space: nowrap">{{pr.rL}}</span>
+</div>
+</div>
+</template>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: 52px minmax(0, 1fr) 160px minmax(200px, 22%); font-size: 11px; color: #808A99">
+<span></span>
+<div style="position: relative; height: 16px">
+<template data-k="for" list="{{chart.xt}}" as="x" hint-placeholder-count="6"><span style="{{x.style}}">{{x.label}}</span></template>
+</div>
+<span style="padding-left: 8px">hora CDMX</span>
+<div style="display: flex; justify-content: space-between; padding: 0 8px; font-weight: 600"><span style="color: #FF7A45">{{profL}}</span><span style="color: #4C9AFF">{{profR}}</span></div>
+</div>
+<div style="font-size: 11px; color: #808A99">{{d.stripNote}} · solo se rotulan los 3 strikes más cargados de cada lado.</div>
+<div style="display: flex; flex-direction: column; gap: 6px; border-top: 1px solid #232A35; padding-top: 10px">
+<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap">
+<span style="font-size: 13px; font-weight: 600">Cambios de majors · lecturas cada 15 min</span>
+<span style="font-size: 11px; color: #808A99">{{chart.evSummary}}</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 4px 16px">
+<template data-k="for" list="{{chart.evList}}" as="ev" hint-placeholder-count="6">
+<div style="display: flex; align-items: center; gap: 8px; font-size: 12px; padding: 3px 0">
+<span style="font-weight: 600; color: #C9D1DC; min-width: 40px">{{ev.time}}</span>
+<span style="width: 8px; height: 8px; border-radius: 50%; flex: none; background: {{ev.col}}"></span>
+<span style="color: #C9D1DC">{{ev.text}}</span>
+</div>
+</template>
+</div>
+</div>
+
+<div style="font-size: 12px; color: #8A94A3">{{d.mapNote}}</div>
+</div>
+
+<template data-k="if" value="{{isFull}}" hint-placeholder-val="{{false}}">
+<div style="background: #12161D; border: 1px solid #232A35; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 12px; flex: 1 1 auto">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.01em">Dónde coinciden las fuentes</h2>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px">
+<template data-k="for" list="{{d.confluence}}" as="c" hint-placeholder-count="3">
+<div style="display: flex; flex-direction: column; gap: 8px; padding-top: 10px; border-top: 1px solid #232A35">
+<div style="display: flex; align-items: baseline; justify-content: space-between; gap: 8px">
+<span style="font-size: 20px; font-weight: 500; letter-spacing: -0.01em; color: {{c.color}}">{{c.k}}</span>
+<span style="font-size: 11px; color: #8A94A3">{{c.count}}</span>
+</div>
+<ul style="margin: 0; padding-left: 16px; display: flex; flex-direction: column; gap: 4px; font-size: 13px; line-height: 1.4; color: #C9D1DC">
+<template data-k="for" list="{{c.items}}" as="i" hint-placeholder-count="3"><li>{{i}}</li></template>
+</ul>
+</div>
+</template>
+</div>
+</div>
+</template>
+</div>
+
+</section>
+
+<template data-k="if" value="{{isSimple}}" hint-placeholder-val="{{true}}">
+<section aria-label="Estructuras" style="background: #12161D; border: 1px solid #232A35; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.01em">Estructuras · qué favorece el entorno · {{d.sym}}</h2>
+<span style="font-size: 11px; color: #808A99">●●● encaja bien · ●●○ encaja con reservas · ●○○ encaja poco</span>
+</div>
+<div style="overflow-x: auto">
+<div style="min-width: 680px; display: flex; flex-direction: column">
+<div style="display: grid; grid-template-columns: 170px 70px minmax(0, 1fr) minmax(0, 1fr); gap: 12px; font-size: 11px; font-weight: 500; letter-spacing: 0.08em; color: #8A94A3; padding: 0 0 6px">
+<span>ESTRUCTURA</span><span>ENCAJE</span><span>POR QUÉ</span><span>REFERENCIA</span>
+</div>
+<template data-k="for" list="{{est}}" as="es" hint-placeholder-count="5">
+<div style="display: grid; grid-template-columns: 170px 70px minmax(0, 1fr) minmax(0, 1fr); gap: 12px; align-items: center; padding: 10px 0; border-top: 1px solid #232A35; font-size: 13px">
+<span style="font-weight: 600">{{es.name}}</span>
+<span role="img" aria-label="{{es.aria}}" style="display: flex; gap: 4px">
+<span style="width: 10px; height: 10px; border-radius: 50%; background: {{es.d1}}"></span>
+<span style="width: 10px; height: 10px; border-radius: 50%; background: {{es.d2}}"></span>
+<span style="width: 10px; height: 10px; border-radius: 50%; background: {{es.d3}}"></span>
+</span>
+<span style="color: #C9D1DC">{{es.why}}</span>
+<span style="color: #E8ECF1; font-weight: 500">{{es.ref}}</span>
+</div>
+</template>
+</div>
+</div>
+<div style="font-size: 11px; color: #808A99; line-height: 1.5; border-top: 1px solid #232A35; padding-top: 8px">Reglas fijas: el iron condor encaja más con gamma positiva, volatilidad bajando y precio dentro del rango esperado. Los spreads de venta, del lado contrario a la tendencia y detrás de un muro. La compra directa, con gamma negativa y las tres temporalidades alineadas. Describe el entorno; no es recomendación de entrada. Detalle técnico, agenda completa y bitácora en la vista Completa.</div>
+</section>
+</template>
+
+<template data-k="if" value="{{isFull}}" hint-placeholder-val="{{false}}">
+<section style="display: flex; flex-wrap: wrap; gap: 12px; align-items: stretch">
+<div style="flex: 1 1 420px; min-width: 0; background: #12161D; border: 1px solid #232A35; border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.01em">Técnico multi-timeframe</h2>
+<span style="font-size: 12px; color: #8A94A3">{{d.sym}} al cierre {{d.closeTxt}}</span>
+</div>
+<div style="overflow-x: auto">
+<table style="width: 100%; border-collapse: collapse; font-size: 13px; min-width: 440px">
+<thead>
+<tr style="color: #8A94A3; font-size: 12px; text-align: right">
+<th style="text-align: left; font-weight: 500; padding: 6px 4px">TF</th>
+<th style="font-weight: 500; padding: 6px 4px">RSI</th>
+<th style="font-weight: 500; padding: 6px 4px">MACD / señal</th>
+<th style="font-weight: 500; padding: 6px 4px">EMA 20</th>
+<th style="font-weight: 500; padding: 6px 4px">EMA 50</th>
+<th style="font-weight: 500; padding: 6px 4px">ADX</th>
+</tr>
+</thead>
+<tbody>
+<template data-k="for" list="{{d.tech}}" as="t" hint-placeholder-count="3">
+<tr style="border-top: 1px solid #232A35; font-family: 'Inter', sans-serif; text-align: right">
+<td style="text-align: left; padding: 10px 4px; font-family: 'Inter', sans-serif; font-weight: 600">{{t.tf}}</td>
+<td style="padding: 10px 4px; color: {{t.rsiColor}}">{{t.rsi}}</td>
+<td style="padding: 10px 4px">{{t.macd}}</td>
+<td style="padding: 10px 4px; color: {{t.e20Color}}">{{t.e20}}</td>
+<td style="padding: 10px 4px; color: {{t.e50Color}}">{{t.e50}}</td>
+<td style="padding: 10px 4px">{{t.adx}}</td>
+</tr>
+</template>
+</tbody>
+</table>
+</div>
+<div style="font-size: 12px; color: #808A99">Azul: precio arriba de la media · naranja: precio debajo · RSI &lt; 40 naranja, &gt; 60 azul</div>
+<div style="font-size: 11px; color: #808A99; border-top: 1px solid #232A35; padding-top: 8px">Fuente: TradingView · cierre vie 30-oct</div>
+</div>
+
+<div style="flex: 1 1 300px; min-width: 0; background: #12161D; border: 1px solid #232A35; border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.01em">Agenda del lunes</h2>
+<div style="background: #0F1A2A; border: 1px solid #23395A; border-radius: 8px; padding: 10px 12px; font-size: 13px; color: #C9D1DC">Fin del horario de verano en EE.UU.: la apertura queda a las <strong style="color: #E8ECF1">8:30</strong> y el cierre a las <strong style="color: #E8ECF1">15:00</strong> hora CDMX.</div>
+<template data-k="for" list="{{events}}" as="e" hint-placeholder-count="3">
+<div style="display: grid; grid-template-columns: 52px 1fr; gap: 12px; padding: 8px 0; border-top: 1px solid #232A35">
+<span style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600">{{e.time}}</span>
+<div style="display: flex; flex-direction: column; gap: 3px">
+<span style="font-size: 14px; font-weight: 500">{{e.name}}</span>
+<span style="font-size: 12px; color: #8A94A3">{{e.detail}}</span>
+</div>
+</div>
+</template>
+<div style="font-size: 11px; color: #808A99; border-top: 1px solid #232A35; padding-top: 8px">Fuente: TradingView · calendario económico EE.UU.</div>
+</div>
+</section>
+
+<section style="background: #12161D; border: 1px solid #232A35; border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.01em">Bitácora de lecturas · {{d.sym}}</h2>
+<span style="font-size: 12px; color: #8A94A3">Cada corte queda guardado con su resultado al cierre</span>
+</div>
+<div style="overflow-x: auto">
+<table style="width: 100%; border-collapse: collapse; font-size: 13px; min-width: 860px">
+<thead>
+<tr style="color: #8A94A3; font-size: 12px; text-align: left">
+<th style="font-weight: 500; padding: 6px 8px">Sesión</th>
+<th style="font-weight: 500; padding: 6px 8px">Corte</th>
+<th style="font-weight: 500; padding: 6px 8px">Zero γ</th>
+<th style="font-weight: 500; padding: 6px 8px">Gamma + / −</th>
+<th style="font-weight: 500; padding: 6px 8px">Rango esperado</th>
+<th style="font-weight: 500; padding: 6px 8px">Cierre</th>
+<th style="font-weight: 500; padding: 6px 8px">Resultado</th>
+</tr>
+</thead>
+<tbody>
+<template data-k="for" list="{{d.log}}" as="l" hint-placeholder-count="2">
+<tr style="border-top: 1px solid #232A35; vertical-align: top">
+<td style="padding: 10px 8px; font-weight: 600">{{l.day}}</td>
+<td style="padding: 10px 8px; color: #8A94A3">{{l.cut}}</td>
+<td style="padding: 10px 8px; font-family: 'Inter', sans-serif">{{l.zg}}</td>
+<td style="padding: 10px 8px; font-family: 'Inter', sans-serif">{{l.gm}}</td>
+<td style="padding: 10px 8px; font-family: 'Inter', sans-serif">{{l.range}}</td>
+<td style="padding: 10px 8px; font-family: 'Inter', sans-serif">{{l.close}}</td>
+<td style="padding: 10px 8px; color: #C9D1DC">{{l.result}}</td>
+</tr>
+</template>
+</tbody>
+</table>
+</div>
+</section>
+</template>
+
+<footer style="font-size: 12px; color: #808A99; line-height: 1.5">Herramienta de lectura de mercado. No es recomendación de inversión. {{d.footer}}</footer>
+
+</div>
+</div>
+</template>
+<script>
+(function(){
+  const tpl = document.getElementById('tpl');
+  const mount = document.getElementById('app');
+  const lookup = (path, sc) => path.trim().split('.').reduce((o, k) => o == null ? undefined : o[k], sc);
+  const ONE = /^\{\{([^}]+)\}\}$/;
+  const val = (s, sc) => { const m = s.match(ONE); if (m) return lookup(m[1], sc);
+    return s.replace(/\{\{([^}]+)\}\}/g, (_, p) => { const v = lookup(p, sc); return v == null ? '' : String(v); }); };
+  const child = (sc, k, v) => { const o = Object.create(sc); Object.defineProperty(o, k, { value: v, enumerable: true }); return o; };
+  function render(node, sc, out) {
+    for (const n of node.childNodes) {
+      if (n.nodeType === 3) { out.appendChild(document.createTextNode(n.data.includes('{{') ? val(n.data, sc) ?? '' : n.data)); continue; }
+      if (n.nodeType !== 1) continue;
+      if (n.localName === 'template') {
+        const k = n.getAttribute('data-k');
+        if (k === 'for') { const list = val(n.getAttribute('list'), sc) || []; const as = n.getAttribute('as');
+          list.forEach(it => render(n.content, child(sc, as, it), out)); }
+        else if (k === 'if') { if (val(n.getAttribute('value'), sc)) render(n.content, sc, out); }
+        continue;
+      }
+      const el = document.createElementNS(n.namespaceURI, n.localName);
+      for (const a of n.attributes) {
+        if (a.name.startsWith('hint-')) continue;
+        if (a.name.startsWith('on')) { const f = val(a.value, sc); if (typeof f === 'function') el.addEventListener(a.name.slice(2), f); continue; }
+        const v = a.value.includes('{{') ? val(a.value, sc) : a.value;
+        el.setAttribute(a.name, v == null ? '' : String(v));
+      }
+      render(n, sc, el); out.appendChild(el);
+    }
+  }
+  class DCLogic { constructor(p) { this.props = p || {}; this.state = {}; } setState(s) { Object.assign(this.state, s); paint(); } }
+  window.DCLogic = DCLogic;
+  let comp;
+  function paint() { if (!comp || !window.LIVE_DATA) return; const f = document.createDocumentFragment();
+    try { render(tpl.content, comp.renderVals(), f); mount.replaceChildren(f); } catch (e) { console.error(e); } }
+  window.__boot = C => { comp = new C({}); paint(); };
+  let last = '';
+  async function load() {
+    try { const r = await fetch('data.json?t=' + Date.now(), { cache: 'no-store' }); const t = await r.text();
+      if (t !== last) { last = t; window.LIVE_DATA = JSON.parse(t); paint(); } } catch (e) { console.error(e); }
+  }
+  window.__load = load;
+  setInterval(load, 60000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) load(); });
+})();
+</script>
+<script>
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { tk: 'SPX', mode: 'oi', view: 'simple' };
+  }
+  renderVals() {
+    const LIVE = window.LIVE_DATA;
+    const up = '#4C9AFF', dn = '#FF7A45', neu = '#E8ECF1', cyan = '#F2B544', yel = '#C9D1DC';
+    const view = LIVE.on ? 'simple' : (this.state.view || 'simple');
+    const isSimple = view === 'simple';
+    const tk = (isSimple && this.state.tk === 'NDX') ? 'QQQ' : this.state.tk, mode = this.state.mode;
+    const spxTickers = [
+      { sym: 'SPX', feed: 'RT', px: '7,580.07', chg: '−1.82%', chgColor: dn, n: 7580.07, e20: 7580.23, e50: 7625.19, tol: 3.8, inv: false },
+      { sym: 'SPY', feed: 'RT', px: '755.72', chg: '−1.77%', chgColor: dn, n: 755.72, e20: 755.65, e50: 760.27, tol: 0.38, inv: false },
+      { sym: 'ES1!', feed: '10 min', px: '7,614.00', chg: '−1.81%', chgColor: dn, n: 7614.5, e20: 7610.33, e50: 7633.29, tol: 3.8, inv: false },
+      { sym: 'VIX', feed: 'RT', px: '19.42', chg: '+12.91%', chgColor: dn, n: 19.42, e20: 20.51, e50: 19.69, tol: 0.2, inv: true },
+      { sym: 'DXY', feed: 'RT', px: '101.96', chg: '+0.11%', chgColor: neu, n: 101.963, e20: 101.912, e50: 101.880, tol: 0.02, inv: true },
+      { sym: 'US10Y', feed: 'RT', px: '4.933%', chg: '−0.08%', chgColor: neu, n: 4.933, e20: 4.931, e50: 4.933, tol: 0.002, inv: true }
+    ];
+    const ndxTickers = [
+      { sym: 'NDX', feed: '15 min', px: '28,384.85', chg: '−3.46%', chgColor: dn, n: 28384.85, e20: 28401.05, e50: 28743.24, tol: 14.2, inv: false },
+      { sym: 'QQQ', feed: 'RT', px: '690.49', chg: '−3.47%', chgColor: dn, n: 690.49, e20: 690.96, e50: 699.57, tol: 0.35, inv: false },
+      { sym: 'NQ1!', feed: '10 min', px: '28,534.00', chg: '−3.48%', chgColor: dn, n: 28534, e20: 28511.50, e50: 28648.76, tol: 14.3, inv: false },
+      { sym: 'VXN', feed: 'RT', px: '28.50', chg: '+13.19%', chgColor: dn, n: 28.50, e20: 28.97, e50: 27.45, tol: 0.29, inv: true },
+      { sym: 'DXY', feed: 'RT', px: '101.96', chg: '+0.11%', chgColor: neu, n: 101.963, e20: 101.912, e50: 101.880, tol: 0.02, inv: true },
+      { sym: 'US10Y', feed: 'RT', px: '4.933%', chg: '−0.08%', chgColor: neu, n: 4.933, e20: 4.931, e50: 4.933, tol: 0.002, inv: true }
+    ];
+    const SEM = { g: '#26A69A', y: '#8A94A3', r: '#EF5350', off: '#262C36' };
+    const sem = t => {
+      const dx = t.n - t.e20;
+      const pos = Math.abs(dx) <= t.tol ? 0 : (dx > 0 ? 1 : -1);
+      const tr = t.e20 > t.e50 ? 1 : -1;
+      const dir = pos !== 0 && pos === tr ? pos : 0;
+      const eff = t.inv ? -dir : dir;
+      const col = eff > 0 ? 'g' : (eff < 0 ? 'r' : 'y');
+      const dirLabel = eff > 0 ? '▲ Alcista' : (eff < 0 ? '▼ Bajista' : '■ Neutral');
+      const own = dir > 0 ? 'Sube' : (dir < 0 ? 'Baja' : 'Lateral');
+      const posTxt = pos === 0 ? 'en su EMA 20' : (pos > 0 ? 'arriba de EMA 20' : 'debajo de EMA 20');
+      const why = own + ' en 15m · ' + posTxt + ', EMA 20 ' + (tr > 0 ? 'sobre' : 'bajo') + ' EMA 50';
+      const effTxt = 'lectura ' + dirLabel.slice(2).toLowerCase() + ' para el índice';
+      return Object.assign({}, t, {
+        dirLabel, why,
+        dirColor: SEM[col],
+        l1: col === 'r' ? SEM.r : SEM.off,
+        l2: col === 'y' ? SEM.y : SEM.off,
+        l3: col === 'g' ? SEM.g : SEM.off,
+        aria: t.sym + ' ' + own.toLowerCase() + ': ' + effTxt
+      });
+    };
+    const D = {
+      SPX: {
+        sym: 'SPX', spot: 7580, closeTxt: '7,580.07', tickers: spxTickers,
+        subtitle: 'SPX · vencimiento SPXW 11/02 · precio del viernes 30-oct · lectura neutral: niveles y estructura, sin señales de operar',
+        hasWarn: false, warn: '',
+        kpis: [
+          { label: 'MOVIMIENTO ESPERADO · LUN', v1: '7,514 – 7,646', c1: cyan, sep: '', v2: '', c2: cyan, bar: { pos: 50, l: '7,514', mid: 'Cierre 7,580 · 50%', r: '7,646' }, note: 'Straddle ATM 66 pts (±0.87%). En vivo: cuánto del rango ya se consumió.', src: 'Fuente: Cboe · SPXW 11/02 · delay 15 min' },
+          { label: 'RÉGIMEN GAMMA · LUN', v1: '7,593.4', c1: yel, sep: '', v2: '', c2: yel, chip: 'Gamma negativa', tone: 'neg', note: 'Precio 13 pts debajo del zero gamma: los movimientos tienden a amplificarse.', src: 'Fuente: Perfil γ Classic · next (11/02)' },
+          { label: 'MAJOR GAMMA + / − · LUN', v1: '7,650', c1: up, sep: ' / ', v2: '7,500', c2: dn, note: '+70 / −80 pts del cierre · por OI: 7,660 / 7,600', src: 'Fuente: Perfil γ Classic · next (11/02)' },
+          { label: 'MUROS DE OI · PUT ↓ / CALL ↑', v1: '7,500', c1: dn, sep: ' / ', v2: '7,700', c2: up, note: 'Puts debajo: 4,740 a −80 pts · calls arriba: 847 a +120 pts', src: 'Fuente: Cboe · SPXW 11/02 · ±150 pts del spot' }
+        ],
+        mapNote: 'Perfil γ Classic next (11/02): major +, zero γ y major − · Cboe: movimiento esperado · TradingView: precio',
+        stripNote: 'Fuente: Cboe · SPXW 11/02 · escala común a puts y calls',
+        raw: [[7720,440,324,4162,284],[7710,334,430,5494,161],[7700,847,2325,11291,2958],[7690,405,463,6741,219],[7680,253,491,4462,179],[7670,263,287,4837,182],[7660,561,287,4990,586],[7650,276,1989,10671,4883],[7640,106,709,3917,1865],[7630,61,410,4222,2427],[7620,81,1077,4216,3893],[7610,18,695,4253,2524],[7600,127,4320,11751,13403],[7590,42,1027,3651,3196],[7580,31,543,3147,4472],[7570,6,1201,2192,4197],[7560,5,373,2051,4301],[7550,39,2222,5388,8673],[7540,6,684,1233,4204],[7530,57,359,1159,6491],[7520,1,583,770,6330],[7510,8,458,158,3533],[7500,40,4740,332,18382],[7490,0,1747,94,4847],[7480,6,325,83,3129],[7470,1,286,22,2358],[7460,3,582,29,1999],[7450,8,2791,17,7049]],
+        confluence: [
+          { k: '7,650', color: up, count: '2 fuentes', items: ['Perfil γ: major gamma + (volumen)', 'Cboe: 10.7K calls negociadas en 7,650'] },
+          { k: '7,600', color: dn, count: '4 lecturas', items: ['Perfil γ: major gamma − por OI', 'Cboe: 4,320 puts de OI y la mayor concentración de GEX propio', 'Perfil γ State vie: short gamma en 7,605.6'] },
+          { k: '7,500', color: dn, count: '3 lecturas', items: ['Perfil γ: major gamma − (volumen)', 'Cboe: el mayor OI de puts, 4,740', 'Cboe: 18.4K puts negociadas'] }
+        ],
+        tech: [
+          { tf: '1H', rsi: '33.9', rsiColor: dn, macd: '−37.1 / −20.3', e20: '7,645.5', e20Color: dn, e50: '7,677.5', e50Color: dn, adx: '32.5' },
+          { tf: '15m', rsi: '44.6', rsiColor: neu, macd: '−22.7 / −28.6', e20: '7,580.2', e20Color: dn, e50: '7,625.2', e50Color: dn, adx: '48.7' },
+          { tf: '5m', rsi: '62.5', rsiColor: up, macd: '3.9 / −1.3', e20: '7,563.3', e20Color: up, e50: '7,573.3', e50Color: up, adx: '33.3' }
+        ],
+        log: [
+          { day: 'Vie 30-oct', cut: '13:59 CDMX · Perfil γ latest', zg: '7,580.9', gm: '7,580 / 7,590', range: '±1σ 7,557 – 7,605', close: '7,580.07', result: 'Cerró a 0.3 pts del major long gamma (State 7,580.4). El mínimo 7,527.6 rompió −1σ a media sesión.' },
+          { day: 'Lun 2-nov', cut: 'Pre-apertura · Perfil γ next + Cboe', zg: '7,593.4', gm: '7,650 / 7,500', range: 'EM 7,514 – 7,646', close: '—', result: 'Pendiente' }
+        ],
+        footer: 'Fuentes: TradingView (SPX, SPY, VIX en tiempo real; ES1! con 10 min de retraso), Cboe delayed quotes (15 min), Perfil γ (lectura manual).'
+      },
+      SPY: {
+        sym: 'SPY', spot: 756, closeTxt: '755.72', tickers: spxTickers,
+        subtitle: 'SPY · vencimiento 11/02 · precio del viernes 30-oct · lectura neutral: niveles y estructura, sin señales de operar',
+        hasWarn: false, warn: '',
+        kpis: [
+          { label: 'MOVIMIENTO ESPERADO · LUN', v1: '748.89 – 762.55', c1: cyan, sep: '', v2: '', c2: cyan, bar: { pos: 50, l: '748.89', mid: 'Cierre 755.72 · 50%', r: '762.55' }, note: 'Straddle ATM $6.83 (±0.90%). En vivo: cuánto del rango ya se consumió.', src: 'Fuente: Cboe · SPY 11/02 · delay 15 min' },
+          { label: 'RÉGIMEN GAMMA · LUN', v1: '755.59', c1: yel, sep: '', v2: '', c2: yel, chip: 'Gamma positiva · al límite', tone: 'edge', note: 'Precio apenas $0.13 arriba del zero gamma: cualquier baja lo pasa a gamma negativa.', src: 'Fuente: Perfil γ Classic · next (11/02)' },
+          { label: 'MAJOR GAMMA + / − · LUN', v1: '760', c1: up, sep: ' / ', v2: '750', c2: dn, note: '+4.28 / −5.72 del cierre · por OI: 767 / 760', src: 'Fuente: Perfil γ Classic · next (11/02)' },
+          { label: 'MUROS DE OI · PUT ↓ / CALL ↑', v1: '750', c1: dn, sep: ' / ', v2: '774', c2: up, note: 'Puts debajo: 6,625 a −5.72 · calls arriba: 4,839 a +18.28', src: 'Fuente: Cboe · SPY 11/02 · ±$30 del spot' }
+        ],
+        mapNote: 'Perfil γ Classic next (11/02): major +, zero γ y major − · Cboe: movimiento esperado · TradingView: precio',
+        stripNote: 'Fuente: Cboe · SPY 11/02 · escala común a puts y calls',
+        raw: [[770,3857,2288,26096,822],[769,2587,1830,14319,873],[768,1395,1388,17356,547],[767,1985,994,18611,597],[766,817,1093,13999,916],[765,656,6330,51894,7851],[764,291,1448,24496,1054],[763,796,1678,27365,1663],[762,286,772,35143,4181],[761,539,875,39395,10444],[760,467,6923,80366,33460],[759,189,2439,36249,27748],[758,150,1174,50742,29928],[757,68,3983,28606,26857],[756,51,1385,35868,25944],[755,59,3901,39085,64999],[754,20,1328,22132,35300],[753,31,989,22173,45327],[752,84,713,20631,34141],[751,10,639,9949,30849],[750,75,6625,4421,54033],[749,54,370,1518,16773],[748,12,519,777,28211],[747,28,574,500,13079],[746,14,1474,686,16066],[745,28,3337,1014,65643],[744,25,745,178,15861],[743,21,513,115,11221]],
+        confluence: [
+          { k: '760', color: up, count: '4 lecturas', items: ['Perfil γ: major gamma + (volumen) y major gamma − por OI', 'Cboe: 6,923 puts de OI y 80.4K calls negociadas (el mayor)', 'Cboe: mayor concentración de GEX propio'] },
+          { k: '755–756', color: yel, count: '3 lecturas', items: ['Perfil γ: zero gamma en 755.59, junto al cierre', 'Cboe: 65K puts negociadas en 755', 'Cboe: strike ATM del straddle (756)'] },
+          { k: '750', color: dn, count: '3 lecturas', items: ['Perfil γ: major gamma − (volumen)', 'Cboe: 6,625 puts de OI', 'Cboe: 54K puts negociadas'] }
+        ],
+        tech: [
+          { tf: '1H', rsi: '34.2', rsiColor: dn, macd: '−3.67 / −2.00', e20: '762.12', e20Color: dn, e50: '765.27', e50Color: dn, adx: '32.7' },
+          { tf: '15m', rsi: '44.8', rsiColor: neu, macd: '−2.55 / −2.98', e20: '755.65', e20Color: up, e50: '760.27', e50Color: dn, adx: '48.9' },
+          { tf: '5m', rsi: '62.7', rsiColor: up, macd: '0.16 / −0.40', e20: '753.61', e20Color: up, e50: '754.92', e50Color: up, adx: '32.7' }
+        ],
+        log: [
+          { day: 'Lun 2-nov', cut: 'Pre-apertura · Perfil γ next + Cboe', zg: '755.59', gm: '760 / 750', range: 'EM 748.89 – 762.55', close: '—', result: 'Pendiente · primer registro de SPY' }
+        ],
+        footer: 'Fuentes: TradingView (SPX, SPY, VIX en tiempo real; ES1! con 10 min de retraso), Cboe delayed quotes (15 min), Perfil γ (lectura manual).'
+      },
+      NDX: {
+        sym: 'NDX', spot: 28400, closeTxt: '28,384.85', tickers: ndxTickers,
+        subtitle: 'NDX · vencimiento NDXP 11/02 · precio del viernes 30-oct · lectura neutral: niveles y estructura, sin señales de operar',
+        hasWarn: true,
+        warn: 'El vencimiento diario de NDX (NDXP) casi no tiene open interest: el mayor strike suma 89 contratos. Los muros de OI y el GEX propio no son confiables aquí; Perfil γ y el straddle sí sirven como referencia. Además, NDX llega con 15 min de retraso en tu plan de TradingView.',
+        kpis: [
+          { label: 'MOVIMIENTO ESPERADO · LUN', v1: '27,973 – 28,796', c1: cyan, sep: '', v2: '', c2: cyan, bar: { pos: 50, l: '27,973', mid: 'Cierre 28,385 · 50%', r: '28,796' }, note: 'Straddle ATM 412 pts (±1.45%). En vivo: cuánto del rango ya se consumió.', src: 'Fuente: Cboe · NDXP 11/02 · delay 15 min' },
+          { label: 'RÉGIMEN GAMMA · LUN', v1: '28,500.5', c1: yel, sep: '', v2: '', c2: yel, chip: 'Gamma negativa', tone: 'neg', note: 'Precio 116 pts debajo del zero gamma: los movimientos tienden a amplificarse.', src: 'Fuente: Perfil γ Classic · next (11/02)' },
+          { label: 'MAJOR GAMMA + / − · LUN', v1: '28,520', c1: up, sep: ' / ', v2: '28,000', c2: dn, note: '+135 / −385 pts del cierre · por OI: 28,930 / 28,375', src: 'Fuente: Perfil γ Classic · next (11/02)' },
+          { label: 'MUROS DE OI · PUT ↓ / CALL ↑', v1: '27,750', c1: dn, sep: ' / ', v2: '29,800', c2: up, note: 'Puts debajo: 89 a −635 · calls arriba: 25 a +1,415. OI muy bajo: referencia débil.', src: 'Fuente: Cboe · NDXP 11/02 · ±1,500 pts del spot' }
+        ],
+        mapNote: 'Perfil γ Classic next (11/02): major +, zero γ y major − · Cboe: movimiento esperado · TradingView: precio con 15 min de retraso',
+        stripNote: 'Fuente: Cboe · NDXP 11/02 · strikes cada 50 · OI muy bajo: úsalo como referencia, no como muro',
+        raw: [[29100,4,8,27,5],[29050,1,5,6,7],[29000,2,17,39,3],[28950,0,26,15,4],[28900,1,5,44,3],[28850,0,4,6,5],[28800,1,4,37,0],[28750,0,3,55,1],[28700,1,15,76,12],[28650,0,9,18,24],[28600,2,12,37,28],[28550,0,9,34,13],[28500,1,23,59,49],[28450,0,4,53,36],[28400,0,22,15,75],[28350,0,1,18,24],[28300,0,1,8,27],[28250,0,18,8,96],[28200,0,11,6,78],[28150,0,0,5,53],[28100,0,11,0,38],[28050,0,2,0,15],[28000,2,26,5,187],[27950,0,0,1,171],[27900,0,11,2,72],[27850,0,1,2,78],[27800,1,7,0,68],[27750,0,89,2,72]],
+        confluence: [
+          { k: '28,500–520', color: up, count: '3 lecturas', items: ['Perfil γ: zero gamma 28,500.5 y major gamma + 28,520', 'Cboe: 28,520 fue el strike de calls más negociado (274)'] },
+          { k: '28,375', color: dn, count: '2 lecturas', items: ['Perfil γ: major gamma − por OI', 'Cboe: strike ATM del straddle'] },
+          { k: '28,000', color: dn, count: '2 lecturas', items: ['Perfil γ: major gamma − (volumen)', 'Cboe: 187 puts negociadas, el mayor volumen de puts cerca del precio'] }
+        ],
+        tech: [
+          { tf: '1H', rsi: '29.6', rsiColor: dn, macd: '−315.8 / −195.1', e20: '28,920.3', e20Color: dn, e50: '29,234.8', e50Color: dn, adx: '37.0' },
+          { tf: '15m', rsi: '42.3', rsiColor: neu, macd: '−156.1 / −202.8', e20: '28,401.0', e20Color: dn, e50: '28,743.2', e50Color: dn, adx: '51.1' },
+          { tf: '5m', rsi: '64.3', rsiColor: up, macd: '22.3 / −7.9', e20: '28,284.7', e20Color: up, e50: '28,352.9', e50Color: up, adx: '33.0' }
+        ],
+        log: [
+          { day: 'Lun 2-nov', cut: 'Pre-apertura · Perfil γ next + Cboe', zg: '28,500.5', gm: '28,520 / 28,000', range: 'EM 27,973 – 28,796', close: '—', result: 'Pendiente · primer registro de NDX' }
+        ],
+        footer: 'Fuentes: TradingView (QQQ y VXN en tiempo real; NDX con 15 min y NQ1! con 10 min de retraso), Cboe delayed quotes (15 min), Perfil γ (lectura manual).'
+      },
+      QQQ: {
+        sym: 'QQQ', spot: 690, closeTxt: '690.49', tickers: ndxTickers,
+        subtitle: 'QQQ · vencimiento 11/02 · precio del viernes 30-oct · lectura neutral: niveles y estructura, sin señales de operar',
+        hasWarn: false, warn: '',
+        kpis: [
+          { label: 'MOVIMIENTO ESPERADO · LUN', v1: '680.40 – 700.58', c1: cyan, sep: '', v2: '', c2: cyan, bar: { pos: 50, l: '680.40', mid: 'Cierre 690.49 · 50%', r: '700.58' }, note: 'Straddle ATM $10.09 (±1.46%). En vivo: cuánto del rango ya se consumió.', src: 'Fuente: Cboe · QQQ 11/02 · delay 15 min' },
+          { label: 'RÉGIMEN GAMMA · LUN', v1: '688.39', c1: yel, sep: '', v2: '', c2: yel, chip: 'Gamma positiva', tone: 'pos', note: 'Precio $2.10 arriba del zero gamma: los movimientos tienden a amortiguarse.', src: 'Fuente: Perfil γ Classic · next (11/02)' },
+          { label: 'MAJOR GAMMA + / − · LUN', v1: '700', c1: up, sep: ' / ', v2: '680', c2: dn, note: '+9.51 / −10.49 del cierre · por OI: 725 / 695', src: 'Fuente: Perfil γ Classic · next (11/02)' },
+          { label: 'MUROS DE OI · PUT ↓ / CALL ↑', v1: '685', c1: dn, sep: ' / ', v2: '720', c2: up, note: 'Puts debajo: 4,699 a −5.49 · calls arriba: 3,057 a +29.51. El 695 (8,691 puts) quedó arriba del precio.', src: 'Fuente: Cboe · QQQ 11/02 · ±$30 del spot' }
+        ],
+        mapNote: 'Perfil γ Classic next (11/02): major +, zero γ y major − · Cboe: movimiento esperado · TradingView: precio',
+        stripNote: 'Fuente: Cboe · QQQ 11/02 · los strikes sin OI son nuevos del lunes',
+        raw: [[707,393,741,7813,333],[706,84,591,5798,376],[705,519,1897,26377,1649],[704,118,400,10408,361],[703,24,5367,9692,4657],[702,55,995,10293,1266],[701,13,587,10501,655],[700,139,4933,100880,7536],[699,0,0,12030,834],[698,0,0,18503,4068],[697,0,0,20225,5605],[696,0,0,15508,7727],[695,134,8691,51194,20680],[694,0,0,15843,10791],[693,0,0,15784,9705],[692,0,0,15879,9900],[691,0,0,12650,8453],[690,33,2736,45878,36535],[689,0,0,15136,12599],[688,0,0,17790,15212],[687,0,0,18746,16147],[686,0,0,10650,15106],[685,24,4699,32036,41081],[684,0,0,3490,13261],[683,0,0,1434,9945],[682,0,0,976,10358],[681,0,0,550,11649],[680,24,3472,1334,44778]],
+        confluence: [
+          { k: '700', color: up, count: '3 lecturas', items: ['Perfil γ: major gamma + (volumen)', 'Cboe: 100.9K calls negociadas (el mayor por mucho)', 'Cboe: 4,933 puts de OI'] },
+          { k: '695', color: dn, count: '3 lecturas', items: ['Perfil γ: major gamma − por OI', 'Cboe: el mayor OI de puts, 8,691', 'Cboe: mayor concentración de GEX propio'] },
+          { k: '680', color: dn, count: '3 lecturas', items: ['Perfil γ: major gamma − (volumen)', 'Cboe: 3,472 puts de OI', 'Cboe: 44.8K puts negociadas'] }
+        ],
+        tech: [
+          { tf: '1H', rsi: '29.6', rsiColor: dn, macd: '−7.65 / −4.72', e20: '703.52', e20Color: dn, e50: '711.14', e50Color: dn, adx: '37.6' },
+          { tf: '15m', rsi: '41.8', rsiColor: neu, macd: '−4.26 / −5.20', e20: '690.96', e20Color: dn, e50: '699.57', e50Color: dn, adx: '49.7' },
+          { tf: '5m', rsi: '63.5', rsiColor: up, macd: '0.37 / −0.38', e20: '687.84', e20Color: up, e50: '689.74', e50Color: up, adx: '32.7' }
+        ],
+        log: [
+          { day: 'Lun 2-nov', cut: 'Pre-apertura · Perfil γ next + Cboe', zg: '688.39', gm: '700 / 680', range: 'EM 680.40 – 700.58', close: '—', result: 'Pendiente · primer registro de QQQ' }
+        ],
+        footer: 'Fuentes: TradingView (QQQ y VXN en tiempo real; NDX con 15 min y NQ1! con 10 min de retraso), Cboe delayed quotes (15 min), Perfil γ (lectura manual).'
+      }
+    };
+    const LC = { up: '#4C9AFF', dn: '#FF7A45', zg: '#C9D1DC', am: '#F2B544', th: '#5C6573' };
+    const CH = {
+      SPX: {
+        lo: 7480, hi: 7680, ticks: [7650, 7600, 7550, 7500], em: [7514, 7646], fmt: 0,
+        ohlc: {
+          o: [7631.07,7622.26,7631.14,7624.63,7626.15,7630.11,7635.75,7627.63,7619.34,7609.35,7606.1,7599.03,7604.73,7605.3,7618.45,7623.47,7624.32,7619.67,7621.94,7612.83,7615.78,7609.96,7608.93,7611.43,7608.47,7605.69,7601.82,7597.29,7599.33,7599.15,7603.39,7593.74,7594.82,7593.39,7596.72,7593.65,7599.77,7597.15,7600.41,7598.25,7585.92,7579.09,7581.9,7581.28,7576.1,7576.39,7577.35,7580.66,7579.3,7573.76,7574.79,7577.85,7570.32,7563.18,7563.36,7558.15,7558.06,7554.69,7547.82,7545.11,7538.23,7529.86,7541.17,7539.47,7534.39,7531.83,7544.2,7540.96,7554.89,7556.03,7547.11,7553.87,7552.04,7555.21,7557.9,7555.9,7566.5,7584.31,7581.09,7580.07],
+          h: [7633.81,7631.58,7632.58,7630.23,7630.32,7637.48,7636.13,7628.22,7619.76,7611.62,7608.66,7605.55,7607.6,7622.39,7624.86,7627.32,7625.02,7621.95,7623.77,7617.12,7617.37,7612.58,7616.75,7612.69,7608.67,7606.11,7602.16,7599.79,7600.66,7603.73,7603.39,7596.56,7595.86,7596.93,7596.99,7600.63,7599.77,7599.89,7603.61,7598.25,7585.92,7583.33,7583.36,7583.83,7579.2,7578.76,7581.17,7580.76,7579.58,7575.5,7577.82,7578.22,7570.6,7564.48,7563.36,7561.06,7560.67,7554.69,7548.03,7545.23,7539.11,7542.68,7544.14,7539.67,7534.39,7547.13,7545.64,7554.75,7558.66,7556.03,7555.59,7558.96,7556.21,7561.58,7560.79,7566.7,7588.76,7585.01,7581.09,7580.07],
+          l: [7621.76,7617.17,7623.27,7621.19,7624.48,7624.67,7624.24,7619.08,7609.24,7606.14,7597.34,7596.62,7601.59,7605.29,7614.91,7620.04,7616.43,7617.11,7612.86,7610.19,7609.48,7608.79,7607.65,7607.84,7604.19,7601.14,7596.63,7594.97,7597.8,7599.03,7593.3,7593.15,7590.19,7592.03,7591.72,7593.65,7595.09,7594.89,7598.15,7583.31,7577.73,7576.94,7579.18,7575.58,7574.19,7575.11,7576.13,7576.27,7571.84,7569.87,7573.77,7569.22,7561.1,7560.76,7556.69,7557.37,7553.23,7544.93,7539.14,7536.14,7529.84,7529.56,7536.18,7533.68,7527.56,7531.41,7537.55,7540.96,7552.82,7541.8,7546.25,7550.58,7547.23,7553,7552.04,7555.75,7566.5,7569.6,7579.8,7580.07],
+          c: [7622.93,7631.43,7625.17,7625.89,7630.32,7635.77,7627.74,7619.35,7609.72,7606.16,7598.94,7605.01,7605.15,7619.09,7623.07,7624.53,7619.69,7621.12,7612.86,7615.72,7610.25,7609,7611.33,7608.77,7605.82,7601.86,7597.51,7599.42,7599.13,7603.44,7593.98,7594.83,7593.51,7596.7,7593.7,7600.07,7597.17,7599.89,7598.22,7584.58,7579.27,7582.19,7581.39,7576.03,7576.27,7577.61,7580.52,7579.2,7573.85,7574.73,7577.82,7570.61,7563.43,7563.3,7558.08,7557.89,7554.51,7547.74,7545.34,7538.21,7529.84,7541.31,7539.26,7534.62,7531.49,7544.17,7540.97,7554.65,7555.98,7547.13,7553.69,7551.96,7555.32,7557.79,7556.05,7566.38,7584.3,7580.95,7580.07,7580.07],
+          v: [252.1,81.5,61.3,62.5,53.9,54.5,56.6,46.7,50.2,42.0,44.2,38.4,40.3,43.4,42.9,36.4,34.0,30.5,32.6,36.5,29.7,28.1,31.6,28.7,28.6,26.6,29.9,26.5,26.6,25.4,31.3,29.9,30.7,26.6,26.5,32.2,34.3,29.4,28.8,40.4,29.8,26.4,27.0,25.3,28.6,28.0,25.1,21.8,26.6,25.3,24.5,27.7,28.5,27.8,32.3,30.4,28.1,29.0,37.4,29.5,31.6,31.7,29.8,27.7,28.4,32.8,30.7,38.9,34.6,37.8,37.6,46.5,47.5,50.0,50.3,66.6,126.0,279.3,897.8,32.4]
+        },
+        levels: [
+          { v: 7650, c: LC.up, s: 'dash', t: '7,650 · Major +' },
+          { v: 7637.48, c: LC.th, s: 'thin', t: '7,637 · Máx vie' },
+          { v: 7600, c: LC.dn, s: 'dash', t: '7,600 · Major − OI' },
+          { v: 7593.39, c: LC.zg, s: 'dot', t: '7,593 · Zero γ' },
+          { v: 7580.07, c: LC.am, s: 'dot', t: '7,580 · Cierre vie' },
+          { v: 7527.56, c: LC.th, s: 'thin', t: '7,528 · Mín vie' },
+          { v: 7500, c: LC.dn, s: 'solid', t: '7,500 · Major − · muro put' }
+        ],
+        off: [{ t: '↑ Muro call 7,700', dir: 'up', c: LC.up }]
+      },
+      SPY: {
+        lo: 745, hi: 767, ticks: [765, 760, 755, 750], em: [748.89, 762.55], fmt: 0,
+        ohlc: {
+          o: [761.37,759.98,760.72,760.07,760.27,760.641,761.14,760.39,759.58,758.6,758.25,757.52,758.06,758.19,759.39,759.94,760.08,759.61,759.81,758.94,759.16,758.6,758.54,758.75,758.5,758.19,757.82,757.37,757.56,757.565,758.01,757.06,757.1,757,757.27,756.99,757.54,757.37,757.69,757.34,756.27,755.56,755.8,755.77,755.29,755.31,755.42,755.68,755.58,755.035,755.11,755.4,754.67,754,754.01,753.47,753.45,753.08,752.4,752.16,751.48,750.64,751.8,751.61,751.065,750.85,751.96,751.74,753.18,753.23,752.37,753.06,752.85,753.14,753.46,753.26,754.3,756.1],
+          h: [761.45,760.83,760.93,760.65,760.705,761.39,761.27,760.47,759.67,758.83,758.531,758.22,758.43,759.9,760.09,760.4,760.19,759.855,760.02,759.33,759.41,758.9,759.27,758.9,758.53,758.26,757.865,757.65,757.73,758.05,758.01,757.3,757.23,757.36,757.37,757.7,757.58,757.7,758.01,757.4,756.27,756,755.99,756.04,755.6,755.55,755.79,755.74,755.64,755.21,755.56,755.44,754.7,754.11,754.01,753.76,753.72,753.09,752.46,752.2,751.6,751.98,752.1,751.63,751.08,752.4,752.25,753.17,753.56,753.25,753.24,753.56,753.33,753.87,753.75,754.37,756.6,756.21],
+          l: [759.91,759.43,759.97,759.75,760.11,760.15,760.1,759.57,758.59,758.21,757.34,757.28,757.75,758.19,759.1,759.63,759.25,759.35,758.89,758.6,758.57,758.48,758.41,758.42,758.051,757.75,757.32,757.13,757.4,757.56,756.98,756.95,756.66,756.84,756.78,756.97,757.08,757.1,757.38,755.94,755.35,755.31,755.54,755.2,755.04,755.15,755.24,755.26,754.81,754.65,755,754.56,753.73,753.7,753.26,753.39,752.96,752.12,751.47,751.27,750.58,750.54,751.26,751.02,750.37,750.75,751.39,751.74,752.88,751.78,752.25,752.7,752.36,752.93,752.82,753.23,754.3,754.56],
+          c: [760.02,760.76,760.16,760.3,760.64,761.21,760.4,759.59,758.59,758.27,757.53,758.06,758.2,759.43,759.9,760.09,759.62,759.8,758.93,759.19,758.61,758.54,758.75,758.51,758.21,757.85,757.38,757.56,757.56,758.02,757.07,757.08,757,757.3,757,757.6,757.36,757.7,757.41,756.28,755.56,755.87,755.79,755.28,755.3,755.41,755.74,755.56,755.04,755.13,755.42,754.67,753.99,754,753.48,753.45,753.1,752.38,752.18,751.47,750.63,751.81,751.61,751.07,750.84,752.05,751.72,753.16,753.23,752.35,753.05,752.86,753.15,753.46,753.25,754.27,756.07,755.69],
+          v: [255,180,118,115,138,77,84,84,180,149,141,161,100,110,118,101,57,67,73,61,38,49,83,65,59,62,73,74,66,62,81,52,64,69,38,54,61,46,50,97,93,83,76,103,108,87,53,50,79,86,86,55,89,77,92,77,88,102,131,141,184,272,160,98,79,137,79,139,96,123,99,109,165,143,158,336,987,957]
+        },
+        levels: [
+          { v: 761.46, c: LC.th, s: 'thin', t: '761.46 · Máx vie' },
+          { v: 760, c: LC.up, s: 'dash', t: '760 · Major + y − OI' },
+          { v: 755.72, c: LC.am, s: 'dot', t: '755.72 · Cierre vie' },
+          { v: 755.59, c: LC.zg, s: 'dot', t: '755.59 · Zero γ' },
+          { v: 750.36, c: LC.th, s: 'thin', t: '750.36 · Mín vie' },
+          { v: 750, c: LC.dn, s: 'solid', t: '750 · Major − · muro put' }
+        ],
+        off: [{ t: '↑ Muro call 774', dir: 'up', c: LC.up }]
+      },
+      NDX: {
+        lo: 27900, hi: 28850, ticks: [28800, 28600, 28400, 28200, 28000], em: [27973.25, 28796.45], fmt: 0,
+        ohlc: {
+          o: [28604.9,28549.6,28664.0,28603.5,28608.8,28656.7,28698.6,28672.5,28616.2,28536.3,28539.2,28480.3,28529.8,28547.5,28639.8,28645.6,28659.6,28639.5,28634.8,28579.9,28614.9,28566.8,28562.9,28574.6,28553.9,28537.4,28503.7,28484.2,28509.2,28502.6,28525.0,28457.9,28467.3,28446.1,28462.4,28438.1,28469.4,28459.1,28471.9,28462.3,28385.0,28363.7,28377.4,28365.5,28330.2,28324.6,28332.1,28350.4,28343.7,28305.6,28309.4,28328.0,28293.8,28256.3,28251.9,28225.1,28230.9,28221.8,28186.4,28187.6,28163.8,28106.9,28154.8,28164.9,28132.5,28122.4,28181.1,28167.6,28232.9,28250.7,28207.9,28250.3,28250.5,28253.8,28270.1,28274.5,28352.1,28410.3,28391.3],
+          h: [28638.0,28666.1,28664.0,28638.3,28655.4,28711.8,28713.4,28675.6,28616.2,28560.9,28551.9,28534.9,28566.2,28654.7,28682.6,28680.3,28661.8,28641.7,28647.3,28621.8,28626.3,28589.5,28611.7,28585.8,28555.9,28537.5,28504.3,28513.2,28519.9,28526.9,28525.0,28475.5,28472.3,28465.3,28462.7,28475.3,28469.4,28469.8,28489.4,28468.3,28385.0,28391.2,28386.3,28379.8,28342.1,28339.7,28354.0,28353.3,28344.6,28314.0,28330.1,28329.6,28294.2,28259.7,28251.9,28245.1,28255.0,28221.8,28190.5,28187.6,28165.0,28162.6,28175.4,28166.0,28132.5,28197.6,28187.8,28233.6,28257.4,28250.7,28258.5,28288.7,28257.9,28294.4,28289.4,28332.3,28428.4,28410.3,28391.3],
+          l: [28549.1,28528.1,28586.7,28578.2,28601.3,28611.9,28647.4,28614.7,28538.3,28531.2,28472.1,28474.0,28522.5,28547.5,28618.7,28632.5,28611.5,28611.3,28579.5,28579.1,28568.8,28563.0,28554.4,28554.7,28527.8,28499.5,28471.4,28471.8,28497.8,28501.3,28457.2,28453.7,28436.9,28429.5,28431.8,28437.1,28444.4,28442.2,28453.9,28370.3,28348.7,28352.7,28363.3,28328.9,28318.6,28311.3,28321.4,28329.2,28297.6,28280.5,28302.5,28284.1,28244.3,28238.4,28214.8,28224.3,28216.0,28174.3,28150.7,28154.1,28106.1,28102.4,28141.8,28125.1,28093.2,28120.1,28147.8,28165.5,28225.0,28187.1,28203.5,28243.5,28219.0,28242.9,28251.7,28273.5,28349.7,28338.5,28384.8],
+          c: [28554.6,28664.8,28606.8,28609.1,28655.4,28699.5,28675.4,28616.0,28538.3,28539.9,28480.4,28531.2,28548.0,28642.2,28643.7,28661.3,28640.3,28632.6,28580.1,28615.8,28568.8,28563.0,28574.9,28556.4,28537.3,28503.2,28485.5,28510.7,28502.3,28525.7,28457.8,28467.1,28447.5,28462.6,28438.1,28470.4,28459.2,28469.5,28462.7,28382.5,28365.0,28382.4,28365.9,28329.6,28323.9,28332.4,28350.7,28343.4,28305.9,28309.6,28328.4,28294.2,28256.2,28250.8,28226.1,28230.7,28221.2,28186.8,28188.8,28163.7,28106.1,28155.7,28163.9,28133.3,28121.6,28182.6,28167.7,28232.4,28250.3,28207.1,28249.9,28249.8,28255.1,28272.4,28274.0,28329.0,28414.4,28385.7,28384.8],
+          v: [65.4,54.9,39.5,39.7,31.3,33.7,31.6,25.6,28.1,23.4,26.4,22.8,23.2,24.3,24.8,27.0,20.1,16.5,17.4,20.5,16.4,14.4,17.7,14.8,13.8,15.0,15.8,13.6,14.3,12.6,17.9,13.9,17.7,14.0,12.6,16.5,17.2,13.9,15.3,20.9,16.6,13.4,12.9,13.7,14.5,13.8,12.8,10.8,13.8,12.7,12.6,16.1,17.5,14.9,17.0,15.1,14.5,14.8,17.9,15.3,16.8,17.0,14.6,14.0,14.5,16.1,14.6,21.5,19.8,18.2,18.3,22.5,23.7,22.9,22.3,27.7,60.4,246.7,285.1]
+        },
+        levels: [
+          { v: 28713.45, c: LC.th, s: 'thin', t: '28,713 · Máx vie' },
+          { v: 28520, c: LC.up, s: 'dash', t: '28,520 · Major +' },
+          { v: 28500.51, c: LC.zg, s: 'dot', t: '28,501 · Zero γ' },
+          { v: 28384.85, c: LC.am, s: 'dot', t: '28,385 · Cierre vie' },
+          { v: 28375, c: LC.dn, s: 'dash', t: '28,375 · Major − OI' },
+          { v: 28093.25, c: LC.th, s: 'thin', t: '28,093 · Mín vie' },
+          { v: 28000, c: LC.dn, s: 'solid', t: '28,000 · Major −' }
+        ],
+        off: [{ t: '↑ Muro call 29,800 · OI débil', dir: 'up', c: LC.up }, { t: '↓ Muro put 27,750 · OI débil', dir: 'down', c: LC.dn }]
+      },
+      QQQ: {
+        lo: 677, hi: 703, ticks: [700, 695, 690, 685, 680], em: [680.40, 700.58], fmt: 0,
+        ohlc: {
+          o: [697.21,694.63,697.28,695.89,696.11,697.21,698.18,697.51,696.17,694.25,694.3,692.91,694.1,694.54,696.71,696.96,697.23,696.73,696.62,695.32,696.16,694.91,694.87,695.15,694.72,694.24,693.45,692.98,693.55,693.42,693.96,692.39,692.54,692.04,692.44,691.85,692.6,692.37,692.71,692.45,690.55,689.98,690.44,690.09,689.23,689.11,689.28,689.78,689.58,688.63,688.7,689.09,688.33,687.46,687.34,686.72,686.84,686.57,685.75,685.77,685.14,683.83,684.95,685.27,684.35,684.24,685.59,685.29,686.87,687.31,686.22,687.32,687.29,687.36,687.82,687.88,689.18,691.27],
+          h: [697.4,697.37,697.29,696.9,697.24,698.63,698.59,697.72,696.2,694.87,694.67,694.19,695.03,697.2,697.94,697.84,697.36,696.84,697,696.35,696.47,695.54,696.1,695.49,694.76,694.33,693.51,693.71,693.9,694.05,693.96,692.78,692.7,692.54,692.46,692.81,692.6,692.71,693.17,692.57,690.56,690.77,690.66,690.46,689.58,689.53,689.85,689.85,689.61,688.87,689.29,689.23,688.37,687.54,687.34,687.19,687.46,686.6,685.89,685.8,685.28,685.25,685.54,685.3,684.39,686.08,685.85,686.9,687.51,687.34,687.52,688.23,687.51,688.41,688.27,689.3,691.69,691.285],
+          l: [694.46,694.03,695.48,695.23,695.82,696.06,696.889,696.15,694.23,694.1,692.7,692.67,693.89,694.54,696.17,696.52,696.04,696.01,695.25,695.28,694.92,694.88,694.62,694.71,694.01,693.36,692.63,692.65,693.28,693.36,692.24,692.2,691.79,691.55,691.67,691.84,692,691.93,692.22,690.18,689.67,689.78,690.04,689.19,688.97,688.78,689.03,689.195,688.38,688.03,688.54,688.12,687.09,687.03,686.45,686.67,686.42,685.43,684.83,684.93,683.77,683.66,684.61,684.24,683.45,684.12,684.72,685.2,686.59,685.63,686.09,687.12,686.5,687.04,687.241,687.84,689.18,689.36],
+          c: [694.65,697.28,695.9,696.12,697.17,698.17,697.52,696.18,694.23,694.32,692.9,694.07,694.5,696.72,696.93,697.24,696.75,696.65,695.3,696.18,694.92,694.89,695.15,694.73,694.28,693.46,692.99,693.6,693.42,693.97,692.39,692.53,692.04,692.47,691.85,692.63,692.35,692.71,692.47,690.59,690.01,690.47,690.12,689.22,689.1,689.28,689.79,689.58,688.63,688.72,689.11,688.34,687.43,687.33,686.73,686.82,686.59,685.75,685.79,685.13,683.81,685.02,685.26,684.42,684.25,685.65,685.29,686.87,687.32,686.22,687.28,687.29,687.38,687.84,687.84,689.175,691.28,690.49],
+          v: [339,210,161,176,141,146,124,77,163,161,189,204,140,160,196,93,131,128,107,71,74,65,106,61,96,82,146,167,82,77,91,63,79,70,58,104,41,103,104,228,172,91,102,193,156,239,219,144,154,137,105,189,312,106,126,74,82,125,209,156,163,260,194,227,286,268,178,161,172,160,105,102,220,159,180,248,469,471]
+        },
+        levels: [
+          { v: 700, c: LC.up, s: 'dash', t: '700 · Major +' },
+          { v: 698.63, c: LC.th, s: 'thin', t: '698.63 · Máx vie' },
+          { v: 695, c: LC.dn, s: 'dash', t: '695 · Major − OI' },
+          { v: 690.49, c: LC.am, s: 'dot', t: '690.49 · Cierre vie' },
+          { v: 688.39, c: LC.zg, s: 'dot', t: '688.39 · Zero γ' },
+          { v: 685, c: LC.dn, s: 'solid', t: '685 · Muro put' },
+          { v: 683.45, c: LC.th, s: 'thin', t: '683.45 · Mín vie' },
+          { v: 680, c: LC.dn, s: 'solid', t: '680 · Major −' }
+        ],
+        off: [{ t: '↑ Muro call 720', dir: 'up', c: LC.up }]
+      }
+    };
+    const PRE = {
+      SPX: [7732,7729.11,7727.72,7727.78,7728.47,7726.94,7724.71,7723.19,7718.52,7715.59,7716.47,7719.07,7718.27,7719.47,7722.26,7720.35,7721.54,7720.13,7722.57,7721.4,7724.79,7724,7721.54,7721.45,7720.59,7719.28,7720.54,7720.95,7719.92,7716.98,7717.01,7715.87,7717.9,7718.71,7718.46,7719.89,7721.87,7726.41,7727.12,7727.63,7727.54,7726.98,7732.22,7732.68,7732.81,7733.13,7726.47,7722.98,7722.6,7722.6,7739.93,7732.81,7731.2,7723.5,7729,7731.36,7735.07,7730.68,7735.4,7736.1,7733.65,7733.5,7734.64,7728.96,7730.82,7727.84,7727.38,7727.28,7732.04,7732.48,7735.25,7736.59,7738.29,7735.24,7737.53,7740.01,7739.79,7737.29,7736.14,7738.61,7741.14,7739.65,7739.99,7736.34,7734.52,7737.39,7738.97,7735.83,7738.23,7739.5,7749.61,7743.43,7744.01,7737.98,7737.64,7735.3,7735.87,7734.13,7735.69,7735.39,7734.69,7736.11,7738.76,7738.02,7734.1,7730.11,7729.36,7726.26,7726.56,7733.82,7738.54,7740.72,7746.69,7747.63,7742.63,7738.27,7745.03,7736.92,7733.31,7735.93,7730,7733.79,7736.34,7733.86,7738.49,7744.49,7744.23,7748.03,7743.98,7743.98,7699.48,7700.89,7712.89,7702.7,7704.96,7713.33,7722.41,7712.92,7710.96,7718.6,7718.29,7718.28,7725.2,7724.88,7721.19,7702.8,7709.08,7711.21,7718.06,7721.06,7725.14,7721.16,7724.57,7726.26,7729.59,7726.16,7723.79,7716.96,7718.23,7726.26,7722.09,7720.41,7715.8,7716.86,7714.79,7718.29,7712.78,7714.85,7717.19,7712.57,7714.62,7719.74,7716.15,7713.44,7706.13,7709.5,7706.79,7709.65,7707.36,7706.29,7703.29,7698.78,7692.26,7697.5,7694.93,7699.32,7701.95,7698.28,7700.33,7698.4,7694.06,7694.25,7695.45,7697.01,7700.5,7700.02,7702.51,7701.27,7698.28,7702.15,7704.03,7706.88,7711.28,7707.27,7705.51,7709.18,7715.8,7721.02,7720.39,7720.39],
+      SPY: [770.33,770.14,769.94,769.801,769.35,769.06,769.11,769.4,769.33,769.42,769.68,769.5,769.63,769.5,769.745,769.595,769.909,769.85,769.599,769.57,769.48,769.37,769.49,769.51,769.45,769.16,769.14,769.01,769.24,769.31,769.29,769.44,769.72,770.09,770.15,770.19,770.21,770.16,770.72,770.74,770.72,770.84,770.1,769.66,771.34,770.75,770.49,769.719,770.36,770.57,770.95,770.495,770.93,771.1,770.82,770.76,770.9,770.34,770.54,770.24,770.23,770.23,770.7,770.71,771,771.11,771.32,770.97,771.23,771.48,771.39,771.16,771.01,771.36,771.57,771.42,771.46,771.14,770.95,771.25,771.38,771.08,771.28,771.45,772.69,771.84,771.85,771.31,771.25,770.96,771.045,770.88,771.08,771.03,770.95,771.13,771.4,771.29,770.849,770.51,770.41,770.12,770.18,770.895,771.35,771.74,772.12,772.22,771.73,771.23,772.09,771.14,770.76,771.04,770.52,770.82,771.04,770.87,771.29,771.9,771.98,772.34,767.71,767.76,768.76,767.69,768.01,768.71,769.78,768.82,768.61,769.42,769.32,769.36,770.04,770.03,769.66,767.87,768.42,768.67,769.29,769.66,770.05,769.66,769.97,770.18,770.489,770.08,769.89,769.2,769.36,770.19,769.79,769.58,769.13,769.2,769.04,769.305,768.81,769.03,769.23,768.8,768.99,769.52,769.14,768.85,768.16,768.51,768.22,768.52,768.26,768.17,767.87,767.42,766.79,767.31,767.02,767.48,767.73,767.385,767.57,767.39,766.97,766.97,767.06,767.26,767.56,767.53,767.77,767.65,767.39,767.74,767.91,768.21,768.64,768.26,768.09,768.48,769.14,769.53],
+      QQQ: [722.13,722.03,721.66,721.49,720.88,720.42,720.77,721.25,720.87,720.99,721.16,720.51,720.89,720.66,721.15,721.02,721.25,721.13,720.629,720.64,720.68,720.45,720.7,720.67,720.67,720.34,720.47,720.4,720.62,720.8,720.85,721.09,721.26,721.77,721.71,721.7,721.62,721.5,722.29,722.3,722.41,722.27,721.16,721.2,724.209,723.499,722.93,720.74,721.79,722.5,722.81,721.5,721.87,722.149,721.77,722.14,721.95,721.46,721.719,721.42,721.09,721.19,722.04,722.07,722.36,722.15,722.18,721.86,722.08,722.56,722.52,722,721.9,722.24,722.61,722.2,722.21,722.06,721.83,722.17,722.43,722.08,722.41,722.28,723.88,723.14,723.26,722.5,722.33,721.91,721.96,721.51,721.94,722.01,722.06,722.11,722.68,722.59,722.04,721.49,721.52,721.36,721.47,722.55,723.22,723.91,724.61,724.28,723.99,723.65,724.55,723.36,723.12,723.35,722.34,722.91,723.3,723.12,723.84,724.65,724.87,725.55,712.31,712.55,715.1,712.78,713.06,715,716.66,715.29,715.01,716.19,715.99,715.59,716.81,716.53,715.75,713.22,713.93,714.49,715.71,716.13,716.58,716.13,716.64,716.62,717.61,717.05,717.02,716.07,716.51,717.57,716.52,716.14,715.35,715.5,715.03,715.48,714.85,715.15,715.37,714.86,715.29,716.01,715.33,714.73,713.76,714.28,714.25,714.54,714.38,714.23,714.09,713.49,712.46,712.95,712.69,713.24,713.47,713.241,713.49,713.13,712.33,712.19,712.42,712.55,713.14,712.96,713.31,712.89,712.61,712.97,713.371,713.64,714.34,713.46,713.22,713.92,714.72,715.29],
+      NDX: [29664,29637,29619,29633,29652,29638,29645,29651,29626,29639,29630,29650,29645,29655,29649,29630,29630,29631,29621,29631,29632,29630,29617,29620,29619,29625,29634,29636,29648,29652,29676,29674,29673,29669,29665,29698,29696,29702,29694,29648,29652,29651,29779,29747,29726,29632,29678,29705,29720,29665,29679,29687,29675,29690,29683,29660,29673,29660,29646,29649,29683,29685,29700,29693,29692,29682,29689,29707,29705,29686,29680,29696,29709,29694,29696,29687,29678,29691,29702,29688,29701,29697,29751,29733,29737,29705,29698,29682,29685,29664,29679,29684,29685,29687,29709,29708,29690,29665,29661,29657,29660,29705,29734,29754,29793,29783,29768,29754,29784,29743,29728,29732,29696,29720,29737,29727,29759,29790,29796,29822,29813,29278,29291,29409,29307,29316,29393,29462,29406,29396,29442,29435,29421,29467,29454,29424,29319,29350,29373,29420,29441,29458,29438,29461,29462,29502,29478,29478,29441,29454,29497,29458,29443,29407,29415,29394,29416,29388,29401,29410,29389,29405,29439,29405,29386,29345,29363,29364,29374,29369,29362,29355,29330,29292,29308,29298,29321,29329,29320,29329,29314,29283,29279,29287,29293,29318,29310,29328,29305,29293,29309,29326,29337,29365,29330,29320,29345,29383,29407,29403]
+    };
+    const GX = {
+      SPX: {
+        c: [7675,7650,7680,7650,7650,7650,7650,7650,7650,7650,7650,7650,7650,7650,7650,7650,7650,7650,7650,7650,7650,7650,7650,7650,7650,7650,7650,7650,7650,7650,7650,7650,7650,7650,7650,7650,7630,7650,7630,7630,7630,7630,7630,7630,7630,7630,7630,7630,7625,7625,7630,7620,7610,7605,7600,7600,7600,7610,7600,7605,7615,7600,7595,7600,7600,7600,7605,7595,7600,7610,7600,7600,7600,7590,7595,7595,7600,7580,7580,7580],
+        p: [7595,7600,7600,7600,7600,7600,7600,7600,7600,7600,7600,7600,7600,7600,7600,7600,7600,7600,7600,7600,7600,7600,7600,7600,7600,7600,7600,7600,7600,7600,7600,7600,7600,7600,7580,7600,7590,7590,7590,7580,7580,7580,7580,7580,7580,7580,7580,7580,7580,7580,7580,7570,7550,7550,7550,7550,7550,7550,7550,7550,7550,7550,7550,7550,7550,7550,7550,7550,7550,7550,7550,7550,7550,7550,7550,7550,7580,7590,7590,7590],
+        z: [7641,7629,7630,7629,7629,7628,7629,7629,7629,7628,7628,7628,7627,7626,7626,7626,7626,7626,7625,7625,7625,7625,7625,7625,7624,7625,7624,7624,7623,7623,7622,7622,7621,7621,7621,7620,7620,7620,7618,7617,7614,7615,7613,7612,7611,7611,7612,7611,7608,7608,7609,7607,7603,7602,7598,7596,7597,7597,7596,7598,7596,7593,7593,7596,7587,7593,7596,7592,7596,7605,7588,7584,7593,7583,7585,7593,7598,7581,7581,7581]
+      },
+      SPY: {
+        c: [763,762,762,761.1,761.1,761.05,761.05,761.05,761.02,761.02,761.02,761.02,761,761,761,761,761,761,761,761,761,761,761,761,761,761,761,761,761,761,761,761,761,761,761,761,761,761,761,761,761,761,761,761,761,761,761,761,761,761,759,761,760.05,761,761,761,761,760,761,761,761,761,760,760.98,761,761,760,760,761,760,761,760,760,758,759,761,760.98,756,756,756],
+        p: [760,760,760,759.98,759.98,759.98,759.98,759.95,758.02,758,757.95,757.02,757,757,757.02,757.83,757.98,757.98,757.95,757.98,757.17,757.9,757.95,757.59,757.17,757.02,757,757,757,757,757,757,757,757,757,757,757,757,757,757,755,755,755,755,755,755,755,755,755,755,755,755,755,755,755,755,755,750,750,750,750,750,750,750,750,750,750,750,750,750,750,750,750,750,750,755,755,755,755,755],
+        z: [761.3,760.8,760.7,760.6,760.7,760.5,760.6,760.6,760.5,760.5,760.4,760.3,760.2,760.1,759.9,759.9,759.9,759.8,759.8,759.8,759.8,759.8,759.8,759.8,759.8,759.8,759.7,759.7,759.7,759.6,759.6,759.5,759.5,759.4,759.4,759.3,759.3,759.4,759.2,759.2,759.2,759.2,759.2,759.2,759.2,759.1,759.1,759.1,759,759,758.3,759,758.8,759,758.9,759.1,759,759,758.4,758.1,758.8,758.8,759.1,759.2,759.2,759.2,757.7,758.2,758.8,757.8,759,759.2,757.8,757.8,758.5,758.7,758,755.5,755.5,755.5]
+      },
+      QQQ: {
+        c: [700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,695,700,700,700,700,700,695,700,700,700,700,695.2,692,697,695,695,694,695,693,692,700,691,688,688,693,693,691,691],
+        p: [690,690,690,690,690,690,690,690,690,690,690,690,690,690,690,690,690,690,690,690,690,690,690,690,690,690,690,690,690,690,690,690,690,690,690,690,690,690,690,690,690,690,690,690,690,690,690,690,690,690,690,690,690,690,690,690,685,685,685,685,685,685,685,685,685,685,685,685,685,685,685,685,685,685,685,690,690,690,690,690],
+        z: [696.1,695.5,695.8,695.7,695.9,695.8,695.9,696,696.1,695.8,695.8,695.6,695.2,695.1,695.2,695.4,695.5,695.4,695.5,695.6,695.6,695.5,695.5,695.6,695.6,695.5,695.4,695.4,695.3,695.3,695.2,695.2,695.2,695.1,695,694.9,694.9,695.1,694.8,694.6,694.6,694.5,694.5,694.4,694.3,694.3,694.3,694.2,694.2,694.1,694.1,694.2,693.8,694.2,693.7,694.1,694.2,692.8,692.9,694.3,693.9,693.3,694.3,692.9,691.2,694.5,691,693.6,693.2,693.7,692.4,691.2,697,687.8,687.8,689.1,691,691.8,690.8,690.8]
+      },
+      NDX: {
+        c: [28900,29150,29150,29000,29000,28900,28900,28900,28900,28900,28700,28800,28800,28800,28800,28800,28800,28800,28800,28800,28800,28800,28800,28800,28800,28800,28800,28800,28800,28800,28800,28800,28800,28800,28800,28700,28800,28800,28800,28800,28800,28800,28800,28800,28800,28800,28800,28800,28800,28800,28550,28800,28800,28500,28500,28500,28450,28450,28450,28450,28450,28450,28450,28450,28450,28450,28450,28450,28450,28450,28450,28450,28450,28450,28450,28450,28450,28410,28410,28410],
+        p: [28500,28500,28500,28500,28500,28500,28500,28500,28500,28500,28400,28400,28400,28400,28500,28500,28500,28500,28500,28500,28500,28500,28500,28500,28500,28500,28500,28500,28500,28500,28400,28400,28400,28400,28400,28400,28400,28400,28400,28300,28300,28300,28300,28300,28300,28300,28300,28300,28300,28300,28300,28300,28300,28300,28300,28300,28300,28150,28200,28100,28000,28100,28100,28100,28100,28100,28100,28150,28150,28150,28150,28200,28100,28100,28200,28250,28350,28380,28380,28380],
+        z: [28670,28740,29040,28640,28678,28603,28656,28790,28790,28641,28490,28592,28684,28642,28683,28662,28679,28679,28572,28645,28680,28637,28642,28642,28638,28572,28649,28643,28643,28642,28642,28637,28573,28680,28555,28539,28559,28533,28538,28560,28531,28542,28605,28545,28598,28573,28463,28464,28679,28640,28487,28690,28464,28472,28475,28475,28442,28392,28442,28410,28443,28371,28362,28370,28373,28386,28320,28417,28421,28361,28439,28317,28421,28327,28425,28328,28375,28407,28407,28407]
+      }
+    };
+    const LS = {
+      SPX: [
+        { v: 7650, c: LC.up, s: 'dash', t: 'Techo 7,650 · 2 fuentes' },
+        { v: 7600, c: '#E8ECF1', s: 'solid', t: 'PIN 7,600 · 4 fuentes' },
+        { v: 7593.39, c: LC.zg, s: 'dot', t: 'Zero γ 7,593' },
+        { v: 7580.07, c: LC.am, s: 'dot', t: 'Cierre vie 7,580' },
+        { v: 7500, c: LC.dn, s: 'solid', t: 'Piso 7,500 · 3 fuentes' }
+      ],
+      SPY: [
+        { v: 760, c: LC.up, s: 'dash', t: 'Techo 760 · 4 fuentes' },
+        { v: 755.72, c: LC.am, s: 'dot', t: 'Cierre vie 755.72' },
+        { v: 755.59, c: '#E8ECF1', s: 'solid', t: 'PIN / zero γ 755.6 · 3 fuentes' },
+        { v: 750, c: LC.dn, s: 'solid', t: 'Piso 750 · 3 fuentes' }
+      ],
+      QQQ: [
+        { v: 700, c: LC.up, s: 'dash', t: 'Techo 700 · 3 fuentes' },
+        { v: 695, c: '#E8ECF1', s: 'solid', t: 'Zona OI 695 · 3 fuentes' },
+        { v: 690.49, c: LC.am, s: 'dot', t: 'Cierre vie 690.49' },
+        { v: 688.39, c: LC.zg, s: 'dot', t: 'Zero γ 688.4' },
+        { v: 680, c: LC.dn, s: 'solid', t: 'Piso 680 · 3 fuentes' }
+      ]
+    };
+    const buildChart = (cfg, sym, simple) => {
+      const o = cfg.ohlc.o, h = cfg.ohlc.h, l = cfg.ohlc.l, c = cfg.ohlc.c, v = cfg.ohlc.v;
+      const n = c.length, lo = cfg.lo, hi = cfg.hi;
+      const Y = p => (hi - p) / (hi - lo) * 400;
+      const P = p => (hi - p) / (hi - lo) * 100;
+      const W = cfg.live ? 1000 / 78 : 800 / n, bw = Math.max(W * 0.62, 1);
+      const xp = i => cfg.live ? (i + 0.5) / 78 * 100 : (i + 0.5) / n * 80;
+      let wu = '', wd = '', bu = '', bd = '', vw = '', pv = 0, vv = 0;
+      for (let i = 0; i < n; i++) {
+        const x = (i + 0.5) * W;
+        const wick = 'M' + x.toFixed(1) + ' ' + Y(h[i]).toFixed(1) + 'V' + Y(l[i]).toFixed(1);
+        const t = Y(Math.max(o[i], c[i]));
+        let b = Y(Math.min(o[i], c[i]));
+        if (b - t < 0.8) b = t + 0.8;
+        const x0 = (x - bw / 2).toFixed(1), x1 = (x + bw / 2).toFixed(1);
+        const body = 'M' + x0 + ' ' + t.toFixed(1) + 'H' + x1 + 'V' + b.toFixed(1) + 'H' + x0 + 'Z';
+        if (c[i] >= o[i]) { wu += wick; bu += body; } else { wd += wick; bd += body; }
+      }
+      const preA = cfg.pre || PRE[sym] || [];
+      const all = preA.concat(c), off = preA.length;
+      const ema = N => { const k = 2 / (N + 1); let e = all[0]; const out = []; for (let j = 0; j < all.length; j++) { e = j ? all[j] * k + e * (1 - k) : all[0]; if (j >= off) out.push(e); } return out; };
+      const sma = N => { const out = []; let s = 0; for (let j = 0; j < all.length; j++) { s += all[j]; if (j >= N) s -= all[j - N]; if (j >= off) out.push(j >= N - 1 ? s / N : null); } return out; };
+      const curve = arr => { let s = '', pen = false; arr.forEach((val, i) => { if (val == null) { pen = false; return; } s += (pen ? 'L' : 'M') + ((i + 0.5) * W).toFixed(1) + ' ' + Y(val).toFixed(1); pen = true; }); return s || 'M0 0'; };
+      const step = arr => { if (!arr || !arr.length) return 'M0 0'; const a = arr.slice(0, n); let s = 'M0 ' + Y(a[0]).toFixed(1); a.forEach((val, i) => { s += 'H' + ((i + 1) * W).toFixed(1); if (i + 1 < a.length) s += 'V' + Y(a[i + 1]).toFixed(1); }); return s; };
+      const gx = GX[sym] || {};
+      const s200 = sma(200);
+      const sLast = s200[s200.length - 1];
+      const offList = (cfg.off || []).slice();
+      if (sLast != null && sLast > hi) offList.push({ t: '↑ SMA 200 · ' + sLast.toLocaleString('en-US', { maximumFractionDigits: sLast > 1000 ? 0 : 2 }), dir: 'up', c: '#A78BFA' });
+      if (sLast != null && sLast < lo) offList.push({ t: '↓ SMA 200 · ' + sLast.toLocaleString('en-US', { maximumFractionDigits: sLast > 1000 ? 0 : 2 }), dir: 'down', c: '#A78BFA' });
+      const stackN = { up: 0, down: 0 };
+      const ZT = { SPX: 10, SPY: 1, QQQ: 1, NDX: 50 };
+      const MT = { SPX: 10, SPY: 1, QQQ: 1, NDX: 50 };
+      const fv = x => x.toLocaleString('en-US', { maximumFractionDigits: x > 1000 ? 0 : 2 });
+      const tAt = i => { const m = (cfg.start || 450) + 5 * (i + 1); return Math.floor(m / 60) + ':' + String(m % 60).padStart(2, '0'); };
+      const events = [];
+      if (cfg.live && cfg.events) cfg.events.forEach(e => events.push(e));
+      if (!cfg.live && gx.c && gx.p && gx.z) {
+        let prev = null;
+        for (let i = 2; i < n; i += 3) {
+          const cur = { c: gx.c[i], p: gx.p[i], z: gx.z[i], px: c[i] };
+          if (prev) {
+            const mt = MT[sym] || 10;
+            cur.cRef = prev.cRef; cur.pRef = prev.pRef;
+            if (Math.abs(cur.c - prev.cRef) >= mt) { events.push({ i, v: cur.c, col: LC.up, text: 'Gamma + ' + (cur.c < prev.cRef ? 'baja ' : 'sube ') + fv(prev.cRef) + ' → ' + fv(cur.c) }); cur.cRef = cur.c; }
+            if (Math.abs(cur.p - prev.pRef) >= mt) { events.push({ i, v: cur.p, col: LC.dn, text: 'Gamma − ' + (cur.p < prev.pRef ? 'baja ' : 'sube ') + fv(prev.pRef) + ' → ' + fv(cur.p) }); cur.pRef = cur.p; }
+            const crossed = (prev.px - prev.zRef) * (cur.px - cur.z) < 0;
+            if (crossed) events.push({ i, v: cur.z, col: LC.zg, text: 'Precio cruza zero γ (' + fv(cur.z) + ') → gamma ' + (cur.px > cur.z ? 'positiva' : 'negativa') });
+            else if (Math.abs(cur.z - prev.zRef) >= (ZT[sym] || 5)) events.push({ i, v: cur.z, col: LC.zg, text: 'Zero γ ' + (cur.z < prev.zRef ? 'baja ' : 'sube ') + fv(prev.zRef) + ' → ' + fv(cur.z) });
+            cur.zRef = (crossed || Math.abs(cur.z - prev.zRef) >= (ZT[sym] || 5)) ? cur.z : prev.zRef;
+          } else { cur.zRef = cur.z; cur.cRef = cur.c; cur.pRef = cur.p; }
+          prev = cur;
+        }
+      }
+      const evMarks = events.map(e => ({
+        title: tAt(e.i) + ' · ' + e.text,
+        dot: 'position: absolute; width: 9px; height: 9px; border-radius: 50%; background: ' + e.col + '; border: 2px solid #0B0E13; left: calc(' + xp(e.i).toFixed(2) + '% - 6px); top: calc(' + Math.max(1, Math.min(99, P(e.v))).toFixed(2) + '% - 6px)'
+      }));
+      const evList = events.slice().reverse().map(e => ({ time: tAt(e.i), col: e.col, text: e.text }));
+      const evSummary = events.length + (cfg.live ? ' cambios hoy' : ' cambios en la sesión del viernes') + ' · filtro: majors ≥ ' + fv(MT[sym] || 10) + ' y zero γ ≥ ' + fv(ZT[sym] || 10) + ', o cruce del precio';
+      const lineFor = s => s === 'solid' ? '2px solid ' : (s === 'dash' ? '1.5px dashed ' : (s === 'dot' ? '2px dotted ' : '1px solid '));
+      const sorted = ((simple && LS[sym]) || cfg.levels).map(lv => Object.assign({}, lv, { p: P(lv.v) })).sort((a, b) => a.p - b.p);
+      let last = -99;
+      const levels = sorted.map(lv => {
+        const lp = Math.max(lv.p, last + 4.6);
+        last = lp;
+        return {
+          t: lv.t,
+          lineStyle: 'position: absolute; left: ' + (!simple && lv.c !== LC.am && lv.s !== 'thin' ? '80%' : '0') + '; right: 0; top: ' + lv.p.toFixed(2) + '%; border-top: ' + lineFor(lv.s) + lv.c,
+          profLine: 'position: absolute; left: 0; right: 0; top: ' + lv.p.toFixed(2) + '%; opacity: 0.5; border-top: ' + lineFor(lv.s) + lv.c,
+          labelStyle: 'position: absolute; left: 8px; top: calc(' + Math.min(lp, 97).toFixed(2) + '% - 8px); font-size: 11px; font-weight: 500; white-space: nowrap; color: ' + (lv.s === 'thin' ? '#8A94A3' : lv.c)
+        };
+      });
+      const fmtN = x => x.toLocaleString('en-US');
+      const ticks = cfg.ticks.map(tv => ({
+        label: fmtN(tv),
+        style: 'position: absolute; right: 8px; top: calc(' + P(tv).toFixed(2) + '% - 7px); font-size: 11px; color: #808A99',
+        grid: 'position: absolute; left: 0; right: 0; top: ' + P(tv).toFixed(2) + '%; border-top: 1px solid #1A1F27'
+      }));
+      const emTop = P(cfg.em[1]), emBot = P(cfg.em[0]);
+      const st0 = cfg.start || 450;
+      const xt = [0, 18, 36, 54, 72].map(ix => ({ label: Math.floor((st0 + 5 * ix) / 60) + ':' + String((st0 + 5 * ix) % 60).padStart(2, '0'), style: 'position: absolute; top: 2px; left: ' + xp(ix).toFixed(2) + '%; transform: translateX(-50%); white-space: nowrap' }));
+      if (!cfg.live) xt.push({ label: '8:30 lun', style: 'position: absolute; top: 2px; left: 80%; transform: translateX(-50%); white-space: nowrap; color: #C9D1DC' });
+      return {
+        wickUp: wu || 'M0 0', wickDn: wd || 'M0 0', bodyUp: bu || 'M0 0', bodyDn: bd || 'M0 0',
+        ema9: curve(ema(9)), ema21: curve(ema(21)), sma200: curve(s200),
+        events: evMarks, evList: evList, evSummary: evSummary,
+        emStyle: 'position: absolute; left: 0; right: 0; top: ' + emTop.toFixed(2) + '%; height: ' + (emBot - emTop).toFixed(2) + '%; background: rgba(242, 181, 68, 0.06); border-top: 1px dashed rgba(242, 181, 68, 0.45); border-bottom: 1px dashed rgba(242, 181, 68, 0.45)',
+        zoneStyle: cfg.live ? 'display: none' : 'position: absolute; top: 0; bottom: 0; left: 80%; right: 0; background: #0F1318; border-left: 1px dashed #3A4352',
+        zoneLabelStyle: cfg.live ? 'display: none' : 'position: absolute; top: 6px; left: calc(80% + 8px); font-size: 11px; color: #8A94A3; white-space: nowrap',
+        zoneLabel: 'Lun 2-nov · abre 8:30',
+        emLabel: 'position: absolute; left: ' + (cfg.live ? '8px' : 'calc(80% + 8px)') + '; top: calc(' + emTop.toFixed(2) + '% + 4px); font-size: 11px; color: #F2B544; white-space: nowrap',
+        levels, ticks, xt,
+        off: offList.map(of => ({ t: of.t, style: 'position: absolute; left: 8px; ' + (of.dir === 'up' ? 'top: ' : 'bottom: ') + (6 + 26 * (stackN[of.dir]++)) + 'px; font-size: 11px; font-weight: 500; white-space: nowrap; padding: 2px 6px; border-radius: 4px; background: #12161D; border: 1px solid #232A35; color: ' + of.c })),
+        aria: 'Velas de 5 minutos de ' + sym + ' del viernes con VWAP, movimiento esperado y niveles de gamma y open interest para el lunes'
+      };
+    };
+    const d = D[tk];
+    const G = '#26A69A', R = '#EF5350', N = '#8A94A3';
+    const SIMPLE = {
+      SPX: {
+        macro: 'Sin alertas macro: DXY +0.11% · US10Y −0.08% · ES1! 7,614 en pre-market',
+        lect: [
+          { label: 'RÉGIMEN GAMMA', value: 'Gamma negativa', color: '#FF7A45', note: '13 pts bajo el zero γ (7,593): los movimientos tienden a amplificarse.' },
+          { label: 'TENDENCIA', value: 'Lateral · 1H bajista', color: '#C9D1DC', dots: [{ tf: '5m', col: N }, { tf: '15m', col: N }, { tf: '1H', col: R }], note: 'Precio vs EMA 20 y EMA 20 vs EMA 50 en cada temporalidad.' },
+          { label: 'VOLATILIDAD', value: 'VIX 19.42', color: R, note: '+12.9% el viernes; en 15m ya perdió su EMA 20.' },
+          { label: 'RANGO ESPERADO · LUN', value: '7,514 – 7,646', color: '#F2B544', bar: { pos: 50, l: '−66 pts', r: '+66 pts' }, note: '±0.87% · precio al centro antes de abrir.' }
+        ],
+        est: [
+          ['Iron condor', 2, 'Muros claros, pero gamma negativa', 'Cortos fuera de 7,500 / 7,650'],
+          ['Bear call spread', 2, 'Techo cercano en zero γ y PIN', 'Corto arriba de 7,600'],
+          ['Bull put spread', 1, 'Precio debajo del zero γ', 'Corto abajo de 7,500'],
+          ['Compra de puts', 2, 'Gamma negativa y 1H bajista', 'Objetivo 7,550 → 7,500'],
+          ['Compra de calls', 1, 'Sin tendencia alcista', 'Solo arriba de 7,600']
+        ]
+      },
+      SPY: {
+        macro: 'Sin alertas macro: DXY +0.11% · US10Y −0.08% · ES1! 7,614 en pre-market',
+        lect: [
+          { label: 'RÉGIMEN GAMMA', value: 'Gamma en el límite', color: '#C9D1DC', note: 'Precio $0.13 arriba del zero γ (755.59): cualquier baja lo voltea a negativa.' },
+          { label: 'TENDENCIA', value: 'Lateral · 1H bajista', color: '#C9D1DC', dots: [{ tf: '5m', col: N }, { tf: '15m', col: N }, { tf: '1H', col: R }], note: 'Precio vs EMA 20 y EMA 20 vs EMA 50 en cada temporalidad.' },
+          { label: 'VOLATILIDAD', value: 'VIX 19.42', color: R, note: '+12.9% el viernes; en 15m ya perdió su EMA 20.' },
+          { label: 'RANGO ESPERADO · LUN', value: '748.89 – 762.55', color: '#F2B544', bar: { pos: 50, l: '−$6.83', r: '+$6.83' }, note: '±0.90% · precio al centro antes de abrir.' }
+        ],
+        est: [
+          ['Iron condor', 2, 'Rango 750–760 marcado; gamma al límite', 'Cortos fuera de 750 / 760'],
+          ['Bear call spread', 2, '760 concentra 4 fuentes', 'Corto arriba de 760'],
+          ['Bull put spread', 2, 'Piso 750 con 3 fuentes', 'Corto abajo de 750'],
+          ['Compra de puts', 2, 'Si pierde 755.6 entra gamma negativa', 'Objetivo 750'],
+          ['Compra de calls', 1, 'Sin tendencia alcista', 'Solo arriba de 760']
+        ]
+      },
+      QQQ: {
+        macro: 'Sin alertas macro: DXY +0.11% · US10Y −0.08% · NQ1! 28,534 en pre-market',
+        lect: [
+          { label: 'RÉGIMEN GAMMA', value: 'Gamma positiva', color: '#4C9AFF', note: '$2.10 arriba del zero γ (688.39): los movimientos tienden a amortiguarse.' },
+          { label: 'TENDENCIA', value: 'Bajista en 15m y 1H', color: R, dots: [{ tf: '5m', col: N }, { tf: '15m', col: R }, { tf: '1H', col: R }], note: 'Precio vs EMA 20 y EMA 20 vs EMA 50 en cada temporalidad.' },
+          { label: 'VOLATILIDAD', value: 'VXN 28.50', color: R, note: '+13.2% el viernes; en 15m debajo de su EMA 20.' },
+          { label: 'RANGO ESPERADO · LUN', value: '680.40 – 700.58', color: '#F2B544', bar: { pos: 50, l: '−$10.09', r: '+$10.09' }, note: '±1.46% · precio al centro antes de abrir.' }
+        ],
+        est: [
+          ['Iron condor', 2, 'Gamma positiva; rango 680–700', 'Cortos fuera de 680 / 700'],
+          ['Bear call spread', 3, 'Tendencia bajista y techo 695–700', 'Corto arriba de 695'],
+          ['Bull put spread', 1, 'Tendencia en contra', 'Corto abajo de 680'],
+          ['Compra de puts', 2, 'Bajista, pero la gamma amortigua', 'Objetivo 685 → 680'],
+          ['Compra de calls', 1, 'Sin tendencia alcista', 'Solo arriba de 695']
+        ]
+      }
+    };
+    const toMin = s => { const p = String(s).split(':'); return +p[0] * 60 + +p[1]; };
+    const L = LIVE.on && LIVE[tk] && LIVE[tk].reads.length ? LIVE[tk] : null;
+    const lr = L ? L.reads[L.reads.length - 1] : null;
+    let liveCfg = null, liveRows = null;
+    if (lr) {
+      const fv2 = x => x.toLocaleString('en-US', { maximumFractionDigits: x > 1000 ? 0 : 2 });
+      const tol = { SPX: 3, SPY: 0.3, QQQ: 0.3 }[tk] || 3;
+      const mt = { SPX: 10, SPY: 1, QQQ: 1 }[tk] || 10;
+      const dz = lr.px - lr.zg;
+      const gpos = dz > tol, gneg = dz < -tol;
+      const tf = lr.tf || [0, 0, 0];
+      const nb = tf.filter(x => x > 0).length, ns = tf.filter(x => x < 0).length;
+      const bullA = nb >= 2, bearA = ns >= 2;
+      const vt = (lr.vix && lr.vix.tr) || 0;
+      const trendTxt = nb === 3 ? 'Alcista en 5m, 15m y 1H' : ns === 3 ? 'Bajista en 5m, 15m y 1H' : (tf[1] > 0 && tf[2] > 0) ? 'Alcista en 15m y 1H' : (tf[1] < 0 && tf[2] < 0) ? 'Bajista en 15m y 1H' : tf[2] > 0 ? 'Lateral · 1H alcista' : tf[2] < 0 ? 'Lateral · 1H bajista' : 'Lateral';
+      const emPos = Math.max(0, Math.min(100, (lr.px - lr.em[0]) / (lr.em[1] - lr.em[0]) * 100));
+      const half = (lr.em[1] - lr.em[0]) / 2;
+      const used = Math.round(Math.abs(lr.px - (lr.em[0] + half)) / half * 100);
+      const volName = tk === 'QQQ' ? 'VXN' : 'VIX';
+      const res = (lr.pin && lr.pin[0] > lr.px) ? lr.pin[0] : lr.techo[0];
+      const sup = (lr.pin && lr.pin[0] < lr.px) ? lr.pin[0] : lr.piso[0];
+      const gTxt = gpos ? 'Gamma positiva' : gneg ? 'Gamma negativa' : 'Gamma en el límite';
+      const vTxt = vt > 0 ? volName + ' subiendo' : vt < 0 ? volName + ' bajando' : volName + ' lateral';
+      const cl = s => Math.max(1, Math.min(3, s));
+      SIMPLE[tk] = {
+        macro: lr.macro || '',
+        lect: [
+          { label: 'RÉGIMEN GAMMA', value: gTxt, color: gpos ? '#4C9AFF' : gneg ? '#FF7A45' : '#C9D1DC', note: fv2(Math.abs(dz)) + (dz >= 0 ? ' arriba' : ' abajo') + ' del zero γ (' + fv2(lr.zg) + '): ' + (gpos ? 'los movimientos tienden a amortiguarse.' : gneg ? 'los movimientos tienden a amplificarse.' : 'cualquier movimiento cambia el régimen.') },
+          { label: 'TENDENCIA', value: trendTxt, color: bullA ? G : bearA ? R : '#C9D1DC', dots: ['5m', '15m', '1H'].map((t, i) => ({ tf: t, col: tf[i] > 0 ? G : tf[i] < 0 ? R : N })), note: 'Precio vs EMA 20 y EMA 20 vs EMA 50 en cada temporalidad.' },
+          { label: 'VOLATILIDAD', value: volName + ' ' + lr.vix.px, color: vt > 0 ? R : vt < 0 ? G : '#C9D1DC', note: lr.vix.chg + ' hoy; en 15m ' + (vt > 0 ? 'subiendo.' : vt < 0 ? 'bajando.' : 'lateral.') },
+          { label: 'RANGO ESPERADO · HOY', value: fv2(lr.em[0]) + ' – ' + fv2(lr.em[1]), color: '#F2B544', bar: { pos: emPos, l: fv2(lr.em[0]), r: fv2(lr.em[1]) }, note: 'Precio ' + fv2(lr.px) + ' · a ' + used + '% del centro hacia el borde · straddle ' + fv2(lr.strad) + '.' }
+        ],
+        est: [
+          ['Iron condor', cl(1 + (gpos ? 1 : 0) + (!bullA && !bearA ? 1 : 0) + (vt < 0 ? 1 : 0) - (gneg && vt > 0 ? 1 : 0)), gTxt + ' · ' + (bullA || bearA ? 'con tendencia' : 'sin tendencia') + ' · ' + vTxt, 'Cortos fuera de ' + fv2(lr.piso[0]) + ' / ' + fv2(lr.techo[0])],
+          ['Bear call spread', cl(1 + (bearA ? 1 : 0) + (lr.px < lr.zg ? 1 : 0) + (vt > 0 ? 1 : 0)), (bearA ? 'Tendencia bajista' : 'Sin tendencia bajista') + ' · ' + (lr.px < lr.zg ? 'bajo zero γ' : 'sobre zero γ'), 'Corto arriba de ' + fv2(res)],
+          ['Bull put spread', cl(1 + (bullA ? 1 : 0) + (lr.px > lr.zg ? 1 : 0) + (vt < 0 ? 1 : 0)), (bullA ? 'Tendencia alcista' : 'Sin tendencia alcista') + ' · ' + (lr.px > lr.zg ? 'sobre zero γ' : 'bajo zero γ'), 'Corto abajo de ' + fv2(sup)],
+          ['Compra de puts', cl(1 + (gneg ? 1 : 0) + (bearA ? 1 : 0) + (vt > 0 ? 1 : 0)), gTxt + ' · ' + (bearA ? 'bajista' : 'sin tendencia bajista'), 'Objetivo ' + fv2(lr.piso[0])],
+          ['Compra de calls', cl(1 + (gneg ? 1 : 0) + (bullA ? 1 : 0) + (vt < 0 ? 1 : 0)), gTxt + ' · ' + (bullA ? 'alcista' : 'sin tendencia alcista'), 'Objetivo ' + fv2(lr.techo[0])]
+        ]
+      };
+      const prevClose = { SPX: 7580.07, SPY: 755.72, QQQ: 690.49 }[tk];
+      LS[tk] = [
+        { v: lr.techo[0], c: LC.up, s: 'dash', t: 'Techo ' + fv2(lr.techo[0]) + ' · ' + lr.techo[1] + ' fuentes' },
+        lr.pin ? { v: lr.pin[0], c: '#E8ECF1', s: 'solid', t: 'PIN ' + fv2(lr.pin[0]) + ' · ' + lr.pin[1] + ' fuentes' } : null,
+        { v: lr.zg, c: LC.zg, s: 'dot', t: 'Zero γ ' + fv2(lr.zg) },
+        { v: prevClose, c: LC.am, s: 'dot', t: 'Cierre ant. ' + fv2(prevClose) },
+        { v: lr.piso[0], c: LC.dn, s: 'solid', t: 'Piso ' + fv2(lr.piso[0]) + ' · ' + lr.piso[1] + ' fuentes' }
+      ].filter(Boolean);
+      const hasBars = L.c.length > 0;
+      const vals = [lr.em[0], lr.em[1], lr.techo[0], lr.piso[0], lr.zg, lr.px, prevClose].concat(hasBars ? L.h.concat(L.l) : []);
+      let lo = Math.min(...vals), hi = Math.max(...vals);
+      const pad = (hi - lo) * 0.08; lo -= pad; hi += pad;
+      const rawStep = (hi - lo) / 4;
+      const st = [0.5, 1, 2, 2.5, 5, 10, 25, 50, 100, 250].find(s => s >= rawStep) || 250;
+      const ticks = [];
+      for (let t = Math.ceil(lo / st) * st; t <= hi; t += st) ticks.push(+t.toFixed(2));
+      const evs = [];
+      for (let j = 1; j < L.reads.length; j++) {
+        const a = L.reads[j - 1], b = L.reads[j];
+        const i = Math.max(0, Math.round((toMin(b.t) - 510) / 5) - 1);
+        if (Math.abs(b.mp - a.mp) >= mt) evs.push({ i, v: b.mp, col: LC.up, text: 'Gamma + ' + (b.mp < a.mp ? 'baja ' : 'sube ') + fv2(a.mp) + ' → ' + fv2(b.mp) });
+        if (Math.abs(b.mn - a.mn) >= mt) evs.push({ i, v: b.mn, col: LC.dn, text: 'Gamma − ' + (b.mn < a.mn ? 'baja ' : 'sube ') + fv2(a.mn) + ' → ' + fv2(b.mn) });
+        if ((a.px - a.zg) * (b.px - b.zg) < 0) evs.push({ i, v: b.zg, col: LC.zg, text: 'Precio cruza zero γ (' + fv2(b.zg) + ') → gamma ' + (b.px > b.zg ? 'positiva' : 'negativa') });
+      }
+      const offs = [];
+      if (lr.cw && lr.cw[0] > hi) offs.push({ t: '↑ Muro call ' + fv2(lr.cw[0]), dir: 'up', c: LC.up });
+      if (lr.pw && lr.pw[0] < lo) offs.push({ t: '↓ Muro put ' + fv2(lr.pw[0]), dir: 'down', c: LC.dn });
+      liveCfg = { live: true, start: 510, lo, hi, ticks, em: lr.em, ohlc: { o: L.o, h: L.h, l: L.l, c: L.c, v: L.v }, pre: (PRE[tk] || []).concat(CH[tk].ohlc.c), off: offs, events: evs };
+      if (L.rows.length) liveRows = L.rows[L.rows.length - 1];
+      d.subtitle = d.sym + ' · vencimiento 0DTE de hoy · lecturas cada 15 min · lectura neutral, no es recomendación';
+    }
+    const AG = [[540, '9:00 · ISM manufactura'], [615, '10:15 · Goolsbee (Fed)']];
+    const nowMin = lr ? toMin(lr.t) : 0;
+    const nextAg = AG.find(a => a[0] > nowMin);
+    const nextEv = nextAg ? nextAg[1] : 'Sin más eventos hoy';
+    const status = lr
+      ? { txt: (nowMin < 510 ? 'Pre-market' : (nowMin >= 900 ? 'Cierre' : 'En vivo')) + ' · lectura ' + lr.t + ' CDMX', chip: 'display: flex; align-items: center; gap: 8px; border: 1px solid #1F4D47; background: #0F2421; color: #5FD4C4; padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 500', dot: 'width: 7px; height: 7px; border-radius: 50%; background: #26A69A' }
+      : { txt: 'Mercado cerrado · cierre vie 30-oct', chip: 'display: flex; align-items: center; gap: 8px; border: 1px solid #6B2E2C; background: #24151A; color: #F08A84; padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 500', dot: 'width: 7px; height: 7px; border-radius: 50%; background: #F08A84' };
+    const nxt = lr ? nowMin + 15 : 0;
+    const readTxt = lr ? (nowMin >= 900 ? 'Sesión cerrada' : 'Próxima lectura ~' + Math.floor(nxt / 60) + ':' + String(nxt % 60).padStart(2, '0')) : 'Lectura manual · dom 1-nov CDMX';
+    const GEXS = {
+      SPX: {7450:-240,7460:-57,7470:-31,7480:-40,7490:-241,7500:-729,7510:-78,7520:-110,7530:-62,7540:-152,7550:-514,7560:-93,7570:-316,7580:-138,7590:-272,7600:-1156,7610:-183,7620:-263,7630:-88,7640:-142,7650:-374,7660:54,7670:-4,7680:-36,7690:-7,7700:-161,7710:-9,7720:9},
+      SPY: {743:-4.2,744:-7.0,745:-36.1,746:-18.0,747:-7.5,748:-7.8,749:-5.4,750:-123.5,751:-12.9,752:-14.0,753:-22.8,754:-32.9,755:-100.7,756:-36.1,757:-107.6,758:-28.2,759:-61.0,760:-169.4,761:-8.5,762:-11.4,763:-19.0,764:-22.4,765:-97.8,766:-4.0,767:13.5,768:0.5,769:8.1,770:13.9},
+      QQQ: {680:-33.8,685:-59.7,690:-40.1,695:-128.5,700:-60.3,701:-6.8,702:-10.4,703:-54.6,704:-2.6,705:-11.7,706:-3.9,707:-2.4},
+      NDX: {27750:-28.68,27800:-1.93,27850:-0.32,27900:-4.43,28000:-11.6,28050:-0.97,28100:-5.32,28200:-6.2,28250:-10.15,28300:-0.64,28350:-0.64,28400:-14.18,28450:-2.58,28500:-14.18,28550:-5.8,28600:-5.64,28650:-5.08,28700:-7.9,28750:-1.45,28800:-1.45,28850:-1.61,28900:-1.61,28950:-8.38,29000:-4.83,29050:-1.29,29100:-0.97}
+    };
+    const cfgP = liveCfg || CH[tk];
+    const Pp = k => (cfgP.hi - k) / (cfgP.hi - cfgP.lo) * 100;
+    const pvals = (liveRows || d.raw).filter(r => r[0] >= cfgP.lo && r[0] <= cfgP.hi).map(r => {
+      if (mode === 'gex') { const g = (liveRows ? r[5] : (GEXS[tk] || {})[r[0]]) || 0; return { k: r[0], L: g < 0 ? -g : 0, R: g > 0 ? g : 0 }; }
+      return mode === 'oi' ? { k: r[0], L: r[2], R: r[1] } : { k: r[0], L: r[4], R: r[3] };
+    });
+    let pmx = 1e-9;
+    pvals.forEach(v => { pmx = Math.max(pmx, v.L, v.R); });
+    const topL = pvals.slice().sort((a, b) => b.L - a.L).slice(0, 3).filter(v => v.L > 0).map(v => v.k);
+    const topR = pvals.slice().sort((a, b) => b.R - a.R).slice(0, 3).filter(v => v.R > 0).map(v => v.k);
+    const fmtP = x => mode === 'gex' ? (x >= 1000 ? (x / 1000).toFixed(2) + 'B' : (x >= 10 ? x.toFixed(0) : x.toFixed(1)) + 'M') : (x >= 1000 ? (x / 1000).toFixed(1) + 'K' : String(x));
+    const kfmt = k => k.toLocaleString('en-US');
+    const prof = pvals.map(v => ({
+      row: 'position: absolute; left: 0; right: 0; top: calc(' + Pp(v.k).toFixed(2) + '% - 5px); height: 10px; display: grid; grid-template-columns: 1fr 1fr',
+      lBar: 'height: 10px; flex: none; border-radius: 2px 0 0 2px; background: #FF7A45; opacity: ' + (topL.includes(v.k) ? 1 : 0.5) + '; width: ' + (v.L > 0 ? Math.max(v.L / pmx * 72, 1.5) : 0).toFixed(1) + '%',
+      rBar: 'height: 10px; flex: none; border-radius: 0 2px 2px 0; background: #4C9AFF; opacity: ' + (topR.includes(v.k) ? 1 : 0.5) + '; width: ' + (v.R > 0 ? Math.max(v.R / pmx * 72, 1.5) : 0).toFixed(1) + '%',
+      lL: topL.includes(v.k) ? kfmt(v.k) + ' · ' + fmtP(v.L) : '',
+      rL: topR.includes(v.k) ? fmtP(v.R) + ' · ' + kfmt(v.k) : ''
+    }));
+    const ci = mode === 'oi' ? 1 : 3;
+    const pi = mode === 'oi' ? 2 : 4;
+    let max = 1;
+    d.raw.forEach(r => { max = Math.max(max, r[ci], r[pi]); });
+    const fmt = n => n >= 1000 ? (n / 1000).toFixed(1) + 'K' : String(n);
+    const rows = d.raw.map(r => {
+      const spot = r[0] === d.spot;
+      const cw = Math.max(r[ci] / max * 100, r[ci] > 0 ? 1 : 0);
+      const pw = Math.max(r[pi] / max * 100, r[pi] > 0 ? 1 : 0);
+      return {
+        k: r[0].toLocaleString('en-US'),
+        cLabel: fmt(r[ci]),
+        pLabel: fmt(r[pi]),
+        cBar: 'height: 11px; border-radius: 0 3px 3px 0; background: #4C9AFF; width: ' + (cw * 0.8).toFixed(1) + '%',
+        pBar: 'height: 11px; border-radius: 3px 0 0 3px; background: #FF7A45; width: ' + (pw * 0.8).toFixed(1) + '%',
+        rowStyle: 'display: grid; grid-template-columns: 1fr 72px 1fr; align-items: center; height: 17px; border-radius: 4px;' + (spot ? ' background: #2A2414; outline: 1px solid #F2B544;' : ''),
+        kStyle: "text-align: center; font-family: 'Inter', sans-serif; font-size: 12px;" + (spot ? ' color: #F2B544; font-weight: 600' : ' color: #C9D1DC')
+      };
+    });
+    const on = 'background: #232A35; color: #E8ECF1; border: 0; padding: 8px 12px; font: 500 12px Inter, sans-serif; cursor: pointer; min-height: 32px';
+    const off = 'background: transparent; color: #8A94A3; border: 0; padding: 8px 12px; font: 500 12px Inter, sans-serif; cursor: pointer; min-height: 32px';
+    const tabOn = 'display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 84px; min-height: 44px; padding: 5px 12px; border-radius: 7px; border: 1px solid #F2B544; background: #2A2414; color: #E8ECF1; cursor: pointer; text-align: left';
+    const tabOff = 'display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 84px; min-height: 44px; padding: 5px 12px; border-radius: 7px; border: 1px solid transparent; background: transparent; color: #C9D1DC; cursor: pointer; text-align: left';
+    const tabs = [['SPX', 'S&P 500 índice'], ['SPY', 'S&P 500 ETF'], ['NDX', 'Nasdaq 100 índice'], ['QQQ', 'Nasdaq 100 ETF']].filter(([s]) => !(isSimple && s === 'NDX')).map(([s, sub]) => ({
+      sym: s, sub,
+      pressed: tk === s ? 'true' : 'false',
+      style: tk === s ? tabOn : tabOff,
+      subColor: tk === s ? '#F7D58C' : '#808A99',
+      pick: () => this.setState({ tk: s })
+    }));
+    return {
+      d, rows, tabs,
+      tape: d.tickers.map(sem),
+      prof, profL: mode === 'gex' ? '◀ GEX −' : '◀ Puts', profR: mode === 'gex' ? 'GEX + ▶' : 'Calls ▶',
+      showGex: () => this.setState({ mode: 'gex' }),
+      gexPressed: mode === 'gex' ? 'true' : 'false',
+      gexBtnStyle: mode === 'gex' ? on : off,
+      chart: buildChart(liveCfg || CH[tk], tk, isSimple),
+      status, nextEv, readTxt, showToggle: !LIVE.on,
+      isSimple, isFull: !isSimple,
+      showSimple: () => this.setState({ view: 'simple' }),
+      showFull: () => this.setState({ view: 'full' }),
+      simplePressed: isSimple ? 'true' : 'false',
+      fullPressed: isSimple ? 'false' : 'true',
+      simpleBtnStyle: isSimple ? on : off,
+      fullBtnStyle: isSimple ? off : on,
+      simple: SIMPLE[tk] || SIMPLE.SPX,
+      lect: (SIMPLE[tk] || SIMPLE.SPX).lect.map(x => Object.assign({ hasDots: !!x.dots, hasBar: !!x.bar, barMark: x.bar ? 'position: absolute; top: -4px; left: calc(' + x.bar.pos + '% - 1.5px); width: 3px; height: 14px; border-radius: 2px; background: #F2B544' : '', barL: x.bar ? x.bar.l : '', barR: x.bar ? x.bar.r : '' }, x)),
+      est: (SIMPLE[tk] || SIMPLE.SPX).est.map(e => ({ name: e[0], why: e[2], ref: e[3], aria: e[1] + ' de 3', d1: e[1] >= 1 ? '#E8ECF1' : '#2A313C', d2: e[1] >= 2 ? '#E8ECF1' : '#2A313C', d3: e[1] >= 3 ? '#E8ECF1' : '#2A313C' })),
+      kpis: d.kpis.map(k => {
+        const tones = { neg: ['#FF7A45', '#2A1A12', '#5C3320'], pos: ['#4C9AFF', '#111D2E', '#24406B'], edge: ['#C9D1DC', '#1A1F27', '#3A4352'] };
+        const t = tones[k.tone] || tones.edge;
+        return Object.assign({}, k, {
+          hasChip: !!k.chip,
+          chipStyle: 'align-self: flex-start; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; color: ' + t[0] + '; background: ' + t[1] + '; border: 1px solid ' + t[2],
+          hasBar: !!k.bar,
+          barMark: k.bar ? 'position: absolute; top: -4px; left: calc(' + k.bar.pos + '% - 1.5px); width: 3px; height: 14px; border-radius: 2px; background: #F2B544' : '',
+          barL: k.bar ? k.bar.l : '', barMid: k.bar ? k.bar.mid : '', barR: k.bar ? k.bar.r : ''
+        });
+      }),
+      isSPX: tk === 'SPX', isSPY: tk === 'SPY', isNDX: tk === 'NDX', isQQQ: tk === 'QQQ',
+      showOI: () => this.setState({ mode: 'oi' }),
+      showVol: () => this.setState({ mode: 'vol' }),
+      oiPressed: mode === 'oi' ? 'true' : 'false',
+      volPressed: mode === 'vol' ? 'true' : 'false',
+      oiBtnStyle: mode === 'oi' ? on : off,
+      volBtnStyle: mode === 'vol' ? on : off,
+      events: [
+        { time: '9:00', name: 'ISM Manufacturing PMI (oct)', detail: 'Importancia alta · estimado 54.6 · anterior 54.5' },
+        { time: '9:00', name: 'ISM Manufacturing Employment (oct)', detail: 'Importancia media · anterior 52.7' },
+        { time: '10:15', name: 'Discurso de Goolsbee (Fed)', detail: 'Importancia media' }
+      ]
+    };
+  }
+}
+
+window.__boot(Component);
+window.__load();
+</script>
+</body>
+</html>
