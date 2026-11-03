@@ -544,12 +544,19 @@ def build_ticker(c, tk, q, manual, today, state, vixinfo, macro):
     state[hk] = hist
     mt = 10 if tk == "SPX" else 1
     pinmov = None
-    if abs(hist[-1][2] - hist[0][2]) >= mt:
-        pinmov = f"major − {hist[0][2]:g} → {hist[-1][2]:g} en {mins - hist[0][0]} min"
-    elif abs(hist[-1][1] - hist[0][1]) >= mt:
-        pinmov = f"major + {hist[0][1]:g} → {hist[-1][1]:g} en {mins - hist[0][0]} min"
-    elif hist[0][3] != vsign:
-        pinmov = "la gamma por volumen cambió de signo"
+    # con filtro: compara la mediana de los primeros 5 min contra la de los últimos 5 (el major oscila entre strikes vecinos minuto a minuto)
+    if len(hist) >= 10:
+        med = lambda xs: sorted(xs)[len(xs) // 2]
+        a0, a1 = hist[:5], hist[-5:]
+        mn0, mn1 = med([h[2] for h in a0]), med([h[2] for h in a1])
+        mp0, mp1 = med([h[1] for h in a0]), med([h[1] for h in a1])
+        s0, s1 = med([h[3] for h in a0]), med([h[3] for h in a1])
+        if abs(mn1 - mn0) >= mt:
+            pinmov = f"major − {mn0:g} → {mn1:g} en {mins - hist[0][0]} min"
+        elif abs(mp1 - mp0) >= mt:
+            pinmov = f"major + {mp0:g} → {mp1:g} en {mins - hist[0][0]} min"
+        elif s0 != s1:
+            pinmov = "la gamma por volumen cambió de signo"
 
     # bordes por delta (0DTE)
     d15 = [strike_delta(m, px, T0, 0.15, "p"), strike_delta(m, px, T0, 0.15, "c")]
