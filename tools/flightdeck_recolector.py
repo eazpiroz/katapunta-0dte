@@ -5,7 +5,8 @@ Katapunta Flight Deck · recolector automático (Schwab Market Data → 0dte.kat
 Cada minuto, de la hora en que lo abras hasta las 15:01 CDMX:
   - lee de Schwab cotizaciones, velas de 5 min y la cadena 0DTE de SPX, SPY y QQQ
   - calcula straddle, rango restante, GEX por strike, muros, techo/piso/PIN e iron condor de referencia
-  - toma los majors y el zero γ de la última lectura manual (data.json), si existe
+  - toma los majors y el zero γ de la última lectura manual (data.json), si existe; si no, los estima
+  - estima GEX/DEX/charm/vanna (0DTE y próximos vencimientos), zero γ por malla de precios, bordes delta 10/15
   - publica auto.json en la rama "live" del repo; el tablero lo lee solo
 
 Llaves: usa las de Schwab que ya guardó schwab_prueba.py y te pide UNA vez un token de GitHub.
@@ -212,9 +213,9 @@ def trend2(closes, px, vw):
     if len(xs) < 21:
         return 0
     e9, s20 = emas(xs, 9)[-1], sum(xs[-20:]) / 20
-    if px > e9 > s20 and px > vw:
+    if px > e9 > s20 and (vw is None or px > vw):
         return 1
-    if px < e9 < s20 and px < vw:
+    if px < e9 < s20 and (vw is None or px < vw):
         return -1
     return 0
 
@@ -253,28 +254,142 @@ def history(c, sym):
     return j.get("candles", [])
 
 
-def chain(c, sym, S, today, tk):
-    j = sget(c, "/chains", symbol=sym, contractType="ALL", strikeCount=80 if tk == "SPX" else 40,
-             includeUnderlyingQuote="true", fromDate=today, toDate=today)
-    m = {}
-    for side, key in (("c", "callExpDateMap"), ("p", "putExpDateMap")):
-        for exp, ks in j.get(key, {}).items():
-            for k, lst in ks.items():
-                o = lst[0]
-                if tk == "SPX" and not str(o.get("symbol", "")).startswith("SPXW"):
-                    continue
-                m.setdefault(float(k), {})[side] = o
-    return m
-
-
 def mid(o):
     if not o:
         return float("nan")
     return (o.get("bid", 0) + o.get("ask", 0)) / 2
 
 
+# ---------------------------------------------------------------- griegas y exposición (según bibliografía GEX del socio)
+# Convención de inventario (SUPUESTO, no posición observada): el dealer queda largo calls (q = +OI) y corto puts (q = −OI).
+# GEX_1% = Σ q·100·γ·S²·0.01 · Black-Scholes con r = q = 0, IV de cada contrato, T en años de calendario hasta las 15:00 CDMX.
+NDAYS = 10                                           # vencimientos que se leen además del 0DTE (días de calendario)
+
+
+def npdf(x):
+    return math.exp(-0.5 * x * x) / math.sqrt(2 * math.pi)
+
+
+def ncdf(x):
+    return 0.5 * (1 + math.erf(x / math.sqrt(2)))
+
+
+def bs(S, K, T, iv, side):
+    """delta, gamma, vanna (∂Δ/∂σ), charm (∂Δ/∂t por año) — r = q = 0."""
+    if T <= 0 or iv <= 0 or S <= 0 or K <= 0:
+        return 0.0, 0.0, 0.0, 0.0
+    sq = iv * math.sqrt(T)
+    d1 = (math.log(S / K) + 0.5 * iv * iv * T) / sq
+    d2 = d1 - sq
+    pd = npdf(d1)
+    delta = ncdf(d1) - (0 if side == "c" else 1)
+    return delta, pd / (S * sq), -pd * d2 / iv, pd * d2 / (2 * T)
+
+
+def chain(c, sym, S, today, tk):
+    """Devuelve (m0, contratos): m0 = cadena 0DTE por strike {k: {"c": o, "p": o}} y la lista de contratos de hasta NDAYS días."""
+    hasta = (dt.date.fromisoformat(today) + dt.timedelta(days=NDAYS)).isoformat()
+    j = sget(c, "/chains", symbol=sym, contractType="ALL", strikeCount=80 if tk == "SPX" else 40,
+             includeUnderlyingQuote="true", fromDate=today, toDate=hasta)
+    m0, out = {}, []
+    t_now = now()
+    for side, key in (("c", "callExpDateMap"), ("p", "putExpDateMap")):
+        for exp, ks in j.get(key, {}).items():
+            ed = exp.split(":")[0]
+            close = dt.datetime.fromisoformat(ed).replace(hour=15, tzinfo=MX)
+            T = max(1, (close - t_now).total_seconds() / 60) / (365 * 1440)
+            for k, lst in ks.items():
+                o = lst[0]
+                sy = str(o.get("symbol", ""))
+                if tk == "SPX" and ed == today and not sy.startswith("SPXW"):
+                    continue                          # el SPX mensual AM ya liquidó en la mañana
+                iv = o.get("volatility")
+                try:
+                    iv = float(iv) / 100
+                except (TypeError, ValueError):
+                    iv = 0
+                if not (0.01 < iv < 3):
+                    iv = 0
+                out.append({"k": float(k), "s": side, "d0": ed == today, "T": T, "iv": iv,
+                            "oi": o.get("openInterest", 0) or 0, "vol": o.get("totalVolume", 0) or 0,
+                            "sd": o.get("delta"), "o": o})
+                if ed == today:
+                    m0.setdefault(float(k), {})[side] = o
+    # IV faltante → IV del strike válido más cercano del mismo vencimiento y lado
+    for x in out:
+        if not x["iv"]:
+            pares = [y for y in out if y["T"] == x["T"] and y["s"] == x["s"] and y["iv"]]
+            if pares:
+                x["iv"] = min(pares, key=lambda y: abs(y["k"] - x["k"]))["iv"]
+    return m0, [x for x in out if x["iv"]]
+
+
+def exposure(cons, S, peso="oi"):
+    """Por strike: GEX 1% ($MM), y totales GEX, DEX, flujo charm por hora y flujo vanna por −1 pto de IV ($MM)."""
+    gk, tot = {}, {"gex": 0.0, "dex": 0.0, "charm": 0.0, "vanna": 0.0, "gross": 0.0}
+    for x in cons:
+        n = x[peso]
+        if not n:
+            continue
+        q = n if x["s"] == "c" else -n               # supuesto de inventario dealer
+        d, g, va, ch = bs(S, x["k"], x["T"], x["iv"], x["s"])
+        gex = q * 100 * g * S * S * 0.01 / 1e6
+        gk[x["k"]] = gk.get(x["k"], 0) + gex
+        tot["gex"] += gex; tot["gross"] += abs(gex)
+        tot["dex"] += n * 100 * d * S / 1e9          # DEX del interés abierto (calls +, puts −), miles de millones
+        tot["charm"] += -q * 100 * ch / (365 * 24) * S / 1e6   # + = dealers compran por hora (soporte), − = venden
+        tot["vanna"] += -q * 100 * va * (-0.01) * S / 1e6      # flujo si la IV baja 1 punto
+    return gk, tot
+
+
+def flips(cons, S, tk):
+    """Zero γ: recalcula la gamma de TODOS los contratos en una malla de precios hipotéticos y busca cambios de signo."""
+    span, step = (0.03 * S, 2.0) if tk == "SPX" else (0.03 * S, 0.2)
+    grid = [S - span + i * step for i in range(int(2 * span / step) + 1)]
+    act = [x for x in cons if x["oi"]]
+    vals = []
+    for s in grid:
+        v = 0.0
+        for x in act:
+            g = bs(s, x["k"], x["T"], x["iv"], x["s"])[1]
+            v += (x["oi"] if x["s"] == "c" else -x["oi"]) * g * s * s
+        vals.append(v)
+    roots = []
+    for i in range(1, len(grid)):
+        if vals[i - 1] == 0 or vals[i - 1] * vals[i] < 0:
+            a, b = grid[i - 1], grid[i]
+            roots.append(round(a + (b - a) * abs(vals[i - 1]) / (abs(vals[i - 1]) + abs(vals[i])), 2))
+    return roots
+
+
+def strike_delta(m0, S, T, target, side):
+    """Strike 0DTE cuyo delta está más cerca del objetivo (usa el delta de Schwab; si falta, Black-Scholes)."""
+    best = None
+    for k, d in m0.items():
+        o = d.get(side)
+        if not o:
+            continue
+        de = o.get("delta")
+        try:
+            de = float(de)
+        except (TypeError, ValueError):
+            de = None
+        if de is None or de != de or abs(de) > 1:
+            iv = (o.get("volatility") or 0) / 100
+            de = bs(S, k, T, iv, side)[0] if iv > 0 else None
+        if de is None:
+            continue
+        if best is None or abs(abs(de) - target) < abs(abs(best[1]) - target):
+            best = (k, de)
+    return best[0] if best else None
+
+
+FAM = {"major +": "γ", "major −": "γ", "muro call": "γ", "muro put": "γ", "nodo γ+": "γ",
+       "major + vol": "flujo", "major − vol": "flujo", "vol calls": "flujo", "vol puts": "flujo"}
+
+
 def clusters(cands, tol):
-    """cands: [(nivel, fuente)] → grupos [(centro, n_fuentes_distintas)]."""
+    """cands: [(nivel, fuente)] → grupos [(centro, n_familias, n_fuentes)]. Familias: gamma/OI, flujo del día, técnica."""
     cands = sorted([x for x in cands if x[0] is not None])
     groups = []
     for v, src in cands:
@@ -285,7 +400,8 @@ def clusters(cands, tol):
     out = []
     for g in groups:
         center = max(set(g["vals"]), key=g["vals"].count) if len(g["vals"]) > 1 else g["vals"][0]
-        out.append((center, len(g["srcs"])))
+        fams = {FAM.get(s, "técnica") for s in g["srcs"]}
+        out.append((center, len(fams), len(g["srcs"])))
     return out
 
 
@@ -300,8 +416,9 @@ def build_ticker(c, tk, q, manual, today, state, vixinfo, macro):
     prev = qq.get("closePrice")
     chg = qq.get("netPercentChange") or ((px / prev - 1) * 100 if prev else 0)
     t_now = now()
+    mins = t_now.hour * 60 + t_now.minute
 
-    # velas
+    # velas y tendencia
     bars = history(c, sym)
     cut = (t_now - dt.timedelta(minutes=5)).timestamp() * 1000
     closed = [b for b in bars if b["datetime"] <= cut]
@@ -316,95 +433,104 @@ def build_ticker(c, tk, q, manual, today, state, vixinfo, macro):
     vw = vwap(todays) or px
     tf2 = [trend2(c5, px, vw), trend2(c15, px, vw), trend2(c60, px, vw)]
     tech = {"5m SMA200": sma(c5, 200), "15m SMA100": sma(c15, 100), "15m SMA200": sma(c15, 200),
-            "15m EMA100": ema(c15, 100), "15m EMA200": ema(c15, 200)}
+            "15m EMA100": ema(c15, 100), "15m EMA200": ema(c15, 200), "VWAP": vw if todays else None}
 
-    # cadena
-    m = chain(c, sym, px, today, tk)
+    # cadena: 0DTE + vencimientos de los próximos días
+    m, cons = chain(c, sym, px, today, tk)
+    cons0 = [x for x in cons if x["d0"]]
+    T0 = cons0[0]["T"] if cons0 else 1 / (365 * 1440)
     ks = sorted(k for k in m if "c" in m[k] and "p" in m[k])
     atm = min(ks, key=lambda k: abs(k - px)) if ks else None
     strad = round(mid(m[atm]["c"]) + mid(m[atm]["p"]), 2) if atm else None
     em_key = "em_" + tk
-    if t_now.hour * 60 + t_now.minute >= 510 and state.get(em_key + "_d") != today and strad:
+    if mins >= 510 and state.get(em_key + "_d") != today and strad:
         state[em_key] = [round(px - strad, 2), round(px + strad, 2), strad]
         state[em_key + "_d"] = today
         jsave(DIA, state)
     em = state.get(em_key) if state.get(em_key + "_d") == today else [round(px - strad, 2), round(px + strad, 2), strad]
     rem = [round(px - strad, 1), round(px + strad, 1)] if strad else None
+    bands = [[round(px - f * strad, 1), round(px + f * strad, 1)] for f in (1.5, 2)] if strad else None
 
-    rows, cw, pw, gx, cv, pv = [], (0, 0), (0, 0), (0, 0), (0, 0), (0, 0)
-    gexk = {}
+    # exposición: 0DTE por OI, 0DTE por volumen, total por OI
+    gk0, t0 = exposure(cons0, px, "oi")
+    gkv, tv = exposure(cons0, px, "vol")
+    _, tT = exposure(cons, px, "oi")
+
+    rows, cw, pw, cv, pv = [], (0, 0), (0, 0), (0, 0), (0, 0)
     for k in sorted(m):
         if abs(k - px) > SPAN[tk]:
             continue
         cc, pp = m[k].get("c", {}), m[k].get("p", {})
         cOI, pOI = cc.get("openInterest", 0) or 0, pp.get("openInterest", 0) or 0
         cV, pV = cc.get("totalVolume", 0) or 0, pp.get("totalVolume", 0) or 0
-        g = ((cc.get("gamma") or 0) * cOI - (pp.get("gamma") or 0) * pOI) * 100 * px * px * 0.01 / 1e6
-        gexk[k] = g
         if k > px and cOI > cw[1]: cw = (k, cOI)
         if k < px and pOI > pw[1]: pw = (k, pOI)
-        if abs(g) > abs(gx[1]): gx = (k, g)
         if cV > cv[1]: cv = (k, cV)
         if pV > pv[1]: pv = (k, pV)
         if round(k) % STEP[tk] == 0 and float(k).is_integer():
-            rows.append([int(k) if tk == "SPX" else k, cOI, pOI, cV, pV, round(g, 1)])
+            rows.append([int(k) if tk == "SPX" else k, cOI, pOI, cV, pV, round(gk0.get(k, 0), 1), round(gkv.get(k, 0), 1)])
 
-    # majors y zero γ: de la lectura manual si es de hoy; si no, del GEX propio
+    near = {k: g for k, g in gk0.items() if abs(k - px) <= SPAN[tk]}
+    nearv = {k: g for k, g in gkv.items() if abs(k - px) <= SPAN[tk]}
+    pick = lambda d, f: (f(d, key=d.get) if d else None)
+    mp_e = pick({k: g for k, g in near.items() if g > 0}, max)
+    mn_e = pick({k: g for k, g in near.items() if g < 0}, min)
+    mpv = pick({k: g for k, g in nearv.items() if g > 0}, max)
+    mnv = pick({k: g for k, g in nearv.items() if g < 0}, min)
+    mvc = max(near, key=lambda k: abs(near[k])) if near else None
+    fl0, flT = flips(cons0, px, tk), flips(cons, px, tk)
+    zg_e = min(fl0, key=lambda r: abs(r - px)) if fl0 else None
+
+    # majors y zero γ: de la lectura manual (perfil γ) si es de hoy; si no, estimación propia
     mr = None
     if manual.get("date") == today and manual.get(tk, {}).get("reads"):
         mr = manual[tk]["reads"][-1]
     if mr:
         zg, mp, mn, gt = mr["zg"], mr["mp"], mr["mn"], mr["t"]
     else:
-        pos = {k: g for k, g in gexk.items() if g > 0}
-        neg = {k: g for k, g in gexk.items() if g < 0}
-        mp = max(pos, key=pos.get) if pos else px
-        mn = min(neg, key=neg.get) if neg else px
-        zg, cum, prevk = px, 0.0, None
-        for k in sorted(gexk):
-            nc = cum + gexk[k]
-            if prevk is not None and cum < 0 <= nc:
-                zg = k
-            cum, prevk = nc, k
-        gt = None
+        zg = zg_e if zg_e is not None else px
+        mp, mn, gt = mp_e or px, mn_e or px, None
+
+    # régimen con incertidumbre: signo 0DTE vs total y magnitud frente a la exposición bruta
+    sg = lambda v: 1 if v > 0 else -1 if v < 0 else 0
+    inc = (not fl0 and abs(t0["gex"]) < 0.05 * (t0["gross"] or 1)) or abs(px - zg) <= GTOL[tk]
+    reg = {"d0": sg(t0["gex"]), "tot": sg(tT["gex"]), "inc": bool(inc), "mixto": sg(t0["gex"]) != sg(tT["gex"])}
 
     cands = [(mp, "major +"), (mn, "major −"), (cw[0] or None, "muro call"), (pw[0] or None, "muro put"),
-             (gx[0] or None, "máx GEX"), (cv[0] or None, "vol calls"), (pv[0] or None, "vol puts")]
+             (mpv, "major + vol"), (mnv, "major − vol"), (cv[0] or None, "vol calls"), (pv[0] or None, "vol puts")]
+    if mvc is not None and near[mvc] > 0:
+        cands.append((mvc, "nodo γ+"))           # el nodo negativo acelera/expulsa: no cuenta como techo ni piso
     cands += [(v, n) for n, v in tech.items() if v]
     groups = clusters(cands, TOL[tk])
     above = [g for g in groups if g[0] > px + TOL[tk] * 0.3]
     below = [g for g in groups if g[0] < px - TOL[tk] * 0.3]
-    techo = max(above, key=lambda g: (g[1], -abs(g[0] - px))) if above else (round(px + (strad or 0)), 1)
-    piso = max(below, key=lambda g: (g[1], -abs(g[0] - px))) if below else (round(px - (strad or 0)), 1)
+    rank = lambda g: (g[1], g[2], -abs(g[0] - px))
+    techo = max(above, key=rank) if above else (round(px + (strad or 0)), 1, 1)
+    piso = max(below, key=rank) if below else (round(px - (strad or 0)), 1, 1)
     half = (strad or 0) / 2
-    pins = [g for g in groups if g[1] >= 3 and abs(g[0] - px) <= half]
-    pin = max(pins, key=lambda g: g[1]) if pins else None
+    pins = [g for g in groups if g[1] >= 2 and abs(g[0] - px) <= half]
+    pin = max(pins, key=rank) if pins else None
+    if mins >= 780 and mvc is not None and near[mvc] > 0 and abs(mvc - px) <= (strad or 0):
+        pin = next((g for g in groups if abs(g[0] - mvc) <= TOL[tk] * 0.5), (mvc, 1, 1))   # tarde: manda el nodo γ+ 0DTE
 
-    ic = None
-    if rem and ks:
+    # bordes por delta (0DTE)
+    d15 = [strike_delta(m, px, T0, 0.15, "p"), strike_delta(m, px, T0, 0.15, "c")]
+    d10 = [strike_delta(m, px, T0, 0.10, "p"), strike_delta(m, px, T0, 0.10, "c")]
+
+    def ic_at(ps, cs):
         w = WING[tk]
-        stepk = 5 if tk == "SPX" else 1
-        ps = math.floor(rem[0] / stepk) * stepk
-        cs = math.ceil(rem[1] / stepk) * stepk
         try:
-            cr = (mid(m[ps]["p"]) - mid(m[ps - w]["p"])) + (mid(m[cs]["c"]) - mid(m[cs + w]["c"]))
-            ic = [ps, cs, round(cr, 2), w]
-        except KeyError:
-            ic = [ps, cs, 0, w]
-
-    ic2 = None
+            return [ps, cs, round((mid(m[ps]["p"]) - mid(m[ps - w]["p"])) + (mid(m[cs]["c"]) - mid(m[cs + w]["c"])), 2), w]
+        except (KeyError, TypeError):
+            return [ps, cs, 0, w]
+    stepk = 5 if tk == "SPX" else 1
+    ic = ic2 = None
     if strad and ks:
-        w = WING[tk]
-        stepk = 5 if tk == "SPX" else 1
+        ic = ic_at(math.floor(rem[0] / stepk) * stepk, math.ceil(rem[1] / stepk) * stepk)
         dz = px - zg
         lo_m, hi_m = (SKEW[0], SKEW[1]) if dz < -GTOL[tk] else (SKEW[1], SKEW[0]) if dz > GTOL[tk] else (1.25, 1.25)
-        ps = math.floor((px - lo_m * strad) / stepk) * stepk
-        cs = math.ceil((px + hi_m * strad) / stepk) * stepk
-        try:
-            cr = (mid(m[ps]["p"]) - mid(m[ps - w]["p"])) + (mid(m[cs]["c"]) - mid(m[cs + w]["c"]))
-            ic2 = [ps, cs, round(cr, 2), w]
-        except KeyError:
-            ic2 = [ps, cs, 0, w]
+        ic2 = ic_at(math.floor((px - lo_m * strad) / stepk) * stepk, math.ceil((px + hi_m * strad) / stepk) * stepk)
+    icd = ic_at(*d15) if all(d15) else None
 
     edges = {"tol": TOL[tk] * 0.5,
              "up": [(em[1], "borde superior del rango"), (techo[0], "techo")],
@@ -412,12 +538,16 @@ def build_ticker(c, tk, q, manual, today, state, vixinfo, macro):
     fz = fuerza(closed, px, edges)
 
     r2 = lambda x: round(x, 2) if isinstance(x, float) else x
+    rx = lambda d: {k: round(v, 2) for k, v in d.items() if k != "gross"}
     read = {"t": t_now.strftime("%-H:%M") if os.name != "nt" else t_now.strftime("%#H:%M"),
-            "px": r2(px), "chg": fmt_pct(chg), "vix": vixinfo[tk], "macro": macro, "tf": tf,
+            "px": r2(px), "chg": fmt_pct(chg), "vix": vixinfo[tk], "macro": macro, "tf": tf, "tf2": tf2, "vw": r2(vw),
             "zg": r2(zg), "mp": r2(mp), "mn": r2(mn), "em": [em[0], em[1]], "strad": em[2] if len(em) > 2 else strad,
-            "rem": rem, "techo": [r2(techo[0]), techo[1]], "pin": [r2(pin[0]), pin[1]] if pin else None,
-            "piso": [r2(piso[0]), piso[1]], "cw": [cw[0], cw[1]], "pw": [pw[0], pw[1]], "ic": ic,
-            "tf2": tf2, "vw": r2(vw), "ic2": ic2, "fz": fz,
+            "rem": rem, "bands": bands, "techo": [r2(techo[0]), techo[1], techo[2]],
+            "pin": [r2(pin[0]), pin[1], pin[2]] if pin else None, "piso": [r2(piso[0]), piso[1], piso[2]],
+            "cw": [cw[0], cw[1]], "pw": [pw[0], pw[1]], "ic": ic, "ic2": ic2, "icd": icd, "d15": d15, "d10": d10,
+            "fz": fz, "mpv": mpv, "mnv": mnv, "mvc": [mvc, round(near[mvc], 1)] if mvc is not None else None,
+            "zge": zg_e, "flips": fl0, "flipsT": flT, "reg": reg,
+            "gex": {"d0": rx(t0), "tot": rx(tT), "vol": rx(tv)},
             "auto": True, "gt": gt}
     return {"o": [b["open"] for b in todays], "h": [b["high"] for b in todays], "l": [b["low"] for b in todays],
             "c": [b["close"] for b in todays], "v": [b.get("volume", 0) for b in todays],
@@ -426,17 +556,22 @@ def build_ticker(c, tk, q, manual, today, state, vixinfo, macro):
 
 def vix_info(c, q):
     out = {}
+    t = now()
     for sym, tks in (("$VIX", ["SPX", "SPY"]), ("$VXN", ["QQQ"])):
         x = q.get(sym, {}).get("quote", {})
         px = x.get("lastPrice")
         try:
             c15 = [b["close"] for b in resample(history(c, sym), 15)]
             tr = trend(c15, px, 0.01) if px else 0
+            tr2 = trend2(c15, px, None) if px else 0
         except Exception:
-            tr = 0
-        info = {"px": f"{px:.2f}" if px else "—", "chg": fmt_pct(x.get("netPercentChange") or 0), "tr": tr}
-        for t in tks:
-            out[t] = info
+            tr = tr2 = 0
+        hi = x.get("highPrice")
+        nh = bool(px and hi and px >= hi - 0.02 and t.hour * 60 + t.minute >= 520)
+        info = {"px": f"{px:.2f}" if px else "—", "chg": fmt_pct(x.get("netPercentChange") or 0), "tr": tr, "tr2": tr2,
+                "hi": f"{hi:.2f}" if hi else None, "nh": nh}
+        for t_ in tks:
+            out[t_] = info
     return out
 
 
@@ -468,7 +603,7 @@ def cycle(c, tok, state):
         print("  historial:", e)
     s = out.get("SPX", {}).get("read", {})
     print(f"{out['ts']}  SPX {s.get('px')}  rango {s.get('rem')}  techo {s.get('techo')}  piso {s.get('piso')}  "
-          f"IC {s.get('ic2')}  tend {s.get('tf')}/{s.get('tf2')}  velas hoy {len(out.get('SPX', {}).get('c', []))} (última {state.get('_ultima_SPX')})  {'publicado' if ok else 'NO publicado'}")
+          f"zgE {s.get('zge')} γ0 {s.get('gex',{}).get('d0',{}).get('gex')}  IC {s.get('ic2')}  tend {s.get('tf')}/{s.get('tf2')}  velas hoy {len(out.get('SPX', {}).get('c', []))} (última {state.get('_ultima_SPX')})  {'publicado' if ok else 'NO publicado'}")
 
 
 def main():
