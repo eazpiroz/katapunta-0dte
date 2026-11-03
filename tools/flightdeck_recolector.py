@@ -510,8 +510,46 @@ def build_ticker(c, tk, q, manual, today, state, vixinfo, macro):
     half = (strad or 0) / 2
     pins = [g for g in groups if g[1] >= 2 and abs(g[0] - px) <= half]
     pin = max(pins, key=rank) if pins else None
-    if mins >= 780 and mvc is not None and near[mvc] > 0 and abs(mvc - px) <= (strad or 0):
-        pin = next((g for g in groups if abs(g[0] - mvc) <= TOL[tk] * 0.5), (mvc, 1, 1))   # tarde: manda el nodo γ+ 0DTE
+
+    # PIN según estudio 2–3 nov (claude/flight_deck_pin_estudio.md):
+    #   antes de 13:00 → "imán intradía" (nodo γ+ por volumen), no PIN de cierre
+    #   13:00–14:00   → γ por volumen > 0: punto medio de majors; < 0: major −
+    #   desde 14:00   → promedio de max pain por volumen, centro de |GEX vol| (±1.5σ) y strike más probable
+    sig = (strad or 0) / 0.8
+    stepk5 = 5 if tk == "SPX" else 1
+    vsign = 1 if tv["gex"] > 0 else -1
+    pmx, pmn = (mp, mn) if mr else (mpv or mp, mnv or mn)
+    iman = mpv
+    pinm, pinv = None, None
+    if mins >= 840 and sig:
+        ks0 = [k for k in m if abs(k - px) <= 3 * sig]
+        def pay(s_):
+            return sum(((m[k].get("c") or {}).get("totalVolume", 0) or 0) * max(0, s_ - k) +
+                       ((m[k].get("p") or {}).get("totalVolume", 0) or 0) * max(0, k - s_) for k in ks0)
+        grid = [round(px - 3 * sig + i * stepk5 / 5, 2) for i in range(int(6 * sig / (stepk5 / 5)) + 1)]
+        maxpain = min(grid, key=pay) if ks0 else px
+        cerca = {k: g for k, g in gkv.items() if abs(k - px) <= 1.5 * sig}
+        w = sum(abs(g) for g in cerca.values())
+        centro = sum(k * abs(g) for k, g in cerca.items()) / w if w else px
+        moda = round(px / stepk5) * stepk5
+        pinv, pinm = (maxpain + centro + moda) / 3, f"cálculo combinado (max pain vol {maxpain:.0f} · centro γ {centro:.0f} · más probable {moda:g})"
+    elif mins >= 780:
+        pinv, pinm = ((pmx + pmn) / 2, "punto medio de majors (γ vol +)") if vsign > 0 else (pmn, "major − (γ vol −)")
+    if pinv is not None:
+        pin = (round(pinv / stepk5) * stepk5 if tk == "SPX" else round(pinv, 1), 0, 0)
+    pinz = [round(pin[0] - sig / 2, 1), round(pin[0] + sig / 2, 1)] if (pinv is not None and sig) else None
+    # alerta "PIN en movimiento": major − o + se mueve ≥ 10 pts (SPX) o cambia el signo de γ por volumen en 15 min
+    hk = "_pinh_" + tk
+    hist = [h for h in state.get(hk, []) if mins - h[0] <= 15] + [[mins, pmx, pmn, vsign]]
+    state[hk] = hist
+    mt = 10 if tk == "SPX" else 1
+    pinmov = None
+    if abs(hist[-1][2] - hist[0][2]) >= mt:
+        pinmov = f"major − {hist[0][2]:g} → {hist[-1][2]:g} en {mins - hist[0][0]} min"
+    elif abs(hist[-1][1] - hist[0][1]) >= mt:
+        pinmov = f"major + {hist[0][1]:g} → {hist[-1][1]:g} en {mins - hist[0][0]} min"
+    elif hist[0][3] != vsign:
+        pinmov = "la gamma por volumen cambió de signo"
 
     # bordes por delta (0DTE)
     d15 = [strike_delta(m, px, T0, 0.15, "p"), strike_delta(m, px, T0, 0.15, "c")]
@@ -543,7 +581,7 @@ def build_ticker(c, tk, q, manual, today, state, vixinfo, macro):
             "px": r2(px), "chg": fmt_pct(chg), "vix": vixinfo[tk], "macro": macro, "tf": tf, "tf2": tf2, "vw": r2(vw),
             "zg": r2(zg), "mp": r2(mp), "mn": r2(mn), "em": [em[0], em[1]], "strad": em[2] if len(em) > 2 else strad,
             "rem": rem, "bands": bands, "techo": [r2(techo[0]), techo[1], techo[2]],
-            "pin": [r2(pin[0]), pin[1], pin[2]] if pin else None, "piso": [r2(piso[0]), piso[1], piso[2]],
+            "pin": [r2(pin[0]), pin[1], pin[2]] if pin else None, "pinm": pinm, "pinz": pinz, "iman": iman, "pinmov": pinmov, "piso": [r2(piso[0]), piso[1], piso[2]],
             "cw": [cw[0], cw[1]], "pw": [pw[0], pw[1]], "ic": ic, "ic2": ic2, "icd": icd, "d15": d15, "d10": d10,
             "fz": fz, "mpv": mpv, "mnv": mnv, "mvc": [mvc, round(near[mvc], 1)] if mvc is not None else None,
             "zge": zg_e, "flips": fl0, "flipsT": flT, "reg": reg,

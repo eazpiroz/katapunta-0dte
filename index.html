@@ -411,7 +411,7 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
 </div>
 </div>
 </template>
-<script>window.BUILD='26ee6dbc';
+<script>window.BUILD='a7aa1639';
 (function(){
   const tpl = document.getElementById('tpl');
   const mount = document.getElementById('app');
@@ -968,7 +968,7 @@ class Component extends DCLogic {
       SIMPLE[tk] = {
         macro: lr.macro || '',
         lect: [
-          { label: 'RÉGIMEN GAMMA', value: gTxt, color: gpos ? '#4C9AFF' : gneg ? '#FF7A45' : '#C9D1DC', note: fv2(Math.abs(dz)) + (dz >= 0 ? ' arriba' : ' abajo') + ' del zero γ (' + fv2(lr.zg) + '): ' + (gpos ? 'los movimientos tienden a amortiguarse.' : gneg ? 'los movimientos tienden a amplificarse.' : 'cualquier movimiento cambia el régimen.') + regTxt },
+          { label: 'RÉGIMEN GAMMA', value: gTxt, color: gpos ? '#4C9AFF' : gneg ? '#FF7A45' : '#C9D1DC', note: fv2(Math.abs(dz)) + (dz >= 0 ? ' arriba' : ' abajo') + ' del zero γ (' + fv2(lr.zg) + '): ' + (gpos ? 'los movimientos tienden a amortiguarse.' : gneg ? 'los movimientos tienden a amplificarse.' : 'cualquier movimiento cambia el régimen.') + regTxt + (lr.pinm ? ' PIN de cierre: ' + fv2(lr.pin[0]) + (lr.pinz ? ' (zona ' + fv2(lr.pinz[0]) + ' – ' + fv2(lr.pinz[1]) + ')' : '') + ' · ' + lr.pinm + '.' : (lr.iman ? ' Imán intradía: ' + fv2(lr.iman) + ' (antes de las 13:00 no hay PIN de cierre).' : '')) + (lr.pinmov ? ' ⚠ PIN en movimiento: ' + lr.pinmov + '.' : '') },
           { label: 'TENDENCIA', value: trendTxt, color: bullA ? G : bearA ? R : '#C9D1DC', dots: ['5m', '15m', '1H'].map((t, i) => ({ tf: t, col: tf[i] > 0 ? G : tf[i] < 0 ? R : N })), dots2: lr.tf2 ? ['5m', '15m', '1H'].map((t, i) => ({ tf: t, col: lr.tf2[i] > 0 ? G : lr.tf2[i] < 0 ? R : N })) : null, note: 'Arriba: precio vs EMA 20 y EMA 20 vs EMA 50.' + (lr.tf2 ? ' Regla nueva (en prueba): precio vs EMA 9, EMA 9 vs SMA 20 y precio vs VWAP del día.' : '') + (lr.fz ? ' ' + lr.fz : '') },
           { label: 'VOLATILIDAD', value: volName + ' ' + lr.vix.px + (lr.vix.nh ? ' · máx. del día' : ''), color: (vt > 0 || lr.vix.nh) ? R : vt < 0 ? G : '#C9D1DC', note: lr.vix.chg + ' hoy; en 15m ' + (vt > 0 ? 'subiendo' : vt < 0 ? 'bajando' : 'lateral') + (lr.vix.tr2 !== undefined ? ' (EMA 9 vs SMA 20)' : '') + '.' + (lr.vix.nh ? ' Marca nuevo máximo del día.' : (lr.vix.hi ? ' Máximo del día ' + lr.vix.hi + '.' : '')) },
           { label: 'RANGO ESPERADO · HOY', value: fv2(lr.em[0]) + ' – ' + fv2(lr.em[1]), color: '#F2B544', bar: { pos: emPos, l: fv2(lr.em[0]), r: fv2(lr.em[1]) }, note: 'Precio ' + fv2(lr.px) + ' · a ' + used + '% del centro hacia el borde · straddle ' + fv2(lr.strad) + '.' + (lr.rem ? ' Restante: 1× ' + fv2(lr.rem[0]) + ' – ' + fv2(lr.rem[1]) + ' (~58% cierra dentro)' + (lr.bands ? ' · 1.5× ' + fv2(lr.bands[0][0]) + ' – ' + fv2(lr.bands[0][1]) + ' (~77%) · 2× ' + fv2(lr.bands[1][0]) + ' – ' + fv2(lr.bands[1][1]) + ' (~89%)' : '') + '.' : '') + (lr.d15 && lr.d15[0] ? ' Borde δ15: put ' + fv2(lr.d15[0]) + ' / call ' + fv2(lr.d15[1]) + (lr.d10 && lr.d10[0] ? ' · δ10: ' + fv2(lr.d10[0]) + ' / ' + fv2(lr.d10[1]) : '') + '.' : '') },
@@ -986,7 +986,7 @@ class Component extends DCLogic {
       const prevClose = (DAY.prev && DAY.prev[tk]) || { SPX: 7580.07, SPY: 755.72, QQQ: 690.49 }[tk];
       LS[tk] = [
         { v: lr.techo[0], c: LC.up, s: gpos ? 'faint' : 'dash', t: 'Techo ' + fv2(lr.techo[0]) + ' ' + nf(lr.techo) + (gpos ? ' frágil' : '') },
-        lr.pin ? { v: lr.pin[0], c: '#E8ECF1', s: 'solid', t: 'PIN ' + fv2(lr.pin[0]) + ' ' + nf(lr.pin) } : null,
+        lr.pin ? { v: lr.pin[0], c: '#E8ECF1', s: 'solid', t: (lr.pinm ? 'PIN cierre ' + fv2(lr.pin[0]) : (toMin(lr.t) < 780 ? 'Imán ' : 'PIN ') + fv2(lr.pin[0]) + ' ' + nf(lr.pin)) } : null,
         lr.d15 && lr.d15[0] ? { v: lr.d15[0], c: '#8A94A3', s: 'thin', t: 'δ15 put ' + fv2(lr.d15[0]) } : null,
         lr.d15 && lr.d15[1] ? { v: lr.d15[1], c: '#8A94A3', s: 'thin', t: 'δ15 call ' + fv2(lr.d15[1]) } : null,
         { v: lr.zg, c: LC.zg, s: 'dot', t: 'Zero γ ' + fv2(lr.zg) },
