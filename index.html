@@ -194,7 +194,7 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
 <div style="font-size: 11px; color: #808A99">Los puntos sobre el viernes marcan cuándo cambió un major en las lecturas de 15 min (Perfil γ, vencimiento 10/30); el detalle va abajo de la gráfica. En la zona del lunes, los niveles del vencimiento 11/02.</div>
 </template>
 
-<div role="img" aria-label="{{chart.aria}}" style="display: grid; grid-template-columns: 52px minmax(0, 1fr) 160px minmax(200px, 22%); height: 400px">
+<div role="img" aria-label="{{chart.aria}}" style="display: grid; grid-template-columns: 52px minmax(0, 1fr) 160px minmax(200px, 22%); height: 480px">
 <div style="position: relative">
 <template data-k="for" list="{{chart.ticks}}" as="tk" hint-placeholder-count="4"><span style="{{tk.style}}">{{tk.label}}</span></template>
 </div>
@@ -222,6 +222,7 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
 </div>
 <div style="position: relative; overflow: hidden; background: #0F1318; border-left: 1px solid #232A35; border-bottom: 1px solid #232A35">
 <div style="position: absolute; top: 0; bottom: 0; left: 50%; border-left: 1px solid #2A313C"></div>
+<template data-k="for" list="{{chart.ticks}}" as="tk" hint-placeholder-count="4"><div style="{{tk.grid}}"></div><span style="{{tk.pstyle}}">{{tk.label}}</span></template>
 <template data-k="for" list="{{chart.levels}}" as="lv" hint-placeholder-count="7"><div style="{{lv.profLine}}"></div></template>
 <template data-k="for" list="{{prof}}" as="pr" hint-placeholder-count="20">
 <div style="{{pr.row}}">
@@ -243,7 +244,7 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
 <template data-k="for" list="{{chart.xt}}" as="x" hint-placeholder-count="6"><span style="{{x.style}}">{{x.label}}</span></template>
 </div>
 <span style="padding-left: 8px">hora CDMX</span>
-<div style="display: flex; justify-content: space-between; padding: 0 8px; font-weight: 600"><span style="color: #FF7A45">{{profL}}</span><span style="color: #4C9AFF">{{profR}}</span></div>
+<div style="display: flex; justify-content: space-between; padding: 0 8px; font-weight: 600"><span style="color: #FF7A45">{{profL}}</span><span style="color: #808A99; font-weight: 500">{{profScale}}</span><span style="color: #4C9AFF">{{profR}}</span></div>
 </div>
 <div style="font-size: 11px; color: #808A99">{{d.stripNote}} · solo se rotulan los 3 strikes más cargados de cada lado.</div>
 <div style="display: flex; flex-direction: column; gap: 6px; border-top: 1px solid #232A35; padding-top: 10px">
@@ -410,7 +411,7 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
 </div>
 </div>
 </template>
-<script>window.BUILD='b50f6223';
+<script>window.BUILD='26ee6dbc';
 (function(){
   const tpl = document.getElementById('tpl');
   const mount = document.getElementById('app');
@@ -865,7 +866,8 @@ class Component extends DCLogic {
       const ticks = cfg.ticks.map(tv => ({
         label: fmtN(tv),
         style: 'position: absolute; right: 8px; top: calc(' + P(tv).toFixed(2) + '% - 7px); font-size: 11px; color: #808A99',
-        grid: 'position: absolute; left: 0; right: 0; top: ' + P(tv).toFixed(2) + '%; border-top: 1px solid #1A1F27'
+        grid: 'position: absolute; left: 0; right: 0; top: ' + P(tv).toFixed(2) + '%; border-top: 1px solid #1A1F27',
+        pstyle: 'position: absolute; left: 4px; top: calc(' + P(tv).toFixed(2) + '% - 7px); font-size: 10px; color: #8A94A3; pointer-events: none'
       }));
       const emTop = P(cfg.em[1]), emBot = P(cfg.em[0]);
       const st0 = cfg.start || 450;
@@ -980,23 +982,23 @@ class Component extends DCLogic {
           ['Compra de calls', cl(1 + (gneg ? 1 : 0) + (bullA ? 1 : 0) + (vt < 0 ? 1 : 0)), gTxt + ' · ' + (bullA ? 'alcista' : 'sin tendencia alcista'), 'Objetivo ' + fv2(lr.techo[0])]
         ]
       };
-      const nf = a => a.length > 2 ? a[1] + '/3 fam.' : a[1] + ' fuentes';
+      const nf = a => a.length > 2 ? '(' + a[1] + '/3)' : a[1] + ' fuentes';
       const prevClose = (DAY.prev && DAY.prev[tk]) || { SPX: 7580.07, SPY: 755.72, QQQ: 690.49 }[tk];
       LS[tk] = [
-        { v: lr.techo[0], c: LC.up, s: gpos ? 'faint' : 'dash', t: 'Techo ' + fv2(lr.techo[0]) + ' · ' + nf(lr.techo) + (gpos ? ' · frágil' : '') },
-        lr.pin ? { v: lr.pin[0], c: '#E8ECF1', s: 'solid', t: 'PIN ' + fv2(lr.pin[0]) + ' · ' + nf(lr.pin) } : null,
+        { v: lr.techo[0], c: LC.up, s: gpos ? 'faint' : 'dash', t: 'Techo ' + fv2(lr.techo[0]) + ' ' + nf(lr.techo) + (gpos ? ' frágil' : '') },
+        lr.pin ? { v: lr.pin[0], c: '#E8ECF1', s: 'solid', t: 'PIN ' + fv2(lr.pin[0]) + ' ' + nf(lr.pin) } : null,
         lr.d15 && lr.d15[0] ? { v: lr.d15[0], c: '#8A94A3', s: 'thin', t: 'δ15 put ' + fv2(lr.d15[0]) } : null,
         lr.d15 && lr.d15[1] ? { v: lr.d15[1], c: '#8A94A3', s: 'thin', t: 'δ15 call ' + fv2(lr.d15[1]) } : null,
         { v: lr.zg, c: LC.zg, s: 'dot', t: 'Zero γ ' + fv2(lr.zg) },
         { v: prevClose, c: LC.am, s: 'dot', t: 'Cierre ant. ' + fv2(prevClose) },
-        { v: lr.piso[0], c: LC.dn, s: gneg ? 'faint' : 'solid', t: 'Piso ' + fv2(lr.piso[0]) + ' · ' + nf(lr.piso) + (gneg ? ' · frágil' : '') }
+        { v: lr.piso[0], c: LC.dn, s: gneg ? 'faint' : 'solid', t: 'Piso ' + fv2(lr.piso[0]) + ' ' + nf(lr.piso) + (gneg ? ' frágil' : '') }
       ].filter(Boolean);
       const hasBars = L.c.length > 0;
       const vals = [lr.em[0], lr.em[1], lr.techo[0], lr.piso[0], lr.zg, lr.px, prevClose].concat(lr.d15 && lr.d15[0] ? lr.d15 : []).concat(hasBars ? L.h.concat(L.l) : []);
       let lo = Math.min(...vals), hi = Math.max(...vals);
       const pad = (hi - lo) * 0.08; lo -= pad; hi += pad;
-      const rawStep = (hi - lo) / 4;
-      const st = [0.5, 1, 2, 2.5, 5, 10, 25, 50, 100, 250].find(s => s >= rawStep) || 250;
+      const rawStep = (hi - lo) / 12;
+      const st = [0.5, 1, 2, 2.5, 5, 10, 20, 25, 50, 100, 250].find(s => s >= rawStep) || 250;
       const ticks = [];
       for (let t = Math.ceil(lo / st) * st; t <= hi; t += st) ticks.push(+t.toFixed(2));
       const evs = [];
@@ -1044,8 +1046,8 @@ class Component extends DCLogic {
     const kfmt = k => k.toLocaleString('en-US');
     const prof = pvals.map(v => ({
       row: 'position: absolute; left: 0; right: 0; top: calc(' + Pp(v.k).toFixed(2) + '% - 5px); height: 10px; display: grid; grid-template-columns: 1fr 1fr',
-      lBar: 'height: 10px; flex: none; border-radius: 2px 0 0 2px; background: #FF7A45; opacity: ' + (topL.includes(v.k) ? 1 : 0.5) + '; width: ' + (v.L > 0 ? Math.max(v.L / pmx * 72, 1.5) : 0).toFixed(1) + '%',
-      rBar: 'height: 10px; flex: none; border-radius: 0 2px 2px 0; background: #4C9AFF; opacity: ' + (topR.includes(v.k) ? 1 : 0.5) + '; width: ' + (v.R > 0 ? Math.max(v.R / pmx * 72, 1.5) : 0).toFixed(1) + '%',
+      lBar: 'height: 10px; flex: none; border-radius: 2px 0 0 2px; background: #FF7A45; opacity: ' + (topL.includes(v.k) ? 1 : 0.5) + '; width: ' + (v.L > 0 ? Math.max(v.L / pmx * 45, 1.5) : 0).toFixed(1) + '%',
+      rBar: 'height: 10px; flex: none; border-radius: 0 2px 2px 0; background: #4C9AFF; opacity: ' + (topR.includes(v.k) ? 1 : 0.5) + '; width: ' + (v.R > 0 ? Math.max(v.R / pmx * 45, 1.5) : 0).toFixed(1) + '%',
       lL: topL.includes(v.k) ? kfmt(v.k) + ' · ' + fmtP(v.L) : '',
       rL: topR.includes(v.k) ? fmtP(v.R) + ' · ' + kfmt(v.k) : ''
     }));
@@ -1082,7 +1084,7 @@ class Component extends DCLogic {
     return {
       d, rows, tabs,
       tape: d.tickers.map(sem),
-      prof, profL: (mode === 'gex' || mode === 'gexv') ? '◀ GEX −' : '◀ Puts', profR: (mode === 'gex' || mode === 'gexv') ? 'GEX + ▶' : 'Calls ▶',
+      profScale: 'barra mayor = ' + fmtP(pmx), prof, profL: (mode === 'gex' || mode === 'gexv') ? '◀ GEX −' : '◀ Puts', profR: (mode === 'gex' || mode === 'gexv') ? 'GEX + ▶' : 'Calls ▶',
       showGex: () => this.setState({ mode: 'gex' }),
       showGexV: () => this.setState({ mode: 'gexv' }),
       gexvPressed: mode === 'gexv' ? 'true' : 'false',
