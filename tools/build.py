@@ -77,7 +77,7 @@ runtime = r'''
       const ar = Object.assign({}, x.read);
       const mg = manual.length ? manual[manual.length - 1] : null;
       const mins = s => { const p = String(s).split(':'); return +p[0] * 60 + +p[1]; };
-      if (mg && mg.gt && mg.zg && mins(ar.t) - mins(mg.t) <= 30) { ar.zg = mg.zg; ar.gt = mg.gt; }
+      if (mg && mg.gt && mg.zg && mins(ar.t) - mins(mg.t) <= 30) { ar.zg = mg.zg; ar.gt = mg.gt; ar.cwv = mg.mp; ar.pwv = mg.mn; }
       L.reads = manual.concat([ar]);
     }
     return d;

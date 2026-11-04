@@ -430,7 +430,7 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
 </div>
 </div>
 </template>
-<script>window.BUILD='4a682ae7';
+<script>window.BUILD='d3baa348';
 (function(){
   const tpl = document.getElementById('tpl');
   const mount = document.getElementById('app');
@@ -486,7 +486,7 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
       const ar = Object.assign({}, x.read);
       const mg = manual.length ? manual[manual.length - 1] : null;
       const mins = s => { const p = String(s).split(':'); return +p[0] * 60 + +p[1]; };
-      if (mg && mg.gt && mg.zg && mins(ar.t) - mins(mg.t) <= 30) { ar.zg = mg.zg; ar.gt = mg.gt; }
+      if (mg && mg.gt && mg.zg && mins(ar.t) - mins(mg.t) <= 30) { ar.zg = mg.zg; ar.gt = mg.gt; ar.cwv = mg.mp; ar.pwv = mg.mn; }
       L.reads = manual.concat([ar]);
     }
     return d;
@@ -1018,7 +1018,7 @@ class Component extends DCLogic {
         macro: lr.macro || '',
         lect: [
           noG ? { label: 'RÉGIMEN GAMMA', value: 'Sin lectura', color: '#8A94A3', note: '⚠ Falta la lectura del perfil γ (más de 30 min). Sin ella no hay régimen.' }
-              : { label: 'RÉGIMEN GAMMA', value: gpos ? 'Gamma positiva' : gneg ? 'Gamma negativa' : 'En el límite', color: gpos ? '#4C9AFF' : gneg ? '#FF7A45' : '#C9D1DC', note: 'Zero γ ' + fv2(lr.zg) + ' · precio ' + (dz >= 0 ? '+' : '−') + fv2(Math.round(Math.abs(dz) * 10) / 10) + (lr.gt ? ' · lectura ' + lr.gt : ' · estimado') + '\n' + (gpos ? 'Amortigua → rango' : gneg ? 'Amplifica → tendencia' : 'Cualquier movimiento cambia el régimen') },
+              : { label: 'RÉGIMEN GAMMA', value: gpos ? 'Gamma positiva' : gneg ? 'Gamma negativa' : 'En el límite', color: gpos ? '#4C9AFF' : gneg ? '#FF7A45' : '#C9D1DC', note: '• Zero Gamma ' + fv2(lr.zg) + '\n• Distancia al precio ' + (dz >= 0 ? '+' : '−') + (Math.round(Math.abs(dz) * 10) / 10).toFixed(1) + '\n• Call wall ' + fv2(lr.cwv || lr.mpv || lr.mp) + ' · Put wall ' + fv2(lr.pwv || lr.mnv || lr.mn) + '\n• ' + (gpos ? 'Amortigua → rango' : gneg ? 'Amplifica → tendencia' : 'Cualquier movimiento cambia el régimen') + '\n• ' + (lr.gt ? 'Lectura ' + lr.gt : 'Estimado') },
           { label: 'MOMENTUM DIRECCIONAL', value: momA > 0 ? 'Alcista fuerte · 3 TF' : momA < 0 ? 'Bajista fuerte · 3 TF' : 'Sin momentum alineado', color: momA > 0 ? G : momA < 0 ? R : '#C9D1DC', dots: ['5m', '15m', '1H'].map((t, i) => ({ tf: t, col: mom[i] > 0 ? G : mom[i] < 0 ? R : N })), note: (momA ? (momAcc ? 'Acelerando (MACD 5m creciendo). ' : 'Sin aceleración en 5m. ') : '') + 'Fuerte = EMA 9 sobre/bajo EMA 21 con ambas inclinadas, precio vs SMA 20 (media de Bollinger), RSI 14 vs 50, histograma MACD y precio vs VWAP, en 5m, 15m y 1H a la vez. Sirve para compras direccionales.' + (gpos && !momA ? ' Gamma positiva por volumen: día de rango.' : '') + (lr.fz ? ' ' + lr.fz : '') },
           { label: volName, value: vt > 0 ? '▲ Subiendo' : vt < 0 ? '▼ Bajando' : '► Lateral', color: vcol, spark: spark, note: spark ? (lr.vix.nh ? '⚠ Nuevo máximo del día' : 'Tendencia en 15m') : 'La gráfica se llena mientras la página está abierta' },
           { label: 'RANGO RESTANTE', value: fv2(rr[0]) + ' – ' + fv2(rr[1]), color: '#F2B544', rng: 1, rng_open: rng.open, rng_rem: rng.rem, rng_dA: rng.dA, rng_dB: rng.dB, rng_px: rng.px, rngL: fv2(rlo), rngR: fv2(rhi), note: (d15 ? 'Delta 15: ' + fv2(d15[0]) + ' / ' + fv2(d15[1]) + '\n' : '') + 'Apertura (fijo): ' + fv2(lr.em[0]) + ' – ' + fv2(lr.em[1]) },
