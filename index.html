@@ -59,7 +59,12 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px">
 <template data-k="for" list="{{lect}}" as="lc" hint-placeholder-count="4">
 <div style="background: #12161D; border: 1px solid #232A35; border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px">
 <div style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; color: #8A94A3">{{lc.label}}</div>
+<template data-k="if" value="{{lc.hasPill}}" hint-placeholder-val="{{false}}">
+<span style="font-size: 10px; font-weight: 600; letter-spacing: 0.08em; padding: 3px 8px; border-radius: 999px; border: 1px solid {{lc.pillCol}}; color: {{lc.pillCol}}; white-space: nowrap">{{lc.pill}}</span>
+</template>
+</div>
 <div style="font-size: 22px; font-weight: 500; letter-spacing: -0.02em; color: {{lc.color}}">{{lc.value}}</div>
 <template data-k="if" value="{{lc.hasDots}}" hint-placeholder-val="{{false}}">
 <div style="display: flex; gap: 14px">
@@ -430,7 +435,7 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
 </div>
 </div>
 </template>
-<script>window.BUILD='3c9a338b';
+<script>window.BUILD='5c95a622';
 (function(){
   const tpl = document.getElementById('tpl');
   const mount = document.getElementById('app');
@@ -1014,6 +1019,35 @@ class Component extends DCLogic {
       const rng = { open: seg(lr.em[0], lr.em[1], '#2B3240', 14, 3), rem: seg(rr[0], rr[1], '#6B5420', 8, 6), dA: d15 ? tick(d15[0], '#C9D1DC', 20, 0, 2) : 'display: none', dB: d15 ? tick(d15[1], '#C9D1DC', 20, 0, 2) : 'display: none', px: tick(lr.px, '#F2B544', 24, -2, 4) };
       // PIN
       const pinOn = !!(lr.pinm && lr.pin);
+      // PIN: 4 métodos, certeza y 3 bullets
+      const PR = (L.rows && L.rows.length) ? L.rows[L.rows.length - 1] : null;
+      let PN = null;
+      if (PR && PR.length && lr.rem) {
+        const sig = (lr.rem[1] - lr.rem[0]) / 2 / 0.8;
+        const near = PR.filter(x => Math.abs(x[0] - lr.px) <= Math.max(4 * sig, mt * 8));
+        const ks = near.map(x => x[0]);
+        const pain = S => near.reduce((a, x) => a + x[3] * Math.max(0, S - x[0]) + x[4] * Math.max(0, x[0] - S), 0);
+        const mpV = ks.reduce((b, k) => pain(k) < pain(b) ? k : b, ks[0]);
+        const w = near.filter(x => Math.abs(x[0] - lr.px) <= 1.5 * sig && x.length > 6);
+        const ws = w.reduce((a, x) => a + Math.abs(x[6]), 0);
+        const cen = ws ? w.reduce((a, x) => a + x[0] * Math.abs(x[6]), 0) / ws : lr.px;
+        const nk = ks.reduce((b, k) => Math.abs(k - lr.px) < Math.abs(b - lr.px) ? k : b, ks[0]);
+        const cp = lr.cwv || lr.mpv, cn = lr.pwv || lr.mnv;
+        const mid = (cp && cn) ? (cp + cn) / 2 : null;
+        const ms = [mid, mpV, cen, nk].filter(v => v != null && isFinite(v));
+        const ctr = pinOn ? lr.pin[0] : ms.reduce((a, v) => a + v, 0) / ms.length;
+        const spread = Math.max(...ms) - Math.min(...ms);
+        const tm = toMin(lr.t);
+        const tl = { SPX: [5, 15], SPY: [0.5, 1.5], QQQ: [0.5, 1.5] }[tk] || [5, 15];
+        const cert = gneg ? 'BAJA' : tm >= 840 && spread <= tl[0] ? 'ALTA' : (tm >= 780 && spread <= tl[1]) || (tm >= 840) ? 'MEDIA' : 'BAJA';
+        const prim = ks.reduce((b, k) => Math.abs(k - ctr) < Math.abs(b - ctr) ? k : b, ks[0]);
+        const z0 = ctr - sig / 2, z1 = ctr + sig / 2;
+        const inZ = near.filter(x => x[0] >= z0 - mt / 2 && x[0] <= z1 + mt / 2);
+        const anc = inZ.reduce((b, x) => (x[1] + x[2] > b[1] + b[2]) ? x : b, inZ[0] || near[0]);
+        const alt = anc && anc[0] !== prim ? anc[0] : ks.filter(k => k !== prim).reduce((b, k) => Math.abs(k - ctr) < Math.abs(b - ctr) ? k : b, null);
+        PN = { cert, prim, alt, z0, z1, mpV, anc };
+      }
+      const certCol = PN ? (PN.cert === 'ALTA' ? '#5BD69A' : PN.cert === 'MEDIA' ? '#F2B544' : '#8A94A3') : '#8A94A3';
       SIMPLE[tk] = {
         macro: lr.macro || '',
         lect: [
@@ -1022,7 +1056,8 @@ class Component extends DCLogic {
           { label: 'MOMENTUM DIRECCIONAL', value: momA > 0 ? 'Alcista fuerte · 3 TF' : momA < 0 ? 'Bajista fuerte · 3 TF' : 'Sin momentum alineado', color: momA > 0 ? G : momA < 0 ? R : '#C9D1DC', dots: ['5m', '15m', '1H'].map((t, i) => ({ tf: t, col: mom[i] > 0 ? G : mom[i] < 0 ? R : N })), note: (momA ? (momAcc ? 'Acelerando (MACD 5m creciendo). ' : 'Sin aceleración en 5m. ') : '') + 'Fuerte = EMA 9 sobre/bajo EMA 21 con ambas inclinadas, precio vs SMA 20 (media de Bollinger), RSI 14 vs 50, histograma MACD y precio vs VWAP, en 5m, 15m y 1H a la vez. Sirve para compras direccionales.' + (gpos && !momA ? ' Gamma positiva por volumen: día de rango.' : '') + (lr.fz ? ' ' + lr.fz : '') },
           { label: volName, value: vt > 0 ? '▲ Subiendo' : vt < 0 ? '▼ Bajando' : '► Lateral', color: vcol, spark: lr.vix.c15 ? spark : null, note: (lr.vix.nh ? '⚠ Nuevo máximo del día · ' : '') + 'Tendencia en 15m (EMA 9 vs SMA 20)' },
           { label: 'RANGO RESTANTE', value: fv2(rr[0]) + ' – ' + fv2(rr[1]), color: '#F2B544', rng: 1, rng_open: rng.open, rng_rem: rng.rem, rng_dA: rng.dA, rng_dB: rng.dB, rng_px: rng.px, rngL: fv2(rlo), rngR: fv2(rhi), note: (d15 ? 'Delta 15: ' + fv2(d15[0]) + ' / ' + fv2(d15[1]) + '\n' : '') + 'Apertura (fijo): ' + fv2(lr.em[0]) + ' – ' + fv2(lr.em[1]) },
-          { label: pinOn ? 'PIN DE CIERRE' : 'PIN · IMÁN', value: pinOn ? fv2(lr.pin[0]) : (lr.iman ? 'Imán ' + fv2(lr.iman) : '—'), color: '#E8D27A', note: pinOn ? ((lr.pinz ? 'Zona ' + fv2(lr.pinz[0]) + ' – ' + fv2(lr.pinz[1]) : '') + (lr.pinmov ? '\n⚠ ' + lr.pinmov : '')) : ('PIN de cierre desde las 13:00' + (lr.pinmov ? '\n⚠ ' + lr.pinmov : '')) }
+          PN ? { label: pinOn ? 'PIN DE CIERRE' : 'PIN · IMÁN', pill: 'CERTEZA ' + PN.cert, pillCol: certCol, value: fv2(PN.prim) + (PN.alt ? ' (alterno ' + fv2(PN.alt) + ')' : ''), color: '#E8D27A', note: '• Zona ' + fv2(Math.round(PN.z0)) + ' – ' + fv2(Math.round(PN.z1)) + (lr.iman ? ' · imán ' + fv2(lr.iman) : '') + ' · max pain ' + fv2(PN.mpV) + '\n• Ancla: ' + fv2(PN.anc[0]) + ' tiene el mayor OI de la zona (' + fv2(PN.anc[1] + PN.anc[2]) + ')' + '\n• ' + (gneg ? 'Gamma negativa: PIN poco confiable' + (lr.mnv ? ' · nodo − ' + fv2(lr.mnv) : '') : 'Se rompe si 15m cierra abajo del Zero Gamma (' + fv2(lr.zg) + ')' + ((lr.pwv || lr.mnv) ? ' → ' + fv2(lr.pwv || lr.mnv) : '')) + (lr.pinmov ? '\n⚠ ' + lr.pinmov : '') }
+             : { label: 'PIN · IMÁN', value: lr.iman ? 'Imán ' + fv2(lr.iman) : '—', color: '#E8D27A', note: 'Sin cadena para estimar el PIN' }
         ].filter(Boolean),
         est: [
           ['Iron condor', cl(1 + (gpos ? 1 : 0) + (!momA ? 1 : 0) + (vt < 0 ? 1 : 0) - (gneg ? 1 : 0)), gTxt + ' · ' + (momA ? 'con momentum' : 'sin momentum') + ' · ' + vTxt, lr.icd ? 'Delta 15: cortos ' + fv2(lr.icd[0]) + ' / ' + fv2(lr.icd[1]) + (lr.icd[2] ? ' · crédito ' + lr.icd[2].toFixed(2) : '') + ' · alas de ' + lr.icd[3] + (gneg && lr.ic2 ? ' · en γ− alternativa ajustada: ' + fv2(lr.ic2[0]) + ' / ' + fv2(lr.ic2[1]) + (lr.ic2[2] ? ' (' + lr.ic2[2].toFixed(2) + ')' : '') : '') : (lr.ic ? 'Cortos ' + fv2(lr.ic[0]) + ' / ' + fv2(lr.ic[1]) : 'Cortos fuera de ' + fv2(lr.piso[0]) + ' / ' + fv2(lr.techo[0]))],
@@ -1152,7 +1187,7 @@ class Component extends DCLogic {
       simpleBtnStyle: isSimple ? on : off,
       fullBtnStyle: isSimple ? off : on,
       simple: SIMPLE[tk] || SIMPLE.SPX,
-      lect: (SIMPLE[tk] || SIMPLE.SPX).lect.map(x => Object.assign({ hasDots: !!x.dots, hasDots2: !!x.dots2, hasBar: !!x.bar, hasSpark: !!x.spark, hasRng: !!x.rng, barMark: x.bar ? 'position: absolute; top: -4px; left: calc(' + x.bar.pos + '% - 1.5px); width: 3px; height: 14px; border-radius: 2px; background: #F2B544' : '', barL: x.bar ? x.bar.l : '', barR: x.bar ? x.bar.r : '' }, x)),
+      lect: (SIMPLE[tk] || SIMPLE.SPX).lect.map(x => Object.assign({ hasDots: !!x.dots, hasDots2: !!x.dots2, hasBar: !!x.bar, hasSpark: !!x.spark, hasRng: !!x.rng, hasPill: !!x.pill, pill: x.pill || '', pillCol: x.pillCol || '#8A94A3', barMark: x.bar ? 'position: absolute; top: -4px; left: calc(' + x.bar.pos + '% - 1.5px); width: 3px; height: 14px; border-radius: 2px; background: #F2B544' : '', barL: x.bar ? x.bar.l : '', barR: x.bar ? x.bar.r : '' }, x)),
       est: (SIMPLE[tk] || SIMPLE.SPX).est.map(e => ({ name: e[0], why: e[2], ref: e[3], aria: e[1] + ' de 3', d1: e[1] >= 1 ? '#E8ECF1' : '#2A313C', d2: e[1] >= 2 ? '#E8ECF1' : '#2A313C', d3: e[1] >= 3 ? '#E8ECF1' : '#2A313C' })),
       kpis: d.kpis.map(k => {
         const tones = { neg: ['#FF7A45', '#2A1A12', '#5C3320'], pos: ['#4C9AFF', '#111D2E', '#24406B'], edge: ['#C9D1DC', '#1A1F27', '#3A4352'] };
