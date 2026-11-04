@@ -220,6 +220,28 @@ def trend2(closes, px, vw):
     return 0
 
 
+def momentum(closes, px, vw):
+    """Momentum direccional (estudio del socio): alcista si EMA9 > EMA21 con ambas subiendo (3 velas), precio > SMA20 (media de Bollinger),
+    RSI14 > 50, histograma MACD > 0 y precio > VWAP; bajista al revés. Devuelve (estado, acelerando)."""
+    xs = (closes + [px])[-200:]
+    if len(xs) < 40:
+        return 0, False
+    e9, e21 = emas(xs, 9), emas(xs, 21)
+    s20 = sum(xs[-20:]) / 20
+    g = l = 0.0
+    for a, b in zip(xs[-15:-1], xs[-14:]):
+        g += max(b - a, 0); l += max(a - b, 0)
+    rsi = 100 if l == 0 else 100 - 100 / (1 + g / l)
+    macd = [a - b for a, b in zip(emas(xs, 12), emas(xs, 26))]
+    sig = emas(macd, 9)
+    h = [a - b for a, b in zip(macd, sig)]
+    up = e9[-1] > e21[-1] and e9[-1] > e9[-4] and e21[-1] > e21[-4] and px > s20 and rsi > 50 and h[-1] > 0 and px > vw
+    dn = e9[-1] < e21[-1] and e9[-1] < e9[-4] and e21[-1] < e21[-4] and px < s20 and rsi < 50 and h[-1] < 0 and px < vw
+    st_ = 1 if up else -1 if dn else 0
+    acc = bool(st_ and ((h[-1] > h[-2]) if st_ > 0 else (h[-1] < h[-2])))
+    return st_, acc
+
+
 def vwap(bars):
     """VWAP del día con precio típico; si el índice no trae volumen, promedio simple del precio típico."""
     if not bars:
@@ -432,6 +454,9 @@ def build_ticker(c, tk, q, manual, today, state, vixinfo, macro):
     tf = [trend(c5, px, 0.0005), trend(c15, px, 0.0005), trend(c60, px, 0.0005)]
     vw = vwap(todays) or px
     tf2 = [trend2(c5, px, vw), trend2(c15, px, vw), trend2(c60, px, vw)]
+    mo = [momentum(c5, px, vw), momentum(c15, px, vw), momentum(c60, px, vw)]
+    mom = [x[0] for x in mo]
+    momA = mom[0] if mom[0] == mom[1] == mom[2] != 0 else 0
     tech = {"5m SMA200": sma(c5, 200), "15m SMA100": sma(c15, 100), "15m SMA200": sma(c15, 200),
             "15m EMA100": ema(c15, 100), "15m EMA200": ema(c15, 200), "VWAP": vw if todays else None}
 
@@ -577,6 +602,30 @@ def build_ticker(c, tk, q, manual, today, state, vixinfo, macro):
         ic2 = ic_at(math.floor((px - lo_m * strad) / stepk) * stepk, math.ceil((px + hi_m * strad) / stepk) * stepk)
     icd = ic_at(*d15) if all(d15) else None
 
+    def vert(kind, a, b):
+        """kind: bc (bear call vendido a<b), bp (bull put vendido a>b), cc (bull call comprado a<b), pp (bear put comprado a>b). Precio = mid."""
+        try:
+            if kind == "bc": v = mid(m[a]["c"]) - mid(m[b]["c"])
+            elif kind == "bp": v = mid(m[a]["p"]) - mid(m[b]["p"])
+            elif kind == "cc": v = mid(m[a]["c"]) - mid(m[b]["c"])
+            else: v = mid(m[a]["p"]) - mid(m[b]["p"])
+            return [a, b, round(v, 2)] if v == v else [a, b, 0]
+        except (KeyError, TypeError):
+            return [a, b, 0]
+    w = WING[tk]
+    snap = lambda x, up: (math.ceil(x / stepk) * stepk) if up else (math.floor(x / stepk) * stepk)
+    atm_k = round(px / stepk) * stepk
+    vs = {}
+    if ks:
+        cs_ = snap(max(techo[0], d15[1] or 0), True)
+        vs["bc"] = vert("bc", cs_, cs_ + w)
+        ps_ = snap(min(piso[0], d15[0] or 1e9), False)
+        vs["bp"] = vert("bp", ps_, ps_ - w)
+        tgt_up = snap(pmx if pmx > px + stepk else techo[0], True)
+        vs["cc"] = vert("cc", atm_k, min(max(tgt_up, atm_k + w), atm_k + 3 * w))   # ancho entre 1 y 3 alas
+        tgt_dn = snap(pmn if pmn < px - stepk else piso[0], False)
+        vs["pp"] = vert("pp", atm_k, max(min(tgt_dn, atm_k - w), atm_k - 3 * w))
+
     edges = {"tol": TOL[tk] * 0.5,
              "up": [(em[1], "borde superior del rango"), (techo[0], "techo")],
              "dn": [(em[0], "borde inferior del rango"), (piso[0], "piso")]}
@@ -590,7 +639,7 @@ def build_ticker(c, tk, q, manual, today, state, vixinfo, macro):
             "rem": rem, "bands": bands, "techo": [r2(techo[0]), techo[1], techo[2]],
             "pin": [r2(pin[0]), pin[1], pin[2]] if pin else None, "pinm": pinm, "pinz": pinz, "iman": iman, "pinmov": pinmov, "piso": [r2(piso[0]), piso[1], piso[2]],
             "cw": [cw[0], cw[1]], "pw": [pw[0], pw[1]], "ic": ic, "ic2": ic2, "icd": icd, "d15": d15, "d10": d10,
-            "fz": fz, "mpv": mpv, "mnv": mnv, "mvc": [mvc, round(near[mvc], 1)] if mvc is not None else None,
+            "fz": fz, "mom": mom, "momA": momA, "momAcc": [x[1] for x in mo], "vs": vs, "mpv": mpv, "mnv": mnv, "mvc": [mvc, round(near[mvc], 1)] if mvc is not None else None,
             "zge": zg_e, "flips": fl0, "flipsT": flT, "reg": reg,
             "gex": {"d0": rx(t0), "tot": rx(tT), "vol": rx(tv)},
             "auto": True, "gt": gt}
