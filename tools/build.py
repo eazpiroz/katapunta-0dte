@@ -74,7 +74,11 @@ runtime = r'''
       if (x.pre) L.pre = x.pre;
       if (x.rows && x.rows.length) L.rows = [x.rows];
       const manual = DATA.date === a.date ? (L.reads || []) : [];
-      L.reads = manual.concat([x.read]);
+      const ar = Object.assign({}, x.read);
+      const mg = manual.length ? manual[manual.length - 1] : null;
+      const mins = s => { const p = String(s).split(':'); return +p[0] * 60 + +p[1]; };
+      if (mg && mg.gt && mg.zg && mins(ar.t) - mins(mg.t) <= 30) { ar.zg = mg.zg; ar.gt = mg.gt; }
+      L.reads = manual.concat([ar]);
     }
     return d;
   }
