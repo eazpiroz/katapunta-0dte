@@ -67,7 +67,7 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
 </div>
 <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap"><span style="font-size: 30px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.1; color: {{lc.color}}">{{lc.value}}</span><span style="font-size: 13px; color: #8A94A3">{{lc.sub}}</span></div>
 <template data-k="if" value="{{lc.hasDots}}" hint-placeholder-val="{{false}}">
-<div style="display: flex; gap: 14px">
+<div style="display: flex; flex-wrap: wrap; gap: 6px 12px">
 <template data-k="for" list="{{lc.dots}}" as="dt" hint-placeholder-count="3">
 <span style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #C9D1DC"><span style="width: 10px; height: 10px; border-radius: 50%; background: {{dt.col}}"></span>{{dt.tf}}</span>
 </template>
@@ -227,6 +227,7 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
 <div style="position: relative; overflow: hidden; border-left: 1px solid #232A35; border-bottom: 1px solid #232A35">
 <template data-k="for" list="{{chart.ticks}}" as="tk" hint-placeholder-count="4"><div style="{{tk.grid}}"></div></template>
 <div style="{{chart.emStyle}}"></div>
+<div style="{{chart.pinBand}}"></div>
 <div style="{{chart.zoneStyle}}"></div>
 <span style="{{chart.zoneLabelStyle}}">{{chart.zoneLabel}}</span>
 <span style="{{chart.emLabel}}">{{emTag}}</span>
@@ -442,7 +443,7 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
 </div>
 </div>
 </template>
-<script>window.BUILD='0cfd379a';
+<script>window.BUILD='9eb8020c';
 (function(){
   const tpl = document.getElementById('tpl');
   const mount = document.getElementById('app');
@@ -528,7 +529,7 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
 class Component extends DCLogic {
   constructor(props) {
     super(props);
-    this.state = { tk: 'SPX', mode: 'oi', view: 'simple' };
+    this.state = { tk: 'SPX', mode: 'gexv', view: 'simple' };
   }
   renderVals() {
     const LIVE = window.LIVE_DATA;
@@ -918,6 +919,7 @@ class Component extends DCLogic {
         ema9: curve(ema(9)), ema21: curve(sma(20)), sma200: curve(s200), zgDyn: stepN(dyn.z), cwDyn: stepN(dyn.c), pwDyn: stepN(dyn.p), shPos: shP || 'M0 0', shNeg: shN || 'M0 0',
         events: evMarks, evList: evList, evSummary: evSummary,
         emStyle: 'position: absolute; left: 0; right: 0; top: ' + emTop.toFixed(2) + '%; height: ' + (emBot - emTop).toFixed(2) + '%; background: rgba(242, 181, 68, 0.06); border-top: 1px dashed rgba(242, 181, 68, 0.45); border-bottom: 1px dashed rgba(242, 181, 68, 0.45)',
+        pinBand: cfg.pinz ? 'position: absolute; left: 0; right: 0; top: ' + P(cfg.pinz[1]).toFixed(2) + '%; height: ' + (P(cfg.pinz[0]) - P(cfg.pinz[1])).toFixed(2) + '%; background: rgba(232, 210, 122, 0.10); border-top: 1px dashed rgba(232, 210, 122, 0.55); border-bottom: 1px dashed rgba(232, 210, 122, 0.55)' : 'display: none',
         zoneStyle: cfg.live ? 'display: none' : 'position: absolute; top: 0; bottom: 0; left: 80%; right: 0; background: #0F1318; border-left: 1px dashed #3A4352',
         zoneLabelStyle: cfg.live ? 'display: none' : 'position: absolute; top: 6px; left: calc(80% + 8px); font-size: 11px; color: #8A94A3; white-space: nowrap',
         zoneLabel: 'Lun 2-nov · abre 8:30',
@@ -1069,7 +1071,8 @@ class Component extends DCLogic {
           { label: volName, ic: '∿', pill: lr.vix.nh ? 'MÁX. DEL DÍA' : '', pillCol: R, value: vt > 0 ? '▲ Subiendo' : vt < 0 ? '▼ Bajando' : '► Lateral', color: vcol, spark: spark, note: (lr.vix.nh ? '⚠ Nuevo máximo del día · ' : '') + 'Velas de 15m · amarillo = SMA 20' },
           { label: 'RANGO RESTANTE', ic: '↔', sub: '±' + fv2(Math.round((rr[1] - rr[0]) / 2)), value: fv2(rr[0]) + ' – ' + fv2(rr[1]), color: '#F2B544', rng: 1, rng_open: rng.open, rng_rem: rng.rem, rng_dA: rng.dA, rng_dB: rng.dB, rng_px: rng.px, rngL: fv2(rlo), rngR: fv2(rhi), note: (d15 ? 'Delta 15: ' + fv2(d15[0]) + ' / ' + fv2(d15[1]) + '\n' : '') + 'Apertura (fijo): ' + fv2(lr.em[0]) + ' – ' + fv2(lr.em[1]) },
           PN ? { label: pinOn ? 'PIN DE CIERRE' : 'PIN · IMÁN', ic: '◎', pill: 'CERTEZA ' + PN.cert, pillCol: certCol, value: fv2(PN.prim), sub: PN.alt ? 'alterno ' + fv2(PN.alt) : '', color: '#E8D27A', note: '• Zona ' + fv2(Math.round(PN.z0)) + ' – ' + fv2(Math.round(PN.z1)) + (lr.iman ? ' · imán ' + fv2(lr.iman) : '') + ' · max pain ' + fv2(PN.mpV) + '\n• Ancla: ' + fv2(PN.anc[0]) + ' tiene el mayor OI de la zona (' + fv2(PN.anc[1] + PN.anc[2]) + ')' + '\n• ' + (PN.gR ? 'Gamma negativa: PIN = major − (' + fv2(Math.round(PN.cn * 10) / 10) + '), se mueve con el precio' : gneg ? 'Gamma negativa: PIN poco confiable' + (lr.mnv ? ' · nodo − ' + fv2(lr.mnv) : '') : 'Se rompe si 15m cierra abajo del Zero Gamma (' + fv2(lr.zg) + ')' + ((lr.pwv || lr.mnv) ? ' → ' + fv2(lr.pwv || lr.mnv) : '')) + (lr.pinmov ? '\n⚠ ' + lr.pinmov : '') }
-             : { label: 'PIN · IMÁN', ic: '◎', value: lr.iman ? 'Imán ' + fv2(lr.iman) : '—', color: '#E8D27A', note: 'Sin cadena para estimar el PIN' }
+             : { label: 'PIN · IMÁN', ic: '◎', value: lr.iman ? 'Imán ' + fv2(lr.iman) : '—', color: '#E8D27A', note: 'Sin cadena para estimar el PIN' },
+          lr.t10 ? { label: 'TOP 10 DEL S&P', ic: '◉', pill: lr.t10.sem > 0 ? 'VERDE' : lr.t10.sem < 0 ? 'ROJO' : 'ÁMBAR', pillCol: lr.t10.sem > 0 ? G : lr.t10.sem < 0 ? R : '#F2B544', value: (lr.t10.sem > 0 ? '● ' : lr.t10.sem < 0 ? '● ' : '● ') + (lr.t10.w >= 0 ? '+' : '−') + Math.abs(lr.t10.w).toFixed(2) + '%', color: lr.t10.sem > 0 ? G : lr.t10.sem < 0 ? R : '#F2B544', dots: lr.t10.s.map(x => ({ tf: x[0], col: x[1] > 0 ? G : x[1] < 0 ? R : N })), note: lr.t10.up + ' de ' + lr.t10.n + ' suben desde la apertura · promedio ponderado por peso en el índice (~40% del S&P)' } : null
         ].filter(Boolean),
         est: [
           ['Iron condor', cl(1 + (gpos ? 1 : 0) + (!momA ? 1 : 0) + (vt < 0 ? 1 : 0) - (gneg ? 1 : 0)), gTxt + ' · ' + (momA ? 'con momentum' : 'sin momentum') + ' · ' + vTxt, lr.icd ? 'Delta 15: cortos ' + fv2(lr.icd[0]) + ' / ' + fv2(lr.icd[1]) + (lr.icd[2] ? ' · crédito ' + lr.icd[2].toFixed(2) : '') + ' · alas de ' + lr.icd[3] + (gneg && lr.ic2 ? ' · en γ− alternativa ajustada: ' + fv2(lr.ic2[0]) + ' / ' + fv2(lr.ic2[1]) + (lr.ic2[2] ? ' (' + lr.ic2[2].toFixed(2) + ')' : '') : '') : (lr.ic ? 'Cortos ' + fv2(lr.ic[0]) + ' / ' + fv2(lr.ic[1]) : 'Cortos fuera de ' + fv2(lr.piso[0]) + ' / ' + fv2(lr.techo[0]))],
@@ -1084,8 +1087,6 @@ class Component extends DCLogic {
       LS[tk] = [
         { v: lr.techo[0], c: '#00BCD4', s: gpos ? 'faint' : 'dash', t: 'Techo ' + fv2(lr.techo[0]) + ' ' + nf(lr.techo) + (gpos ? ' frágil' : '') },
         lr.pin ? { v: lr.pin[0], c: '#E8ECF1', s: 'solid', t: (lr.pinm ? 'PIN cierre ' + fv2(lr.pin[0]) : (toMin(lr.t) < 780 ? 'Imán ' : 'PIN ') + fv2(lr.pin[0]) + ' ' + nf(lr.pin)) } : null,
-        lr.d15 && lr.d15[0] ? { v: lr.d15[0], c: '#8A94A3', s: 'thin', t: 'Delta 15 put ' + fv2(lr.d15[0]) } : null,
-        lr.d15 && lr.d15[1] ? { v: lr.d15[1], c: '#8A94A3', s: 'thin', t: 'Delta 15 call ' + fv2(lr.d15[1]) } : null,
         { v: lr.zg, c: LC.zg, s: 'none', t: 'Zero Gamma ' + fv2(lr.zg) },
         (lr.cwv || lr.mpv) ? { v: lr.cwv || lr.mpv, c: '#7CD34B', s: 'none', t: 'Call wall ' + fv2(lr.cwv || lr.mpv) } : null,
         (lr.pwv || lr.mnv) ? { v: lr.pwv || lr.mnv, c: '#E5534B', s: 'none', t: 'Put wall ' + fv2(lr.pwv || lr.mnv) } : null,
@@ -1093,9 +1094,14 @@ class Component extends DCLogic {
         { v: lr.piso[0], c: '#00BCD4', s: gneg ? 'faint' : 'solid', t: 'Piso ' + fv2(lr.piso[0]) + ' ' + nf(lr.piso) + (gneg ? ' frágil' : '') }
       ].filter(Boolean);
       const hasBars = L.c.length > 0;
-      const vals = [lr.em[0], lr.em[1], lr.techo[0], lr.piso[0], lr.zg, lr.px, prevClose].concat(lr.d15 && lr.d15[0] ? lr.d15 : []).concat(hasBars ? L.h.concat(L.l) : []);
-      let lo = Math.min(...vals), hi = Math.max(...vals);
-      const pad = (hi - lo) * 0.08; lo -= pad; hi += pad;
+      // escala: velas, rango restante y precio; los niveles cercanos entran, los lejanos quedan como etiqueta con flecha
+      const core = [lr.px].concat(lr.rem || []).concat(hasBars ? L.h.concat(L.l) : lr.em);
+      let lo = Math.min(...core), hi = Math.max(...core);
+      const reach = Math.max((hi - lo) * 0.35, mt * 1.5);
+      LS[tk].forEach(lv => { if (lv.v >= lo - reach && lv.v <= hi + reach) { lo = Math.min(lo, lv.v); hi = Math.max(hi, lv.v); } });
+      const pad = (hi - lo) * 0.06; lo -= pad; hi += pad;
+      const farLv = LS[tk].filter(lv => lv.v < lo || lv.v > hi);
+      LS[tk] = LS[tk].filter(lv => lv.v >= lo && lv.v <= hi);
       const rawStep = (hi - lo) / 12;
       const st = [0.5, 1, 2, 2.5, 5, 10, 20, 25, 50, 100, 250].find(s => s >= rawStep) || 250;
       const ticks = [];
@@ -1119,10 +1125,10 @@ class Component extends DCLogic {
         let k = -1, cur = null;
         for (let i = 0; i < nC; i++) { while (k + 1 < src.length && src[k + 1].i <= i) { k++; cur = src[k]; } gzS.push(cur ? cur.z : null); gcS.push(cur ? cur.c : null); gpS.push(cur ? cur.p : null); }
       }
-      const offs = [];
+      const offs = farLv.map(lv => ({ t: (lv.v > hi ? '↑ ' : '↓ ') + lv.t, dir: lv.v > hi ? 'up' : 'down', c: lv.c }));
       if (lr.cw && lr.cw[0] > hi) offs.push({ t: '↑ Muro call ' + fv2(lr.cw[0]), dir: 'up', c: LC.up });
       if (lr.pw && lr.pw[0] < lo) offs.push({ t: '↓ Muro put ' + fv2(lr.pw[0]), dir: 'down', c: LC.dn });
-      liveCfg = { live: true, start: 510, lo, hi, ticks, em: lr.em, ohlc: { o: L.o, h: L.h, l: L.l, c: L.c, v: L.v }, pre: (L.pre && L.pre.length ? L.pre : (PRE[tk] || []).concat(CH[tk].ohlc.c)), off: offs, events: evs, dyn: { z: gzS, c: gcS, p: gpS } };
+      liveCfg = { live: true, start: 510, lo, hi, ticks, em: lr.em, ohlc: { o: L.o, h: L.h, l: L.l, c: L.c, v: L.v }, pre: (L.pre && L.pre.length ? L.pre : (PRE[tk] || []).concat(CH[tk].ohlc.c)), off: offs, events: evs, dyn: { z: gzS, c: gcS, p: gpS }, pinz: (toMin(lr.t) >= 780 && lr.pinz) ? lr.pinz : null };
       if (L.rows.length) liveRows = L.rows[L.rows.length - 1];
       d.subtitle = d.sym + ' · vencimiento 0DTE de hoy · lecturas cada 15 min · lectura neutral, no es recomendación';
       if (lr.auto) { d.subtitle = d.sym + ' · vencimiento 0DTE de hoy · cadena Schwab cada minuto · lectura neutral, no es recomendación'; d.stripNote = 'Fuente: Schwab · cadena 0DTE en tiempo real · escala común a puts y calls'; }

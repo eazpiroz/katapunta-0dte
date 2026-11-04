@@ -686,10 +686,40 @@ def vix_info(c, q):
     return out
 
 
+# Top 10 del S&P 500 por peso en el índice (SPY, 23-oct-2026; Alphabet = GOOGL + GOOG). Revisar cada trimestre.
+TOP10 = [("NVDA", 7.77), ("AAPL", 7.72), ("MSFT", 5.93), ("GOOGL", 5.16), ("AMZN", 3.70),
+         ("AVGO", 2.33), ("META", 2.16), ("TSLA", 1.60), ("LLY", 1.55), ("BRK/B", 1.54)]
+
+
+def top10(q):
+    """% de cada una desde la apertura de hoy (antes de abrir: vs cierre anterior), promedio ponderado y cuántas suben."""
+    rows, sw, swp = [], 0.0, 0.0
+    for sym, w in TOP10:
+        x = (q.get(sym) or q.get(sym.replace("/", ".")) or {}).get("quote", {})
+        last, op, pc = x.get("lastPrice"), x.get("openPrice"), x.get("closePrice")
+        base = op if op else pc
+        if not last or not base:
+            continue
+        pct = (last / base - 1) * 100
+        rows.append([sym.replace("/", "."), round(pct, 2)])
+        sw += w; swp += w * pct
+    if not rows:
+        return None
+    wp = swp / sw
+    up = sum(1 for r in rows if r[1] > 0)
+    sem = 1 if (wp >= 0.15 and up >= 6) else -1 if (wp <= -0.15 and up <= 4) else 0
+    return {"w": round(wp, 2), "up": up, "n": len(rows), "sem": sem, "s": rows}
+
+
 def cycle(c, tok, state):
     t = now()
     today = t.date().isoformat()
     q = sget(c, "/quotes", symbols="$SPX,SPY,QQQ,$VIX,$VXN,$TNX", fields="quote")
+    try:  # llamada aparte: si falla, el resto del ciclo sigue igual
+        t10 = top10(sget(c, "/quotes", symbols=",".join(s_ for s_, _ in TOP10) + ",BRK.B", fields="quote"))
+    except Exception as e:
+        print("  top 10:", e)
+        t10 = None
     tnx = q.get("$TNX", {}).get("quote", {})
     bps = (tnx.get("netChange") or 0) * 10
     macro = ("Alerta macro: " if abs(bps) >= 5 else "Sin alertas macro: ") + f"US10Y {bps:+.1f} pb · datos Schwab en tiempo real"
@@ -700,6 +730,7 @@ def cycle(c, tok, state):
     for tk in TICKERS:
         try:
             out[tk], prev[tk] = build_ticker(c, tk, q, manual, today, state, vi, macro)
+            out[tk]["read"]["t10"] = t10
         except Exception as e:
             print(f"  {tk}: error {e}")
     d = t.date()
