@@ -545,8 +545,8 @@ def build_ticker(c, tk, q, manual, today, state, vixinfo, macro):
     vsign = 1 if tv["gex"] > 0 else -1
     pmx, pmn = (mp, mn) if mr else (mpv or mp, mnv or mn)
     iman = mpv
-    pinm, pinv = None, None
-    if mins >= 840 and sig:
+    pinm, pinv, pinx = None, None, None
+    if sig:
         ks0 = [k for k in m if abs(k - px) <= 3 * sig]
         def pay(s_):
             return sum(((m[k].get("c") or {}).get("totalVolume", 0) or 0) * max(0, s_ - k) +
@@ -557,9 +557,17 @@ def build_ticker(c, tk, q, manual, today, state, vixinfo, macro):
         w = sum(abs(g) for g in cerca.values())
         centro = sum(k * abs(g) for k, g in cerca.items()) / w if w else px
         moda = round(px / stepk5) * stepk5
-        pinv, pinm = (maxpain + centro + moda) / 3, f"cálculo combinado (max pain vol {maxpain:.0f} · centro γ {centro:.0f} · más probable {moda:g})"
-    elif mins >= 780:
-        pinv, pinm = ((pmx + pmn) / 2, "punto medio de majors (γ vol +)") if vsign > 0 else (pmn, "major − (γ vol −)")
+        # los métodos se guardan cada minuto para el estudio (historial)
+        rd = lambda x: round(float(x), 2)
+        pinx = {"mid": rd((pmx + pmn) / 2) if pmx and pmn else None, "mneg": rd(pmn) if pmn else None,
+                "mp": rd(maxpain), "cen": rd(centro), "near": moda, "vs": vsign}
+    if mins >= 780 and vsign < 0 and pmn:
+        # estudio 3 y 4-nov: con γ por volumen negativa el PIN de cierre es el major − (error 1.8 y 1.3 pts)
+        pinv, pinm = pmn, "major − (γ vol −)"
+    elif mins >= 840 and pinx:
+        pinv, pinm = (pinx["mp"] + pinx["cen"] + pinx["near"]) / 3, f"cálculo combinado (max pain vol {pinx['mp']:.0f} · centro γ {pinx['cen']:.0f} · más probable {pinx['near']:g})"
+    elif mins >= 780 and pmx and pmn:
+        pinv, pinm = (pmx + pmn) / 2, "punto medio de majors (γ vol +)"
     if pinv is not None:
         pin = (round(pinv / stepk5) * stepk5 if tk == "SPX" else round(pinv, 1), 0, 0)
     pinz = [round(pin[0] - sig / 2, 1), round(pin[0] + sig / 2, 1)] if (pinv is not None and sig) else None
@@ -637,7 +645,7 @@ def build_ticker(c, tk, q, manual, today, state, vixinfo, macro):
             "px": r2(px), "chg": fmt_pct(chg), "vix": vixinfo[tk], "macro": macro, "tf": tf, "tf2": tf2, "vw": r2(vw),
             "zg": r2(zg), "mp": r2(mp), "mn": r2(mn), "em": [em[0], em[1]], "strad": em[2] if len(em) > 2 else strad,
             "rem": rem, "bands": bands, "techo": [r2(techo[0]), techo[1], techo[2]],
-            "pin": [r2(pin[0]), pin[1], pin[2]] if pin else None, "pinm": pinm, "pinz": pinz, "iman": iman, "pinmov": pinmov, "piso": [r2(piso[0]), piso[1], piso[2]],
+            "pin": [r2(pin[0]), pin[1], pin[2]] if pin else None, "pinm": pinm, "pinz": pinz, "iman": iman, "pinmov": pinmov, "pinx": pinx, "piso": [r2(piso[0]), piso[1], piso[2]],
             "cw": [cw[0], cw[1]], "pw": [pw[0], pw[1]], "ic": ic, "ic2": ic2, "icd": icd, "d15": d15, "d10": d10,
             "fz": fz, "mom": mom, "momA": momA, "momAcc": [x[1] for x in mo], "vs": vs, "mpv": mpv, "mnv": mnv, "mvc": [mvc, round(near[mvc], 1)] if mvc is not None else None,
             "zge": zg_e, "flips": fl0, "flipsT": flT, "reg": reg,
@@ -654,16 +662,25 @@ def vix_info(c, q):
     for sym, tks in (("$VIX", ["SPX", "SPY"]), ("$VXN", ["QQQ"])):
         x = q.get(sym, {}).get("quote", {})
         px = x.get("lastPrice")
+        day15 = None
         try:
-            c15 = [b["close"] for b in resample(history(c, sym), 15)]
+            b15 = resample(history(c, sym), 15)
+            c15 = [b["close"] for b in b15]
             tr = trend(c15, px, 0.01) if px else 0
             tr2 = trend2(c15, px, None) if px else 0
+            # velas de 15 min de hoy con su SMA 20, para la mini gráfica del tablero
+            day15 = []
+            for i, b in enumerate(b15):
+                if dt.datetime.fromtimestamp(b["datetime"] / 1000, MX).date() == t.date():
+                    w = c15[max(0, i - 19):i + 1]
+                    day15.append([round(b["open"], 2), round(b["high"], 2), round(b["low"], 2), round(b["close"], 2),
+                                  round(sum(w) / len(w), 2)])
         except Exception:
             tr = tr2 = 0
         hi = x.get("highPrice")
         nh = bool(px and hi and px >= hi - 0.02 and t.hour * 60 + t.minute >= 520)
         info = {"px": f"{px:.2f}" if px else "—", "chg": fmt_pct(x.get("netPercentChange") or 0), "tr": tr, "tr2": tr2,
-                "hi": f"{hi:.2f}" if hi else None, "nh": nh}
+                "hi": f"{hi:.2f}" if hi else None, "nh": nh, "c15": day15 or None}
         for t_ in tks:
             out[t_] = info
     return out
