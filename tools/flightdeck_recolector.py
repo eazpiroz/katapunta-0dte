@@ -578,13 +578,10 @@ def build_ticker(c, tk, q, manual, today, state, vixinfo, macro):
         rd = lambda x: round(float(x), 2)
         pinx = {"mid": rd((pmx + pmn) / 2) if pmx and pmn else None, "mneg": rd(pmn) if pmn else None,
                 "mp": rd(maxpain), "cen": rd(centro), "near": moda, "vs": vsign}
-    if mins >= 780 and vsign < 0 and pmn:
-        # estudio 3 y 4-nov: con γ por volumen negativa el PIN de cierre es el major − (error 1.8 y 1.3 pts)
-        pinv, pinm = pmn, "major − (γ vol −)"
-    elif mins >= 840 and pinx:
-        pinv, pinm = (pinx["mp"] + pinx["cen"] + pinx["near"]) / 3, f"cálculo combinado (max pain vol {pinx['mp']:.0f} · centro γ {pinx['cen']:.0f} · más probable {pinx['near']:g})"
-    elif mins >= 780 and pmx and pmn:
-        pinv, pinm = (pmx + pmn) / 2, "punto medio de majors (γ vol +)"
+    if mins >= 780 and pmn:
+        # regla aprobada el 4-nov (auditoría 3 y 4-nov): desde 13:00 el PIN de cierre es el major − por volumen
+        # (error 1.2–1.8 pts en 13–14 h); el punto medio de majors queda como alterno en el tablero
+        pinv, pinm = pmn, "major − por volumen" + (f" · alterno punto medio {(pmx + pmn) / 2:.0f}" if pmx else "")
     if pinv is not None:
         pin = (round(pinv / stepk5) * stepk5 if tk == "SPX" else round(pinv, 1), 0, 0)
     pinz = [round(pin[0] - sig / 2, 1), round(pin[0] + sig / 2, 1)] if (pinv is not None and sig) else None
