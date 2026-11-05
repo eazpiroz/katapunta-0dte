@@ -449,7 +449,7 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
 </div>
 </div>
 </template>
-<script>window.BUILD='76e5e4a7';
+<script>window.BUILD='3663c1f9';
 (function(){
   const tpl = document.getElementById('tpl');
   const mount = document.getElementById('app');
@@ -1101,7 +1101,7 @@ class Component extends DCLogic {
       const fil = noG ? { c: '#8A94A3', t: 'Sin lectura del perfil γ: no hay filtro de entrada' }
         : tendencia ? { c: R, t: 'Tendencia: precio ' + (lado > 0 ? 'arriba del call wall' : 'abajo del put wall') + ' ' + fuera * 5 + ' min' + (nvTxt ? ', ' + nvTxt : '') + ' · no IC, no vender el lado ' + (lado > 0 ? 'de calls' : 'de puts') }
         : enLim ? { c: '#F2B544', t: 'Régimen indefinido: precio a ' + fv2(Math.round(Math.abs(dz) * 10) / 10) + ' pts del Zero Gamma · esperar' }
-        : { c: (gneg || intens === 'fuerte −') ? '#F2B544' : G, t: 'Condiciones para vender prima: ' + (gpos ? 'rango' : 'gamma negativa') + (nvTxt ? ' (' + nvTxt + ')' : '') + ', precio a ' + fv2(Math.round(Math.abs(dz))) + ' pts del Zero Gamma · ' + (intens === 'fuerte +' ? 'IC en rango restante' : intens === 'fuerte −' ? 'solo el lado a favor, en Delta 10' : 'IC en Delta 15') };
+        : { c: (gneg || intens === 'fuerte −') ? '#F2B544' : G, t: 'Condiciones para vender prima: ' + (gpos ? 'rango' : 'gamma negativa') + (nvTxt ? ' (' + nvTxt + ')' : '') + ', precio a ' + fv2(Math.round(Math.abs(dz))) + ' pts del Zero Gamma · ' + (intens === 'fuerte +' ? 'IC en rango restante' : intens === 'fuerte −' ? (dz < 0 ? 'solo bear call (lado de calls), en Delta 10' : 'solo bull put (lado de puts), en Delta 10') : 'IC en Delta 15') };
       SIMPLE[tk] = {
         fil: fil,
         macro: lr.macro || '',
@@ -1117,8 +1117,8 @@ class Component extends DCLogic {
         ].filter(Boolean),
         est: [
           ['Iron condor', (tendencia || enLim || intens === 'fuerte −') ? 1 : cl(1 + (gpos ? 1 : 0) + (!momA ? 1 : 0) + (vt < 0 ? 1 : 0) - (gneg ? 1 : 0) + (intens === 'fuerte +' ? 1 : 0)), (tendencia ? 'Tendencia fuera del canal · ' : enLim ? 'Régimen indefinido · ' : '') + gTxt + (intens ? ' · intensidad ' + intens : '') + ' · ' + (momA ? 'con momentum' : 'sin momentum') + ' · ' + vTxt, lr.icd ? 'Delta 15: cortos ' + fv2(lr.icd[0]) + ' / ' + fv2(lr.icd[1]) + (lr.icd[2] ? ' · crédito ' + lr.icd[2].toFixed(2) : '') + ' · alas de ' + lr.icd[3] + (gneg && lr.ic2 ? ' · en γ− alternativa ajustada: ' + fv2(lr.ic2[0]) + ' / ' + fv2(lr.ic2[1]) + (lr.ic2[2] ? ' (' + lr.ic2[2].toFixed(2) + ')' : '') : '') : (lr.ic ? 'Cortos ' + fv2(lr.ic[0]) + ' / ' + fv2(lr.ic[1]) : 'Cortos fuera de ' + fv2(lr.piso[0]) + ' / ' + fv2(lr.techo[0]))],
-          ['Bear call vendido', (tendencia && lado > 0) || enLim ? 1 : cl(1 + (bearA ? 1 : 0) + (gpos ? 1 : 0) + ((lr.fz && lr.fz.indexOf('frenado') >= 0 && (lr.fz.indexOf('superior') >= 0 || lr.fz.indexOf('techo') >= 0)) ? 1 : 0)), (bearA ? 'Momentum bajista' : 'Sin momentum bajista') + ' · ' + (gpos ? 'techo firme (γ+)' : 'techo en γ−'), vsTxt('bc', 'Corto arriba de ' + fv2(res))],
-          ['Bull put vendido', (tendencia && lado < 0) || enLim ? 1 : cl(1 + (bullA ? 1 : 0) + (gpos ? 1 : 0) - (gneg ? 1 : 0)), (bullA ? 'Momentum alcista' : 'Sin momentum alcista') + ' · ' + (gneg ? 'piso frágil (γ−)' : 'piso firme (γ+)'), vsTxt('bp', 'Corto abajo de ' + fv2(sup))],
+          ['Bear call vendido', (tendencia && lado > 0) || enLim ? 1 : cl((intens === 'fuerte −' && dz < 0 ? 1 : 0) + 1 + (bearA ? 1 : 0) + (gpos ? 1 : 0) + ((lr.fz && lr.fz.indexOf('frenado') >= 0 && (lr.fz.indexOf('superior') >= 0 || lr.fz.indexOf('techo') >= 0)) ? 1 : 0)), (bearA ? 'Momentum bajista' : 'Sin momentum bajista') + ' · ' + (gpos ? 'techo firme (γ+)' : 'techo en γ−'), vsTxt('bc', 'Corto arriba de ' + fv2(res))],
+          ['Bull put vendido', (tendencia && lado < 0) || enLim ? 1 : cl((intens === 'fuerte −' && dz > 0 ? 1 : 0) + 1 + (bullA ? 1 : 0) + (gpos ? 1 : 0) - (gneg ? 1 : 0)), (bullA ? 'Momentum alcista' : 'Sin momentum alcista') + ' · ' + (gneg ? 'piso frágil (γ−)' : 'piso firme (γ+)'), vsTxt('bp', 'Corto abajo de ' + fv2(sup))],
           ['Bull call comprado', cl(1 + (bullA ? 1 : 0) + (bullA && (gneg || momAcc) ? 1 : 0)), gTxt + ' · ' + (bullA ? 'momentum alcista 3 TF' + (momAcc ? ' acelerando' : '') : 'sin momentum alcista'), vsTxt('cc', 'Objetivo ' + fv2(lr.techo[0]))],
           ['Bear put comprado', cl(1 + (bearA ? 1 : 0) + (bearA && (gneg || momAcc || (lr.pinmov && lr.pinmov.indexOf('major −') === 0)) ? 1 : 0)), gTxt + ' · ' + (bearA ? 'momentum bajista 3 TF' + (momAcc ? ' acelerando' : '') : 'sin momentum bajista'), vsTxt('pp', 'Objetivo ' + fv2(lr.piso[0]))]
         ]
