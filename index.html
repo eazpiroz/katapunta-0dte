@@ -22,10 +22,13 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
 <div style="max-width: 1440px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px">
 
 <header style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px 24px; padding-bottom: 12px; border-bottom: 1px solid #232A35">
-<div style="display: flex; flex-direction: column; gap: 2px; flex: 1 1 280px; min-width: 0">
+<div style="display: flex; align-items: center; gap: 12px; flex: 1 1 280px; min-width: 0">
+<img src="mascota.webp" alt="Katapunta" width="56" height="56" style="flex: none; width: 56px; height: 56px">
+<div style="display: flex; flex-direction: column; gap: 2px; min-width: 0">
 <div style="font-size: 11px; font-weight: 500; letter-spacing: 0.14em; color: #F2B544">FLIGHT DECK · 0DTE</div>
 <h1 style="margin: 0; font-size: 20px; font-weight: 600; letter-spacing: -0.02em">{{dayTitle}}</h1>
 <div style="font-size: 12px; color: #8A94A3">{{d.subtitle}}</div>
+</div>
 </div>
 <div role="group" aria-label="Elegir subyacente" style="display: flex; flex-wrap: wrap; background: #12161D; border: 1px solid #232A35; border-radius: 10px; padding: 3px; gap: 3px">
 <template data-k="for" list="{{tabs}}" as="t" hint-placeholder-count="4">
@@ -442,7 +445,7 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
 </div>
 </div>
 </template>
-<script>window.BUILD='9c44ee5f';
+<script>window.BUILD='5b92f4d5';
 (function(){
   const tpl = document.getElementById('tpl');
   const mount = document.getElementById('app');
