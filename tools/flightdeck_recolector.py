@@ -158,6 +158,23 @@ def gh_put(tok, content):
     return False
 
 
+def gh_put_hist(tok, day):
+    """Sube el historial del día (gzip) a la rama live: historial/AAAA-MM-DD.jsonl.gz, para la auditoría diaria."""
+    f = HIST / f"{day}.jsonl"
+    if not f.exists():
+        return False
+    import gzip
+    path = f"/repos/{REPO}/contents/historial/{day}.jsonl.gz"
+    st, j = gh_req(tok, "GET", path + f"?ref={BRANCH}")
+    body = {"message": "historial " + day, "branch": BRANCH,
+            "content": base64.b64encode(gzip.compress(f.read_bytes())).decode()}
+    if st == 200 and j.get("sha"):
+        body["sha"] = j["sha"]
+    st, j = gh_req(tok, "PUT", path, body)
+    print(f"historial {day} → GitHub: {'ok' if st in (200, 201) else st}")
+    return st in (200, 201)
+
+
 # ---------------------------------------------------------------- cálculos
 def ema(xs, n):
     if len(xs) < n:
@@ -753,6 +770,9 @@ def main():
     if not c.get("key"):
         sys.exit("Primero corre schwab_prueba.py para guardar las llaves de Schwab.")
     tok = gh_token()
+    if "--subir" in sys.argv:  # python flightdeck_recolector.py --subir AAAA-MM-DD
+        gh_put_hist(tok, sys.argv[sys.argv.index("--subir") + 1])
+        return
     st, _ = gh_req(tok, "GET", f"/repos/{REPO}")
     if st != 200:
         sys.exit(f"El token de GitHub no tiene acceso al repo ({st}). Bórralo de {GH} y vuelve a crearlo.")
@@ -771,6 +791,10 @@ def main():
         t = now()
         if t.hour * 60 + t.minute >= 901:
             print("15:01 · mercado cerrado. Fin del día.")
+            try:
+                gh_put_hist(tok, t.date().isoformat())
+            except Exception as e:
+                print("historial a GitHub:", e)
             break
         time.sleep(max(5, 60 - (time.time() - t0)))
 
