@@ -201,7 +201,7 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
 <span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px dotted #E8ECF1"></span>Zero Gamma</span>
 <span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px solid #7CD34B"></span>Call wall</span>
 <span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px solid #E5534B"></span>Put wall</span>
-<span style="display: flex; align-items: center; gap: 6px"><span style="width: 12px; height: 9px; background: rgba(76, 154, 255, 0.25)"></span><span style="width: 12px; height: 9px; background: rgba(255, 122, 69, 0.3)"></span>Gamma + / −</span>
+
 </div>
 </template>
 <template data-k="if" value="{{isFull}}" hint-placeholder-val="{{false}}">
@@ -232,8 +232,6 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
 <span style="{{chart.zoneLabelStyle}}">{{chart.zoneLabel}}</span>
 <span style="{{chart.emLabel}}">{{emTag}}</span>
 <svg viewBox="0 0 1000 400" preserveAspectRatio="none" aria-hidden="true" style="position: absolute; inset: 0; width: 100%; height: 100%">
-<path d="{{chart.shPos}}" fill="rgba(76, 154, 255, 0.05)"></path>
-<path d="{{chart.shNeg}}" fill="rgba(255, 122, 69, 0.06)"></path>
 <path d="{{chart.cwDyn}}" fill="none" stroke="#7CD34B" stroke-width="1.5" vector-effect="non-scaling-stroke" opacity="0.9"></path>
 <path d="{{chart.pwDyn}}" fill="none" stroke="#E5534B" stroke-width="1.5" vector-effect="non-scaling-stroke" opacity="0.9"></path>
 <path d="{{chart.zgDyn}}" fill="none" stroke="#E8ECF1" stroke-width="1.5" stroke-dasharray="2 3" vector-effect="non-scaling-stroke"></path>
@@ -270,6 +268,18 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
 </template>
 </div>
 </div>
+<template data-k="if" value="{{chart.hasSem}}" hint-placeholder-val="{{false}}">
+<div style="display: grid; grid-template-columns: 52px minmax(0, 1fr) 160px minmax(200px, 22%); align-items: center; font-size: 11px; color: #8A94A3">
+<span style="font-weight: 600; letter-spacing: 0.06em">FILTRO</span>
+<svg viewBox="0 0 1000 10" preserveAspectRatio="none" aria-label="Historial del filtro de entrada por vela de 5 minutos" style="width: 100%; height: 12px; display: block">
+<path d="{{chart.semG}}" fill="#2FB67C"></path>
+<path d="{{chart.semA}}" fill="#F2B544"></path>
+<path d="{{chart.semR}}" fill="#EF5350"></path>
+</svg>
+<span style="padding-left: 8px; white-space: nowrap"><span style="color: #2FB67C">●</span> vender prima <span style="color: #F2B544">●</span> reservas <span style="color: #EF5350">●</span> tendencia</span>
+<span></span>
+</div>
+</template>
 <div style="display: grid; grid-template-columns: 52px minmax(0, 1fr) 160px minmax(200px, 22%); font-size: 11px; color: #808A99">
 <span></span>
 <div style="position: relative; height: 16px">
@@ -279,21 +289,6 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
 <div style="display: flex; justify-content: space-between; padding: 0 8px; font-weight: 600"><span style="color: #FF7A45">{{profL}}</span><span style="color: #808A99; font-weight: 500">{{profScale}}</span><span style="color: #4C9AFF">{{profR}}</span></div>
 </div>
 <div style="font-size: 11px; color: #808A99">{{d.stripNote}} · solo se rotulan los 3 strikes más cargados de cada lado.</div>
-<div style="display: flex; flex-direction: column; gap: 6px; border-top: 1px solid #232A35; padding-top: 10px">
-<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap">
-<span style="font-size: 13px; font-weight: 600">Cambios de majors · lecturas cada 15 min</span>
-<span style="font-size: 11px; color: #808A99">{{chart.evSummary}}</span>
-</div>
-<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 4px 16px">
-<template data-k="for" list="{{chart.evList}}" as="ev" hint-placeholder-count="6">
-<div style="display: flex; align-items: center; gap: 8px; font-size: 12px; padding: 3px 0">
-<span style="font-weight: 600; color: #C9D1DC; min-width: 40px">{{ev.time}}</span>
-<span style="width: 8px; height: 8px; border-radius: 50%; flex: none; background: {{ev.col}}"></span>
-<span style="color: #C9D1DC">{{ev.text}}</span>
-</div>
-</template>
-</div>
-</div>
 
 <div style="font-size: 12px; color: #8A94A3">{{d.mapNote}}</div>
 </div>
@@ -449,7 +444,7 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
 </div>
 </div>
 </template>
-<script>window.BUILD='3663c1f9';
+<script>window.BUILD='bb0dc22c';
 (function(){
   const tpl = document.getElementById('tpl');
   const mount = document.getElementById('app');
@@ -860,6 +855,8 @@ class Component extends DCLogic {
       // sombreado de régimen: precio vs zero gamma por vela
       let shP = '', shN = '';
       (dyn.z || []).forEach((zv, i) => { if (zv == null) return; const r = 'M' + (i * W).toFixed(1) + ' 0H' + ((i + 1) * W).toFixed(1) + 'V400H' + (i * W).toFixed(1) + 'Z'; if (c[i] > zv) shP += r; else shN += r; });
+      const semP = { g: '', a: '', r: '' };
+      (cfg.sem || []).forEach((st_, i) => { if (st_) semP[st_] += 'M' + (i * W).toFixed(1) + ' 0H' + ((i + 1) * W - Math.min(1, W * 0.15)).toFixed(1) + 'V10H' + (i * W).toFixed(1) + 'Z'; });
       const gx = GX[sym] || {};
       const s200 = sma(200);
       const sLast = s200[s200.length - 1];
@@ -922,7 +919,7 @@ class Component extends DCLogic {
       if (!cfg.live) xt.push({ label: '8:30 lun', style: 'position: absolute; top: 2px; left: 80%; transform: translateX(-50%); white-space: nowrap; color: #C9D1DC' });
       return {
         wickUp: wu || 'M0 0', wickDn: wd || 'M0 0', bodyUp: bu || 'M0 0', bodyDn: bd || 'M0 0',
-        ema9: curve(ema(9)), ema21: curve(sma(20)), sma200: curve(s200), zgDyn: stepN(dyn.z), cwDyn: stepN(dyn.c), pwDyn: stepN(dyn.p), shPos: shP || 'M0 0', shNeg: shN || 'M0 0',
+        ema9: curve(ema(9)), ema21: curve(sma(20)), sma200: curve(s200), zgDyn: stepN(dyn.z), cwDyn: stepN(dyn.c), pwDyn: stepN(dyn.p), shPos: shP || 'M0 0', shNeg: shN || 'M0 0', semG: semP.g || 'M0 0', semA: semP.a || 'M0 0', semR: semP.r || 'M0 0', hasSem: !!(cfg.sem && cfg.sem.some(Boolean)),
         events: evMarks, evList: evList, evSummary: evSummary,
         emStyle: 'position: absolute; left: 0; right: 0; top: ' + emTop.toFixed(2) + '%; height: ' + (emBot - emTop).toFixed(2) + '%; background: rgba(242, 181, 68, 0.06); border-top: 1px dashed rgba(242, 181, 68, 0.45); border-bottom: 1px dashed rgba(242, 181, 68, 0.45)',
         pinBand: cfg.pinz ? 'position: absolute; left: 0; right: 0; top: ' + P(cfg.pinz[1]).toFixed(2) + '%; height: ' + (P(cfg.pinz[0]) - P(cfg.pinz[1])).toFixed(2) + '%; background: rgba(232, 210, 122, 0.10); border-top: 1px dashed rgba(232, 210, 122, 0.55); border-bottom: 1px dashed rgba(232, 210, 122, 0.55)' : 'display: none',
@@ -1070,14 +1067,14 @@ class Component extends DCLogic {
       const certCol = PN ? (PN.cert === 'ALTA' ? '#5BD69A' : PN.cert === 'MEDIA' ? '#F2B544' : '#8A94A3') : '#8A94A3';
       // series del perfil γ por vela de 5 min: historia de Perfil γ (day.gx) o, si no hay, lecturas manuales
       const nC = L.c.length, gxs = (DAY.gx && DAY.gx[tk]) || null;
-      const gzS = [], gcS = [], gpS = [];
+      const gzS = [], gcS = [], gpS = [], gnS = [];
       if (nC) {
-        const src = gxs ? gxs.map(r => ({ i: r[0], z: r[1], c: r[2], p: r[3] }))
-          : L.reads.filter(r => r.gt).map(r => ({ i: Math.max(0, Math.round((toMin(r.t) - 510) / 5) - 1), z: r.zg, c: r.cwv || r.mp, p: r.pwv || r.mn }));
-        if (gxs && lr.gt) src.push({ i: nC - 1, z: lr.zg, c: lr.cwv || lr.mp, p: lr.pwv || lr.mn });
+        const src = gxs ? gxs.map(r => ({ i: r[0], z: r[1], c: r[2], p: r[3], n: r[4] }))
+          : L.reads.filter(r => r.gt).map(r => ({ i: Math.max(0, Math.round((toMin(r.t) - 510) / 5) - 1), z: r.zg, c: r.cwv || r.mp, p: r.pwv || r.mn, n: r.nv }));
+        if (gxs && lr.gt) src.push({ i: nC - 1, z: lr.zg, c: lr.cwv || lr.mp, p: lr.pwv || lr.mn, n: lr.nv });
         src.sort((a, b) => a.i - b.i);
         let k = -1, cur = null;
-        for (let i = 0; i < nC; i++) { while (k + 1 < src.length && src[k + 1].i <= i) { k++; cur = src[k]; } gzS.push(cur ? cur.z : null); gcS.push(cur ? cur.c : null); gpS.push(cur ? cur.p : null); }
+        for (let i = 0; i < nC; i++) { while (k + 1 < src.length && src[k + 1].i <= i) { k++; cur = src[k]; } gzS.push(cur ? cur.z : null); gcS.push(cur ? cur.c : null); gpS.push(cur ? cur.p : null); gnS.push(cur && cur.n != null ? cur.n : null); }
       }
       // FILTRO DE ENTRADA (aprobado 4-nov): intensidad = GEX neto por volumen del perfil γ; límite = precio a < 5 pts del zero gamma;
       // tendencia = 3+ velas de 5 min seguidas fuera del canal de majors por volumen con GEX neto negativo
@@ -1086,6 +1083,16 @@ class Component extends DCLogic {
       const intens = nv == null ? null : nv >= 200 ? 'fuerte +' : nv <= -300 ? 'fuerte −' : 'neutro';
       const limP = tk === 'SPX' ? 5 : 0.5;
       const enLim = !noG && lr.zg != null && Math.abs(dz) < limP;
+      // historial del filtro por vela (franja del mapa)
+      const semS = []; { let run = 0, rl = 0;
+        for (let i = 0; i < nC; i++) {
+          const c = L.c[i], z = gzS[i], hc = gcS[i], hp = gpS[i], n_ = gnS[i];
+          if (z == null) { semS.push(null); run = 0; rl = 0; continue; }
+          const sd = (hc != null && c > hc) ? 1 : (hp != null && c < hp) ? -1 : 0;
+          run = sd && sd === rl ? run + 1 : (sd ? 1 : 0); rl = sd;
+          const tr = run >= 3 && ((n_ != null && n_ < 0) || c < z);
+          semS.push(tr ? 'r' : (Math.abs(c - z) < limP || c < z || (n_ != null && n_ <= -300)) ? 'a' : 'g');
+        } }
       let fuera = 0, lado = 0;
       for (let i = nC - 1; i >= 0; i--) {
         const c = L.c[i], hc = gcS[i], hp = gpS[i];
@@ -1158,7 +1165,7 @@ class Component extends DCLogic {
       const offs = farLv.map(lv => ({ t: (lv.v > hi ? '↑ ' : '↓ ') + lv.t, dir: lv.v > hi ? 'up' : 'down', c: lv.c }));
       if (lr.cw && lr.cw[0] > hi) offs.push({ t: '↑ Muro call ' + fv2(lr.cw[0]), dir: 'up', c: LC.up });
       if (lr.pw && lr.pw[0] < lo) offs.push({ t: '↓ Muro put ' + fv2(lr.pw[0]), dir: 'down', c: LC.dn });
-      liveCfg = { live: true, start: 510, lo, hi, ticks, em: lr.em, ohlc: { o: L.o, h: L.h, l: L.l, c: L.c, v: L.v }, pre: (L.pre && L.pre.length ? L.pre : (PRE[tk] || []).concat(CH[tk].ohlc.c)), off: offs, events: evs, dyn: { z: gzS, c: gcS, p: gpS }, pinz: (toMin(lr.t) >= 780 && lr.pinz) ? lr.pinz : null };
+      liveCfg = { live: true, start: 510, lo, hi, ticks, em: lr.em, ohlc: { o: L.o, h: L.h, l: L.l, c: L.c, v: L.v }, pre: (L.pre && L.pre.length ? L.pre : (PRE[tk] || []).concat(CH[tk].ohlc.c)), off: offs, events: evs, dyn: { z: gzS, c: gcS, p: gpS }, sem: semS, pinz: (toMin(lr.t) >= 780 && lr.pinz) ? lr.pinz : null };
       if (L.rows.length) liveRows = L.rows[L.rows.length - 1];
       d.subtitle = d.sym + ' · vencimiento 0DTE de hoy · lecturas cada 15 min · lectura neutral, no es recomendación';
       if (lr.auto) { d.subtitle = d.sym + ' · vencimiento 0DTE de hoy · cadena Schwab cada minuto · lectura neutral, no es recomendación'; d.stripNote = 'Fuente: Schwab · cadena 0DTE en tiempo real · escala común a puts y calls'; }
