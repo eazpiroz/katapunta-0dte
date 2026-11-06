@@ -98,7 +98,7 @@ def main():
     if not files:
         sys.exit("No hay días con historial suficiente.")
     last = files[-1].name.split(".")[0]
-    A = {k: Acc() for k in ("rng", "lvl", "pin", "reg", "mom", "est", "t10")}
+    A = {k: Acc() for k in ("rng", "lvl", "pin", "reg", "mom", "est", "t10", "lad")}
     info = {}
     for f in files:
         day = f.name.split(".")[0]
@@ -249,6 +249,27 @@ def main():
                     lab = {"icd": "IC Delta 15", "ic2": "IC ajustado al régimen", "ic": "IC rango restante"}[name]
                     A["est"].add(lab, (cr - loss) * 100, today)
 
+        # 8. ESCALERA de verticales (venta vs compra) por régimen, al vencimiento, precio mid, cada 30 min 9:00–13:30
+        for m in M:
+            if m % 30 or m < 30 or m > 300:
+                continue
+            lad = rs[m].get("lad") or {}
+            rg = regime(m)
+            for side, dl, s_, l_, nat, md in lad.get("v", []):
+                if not md or md <= 0:
+                    continue
+                w = abs(l_ - s_)
+                itm = (close - s_) if side == "c" else (s_ - close)
+                lab = f"venta {'bear call' if side == 'c' else 'bull put'} δ{int(dl * 100)} ×{w:g}"
+                A["lad"].add((lab, rg), (md - max(0, min(itm, w))) * 100, today)
+            for side, dl, l_, s_, nat, md in lad.get("c", []):
+                if not md or md <= 0:
+                    continue
+                w = abs(s_ - l_)
+                itm = (close - l_) if side == "c" else (l_ - close)
+                lab = f"compra {'bull call' if side == 'c' else 'bear put'} δ{int(dl * 100)} ×{w:g}"
+                A["lad"].add((lab, rg), (max(0, min(itm, w)) - md) * 100, today)
+
         # 7. SEMÁFORO TOP 10 (cambios de estado) → SPX 30 min después
         prev = None
         for m in M:
@@ -336,6 +357,17 @@ def main():
                 rows.append([key, f"{mean(d):+.1f} (n {len(d)})" if d else "—", f"{mean(t):+.1f} (n {len(t)})",
                              pct(sum(x > 0 for x in t), len(t))])
         tbl("7. Semáforo Top 10: SPX 30 min después de cada cambio, a favor del color (pts)", ["color", "hoy", "acumulado", "acierto acum."], rows)
+
+    if A["lad"].tot:
+        regs = ("γ+", "límite", "γ−")
+        cell = lambda v: f"{pct(sum(x > 0 for x in v), len(v))} · {mean(v):+.0f} $ (n {len(v)})" if v else "—"
+        labs = sorted({k[0] for k in A["lad"].tot}, key=lambda s: (s.split()[0], s.split()[1], int(s.split('δ')[1].split()[0]), s))
+        rows = [[lab] + [cell(A["lad"].tot.get((lab, rg), [])) for rg in regs] for lab in labs]
+        tbl("8. Escalera venta vs compra por régimen, acumulado (al vencimiento, precio mid, cada 30 min 9:00–13:30; gana · P&L medio $/contrato)",
+            ["estructura"] + list(regs), rows)
+        rows = [[lab] + [cell(A["lad"].day.get((lab, rg), [])) for rg in regs] for lab in labs if any(A["lad"].day.get((lab, rg)) for rg in regs)]
+        if rows:
+            tbl("8b. Escalera — solo hoy", ["estructura"] + list(regs), rows)
 
 
 if __name__ == "__main__":

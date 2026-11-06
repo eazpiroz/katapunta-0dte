@@ -648,6 +648,31 @@ def build_ticker(c, tk, q, manual, today, state, vixinfo, macro):
         tgt_dn = snap(pmn if pmn < px - stepk else piso[0], False)
         vs["pp"] = vert("pp", atm_k, max(min(tgt_dn, atm_k - w), atm_k - 3 * w))
 
+    # escalera de verticales (pedido del socio 5-nov): cotiza venta (crédito) y compra (débito) para comparar riesgo/ganancia.
+    #   "v": [lado, δ objetivo, corto, largo, crédito natural, crédito mid]   lado c = bear call, p = bull put
+    #   "c": [lado, δ objetivo, largo, corto, débito natural, débito mid]     lado c = bull call, p = bear put
+    #   ancho = |largo − corto|; venta: pérdida máx = ancho − crédito; compra: ganancia máx = ancho − débito.
+    lad = {"v": [], "c": []}
+    if ks:
+        fb = lambda o, f: float((o or {}).get(f) or 0)
+        LADW = {"SPX": ((5, 10), (10, 20)), "SPY": ((1, 2), (1, 2)), "QQQ": ((1, 2), (1, 2))}[tk]
+        for side in ("c", "p"):
+            sg_ = 1 if side == "c" else -1
+            for dl in (0.05, 0.10, 0.15, 0.20, 0.25):
+                k = strike_delta(m, px, T0, dl, side)
+                for ww in LADW[0]:
+                    kl = k + sg_ * ww if k is not None else None
+                    s_o, l_o = (m.get(k) or {}).get(side), (m.get(kl) or {}).get(side)
+                    if s_o and l_o:
+                        lad["v"].append([side, dl, k, kl, round(fb(s_o, "bid") - fb(l_o, "ask"), 2), round(mid(s_o) - mid(l_o), 2)])
+            for dl in (0.40, 0.30, 0.20, 0.15):
+                k = strike_delta(m, px, T0, dl, side)
+                for ww in LADW[1]:
+                    ksh = k + sg_ * ww if k is not None else None
+                    l_o, s_o = (m.get(k) or {}).get(side), (m.get(ksh) or {}).get(side)
+                    if s_o and l_o:
+                        lad["c"].append([side, dl, k, ksh, round(fb(l_o, "ask") - fb(s_o, "bid"), 2), round(mid(l_o) - mid(s_o), 2)])
+
     edges = {"tol": TOL[tk] * 0.5,
              "up": [(em[1], "borde superior del rango"), (techo[0], "techo")],
              "dn": [(em[0], "borde inferior del rango"), (piso[0], "piso")]}
@@ -661,7 +686,7 @@ def build_ticker(c, tk, q, manual, today, state, vixinfo, macro):
             "rem": rem, "bands": bands, "techo": [r2(techo[0]), techo[1], techo[2]],
             "pin": [r2(pin[0]), pin[1], pin[2]] if pin else None, "pinm": pinm, "pinz": pinz, "iman": iman, "pinmov": pinmov, "pinx": pinx, "piso": [r2(piso[0]), piso[1], piso[2]],
             "cw": [cw[0], cw[1]], "pw": [pw[0], pw[1]], "ic": ic, "ic2": ic2, "icd": icd, "d15": d15, "d10": d10,
-            "fz": fz, "mom": mom, "momA": momA, "momAcc": [x[1] for x in mo], "vs": vs, "mpv": mpv, "mnv": mnv, "mvc": [mvc, round(near[mvc], 1)] if mvc is not None else None,
+            "fz": fz, "mom": mom, "momA": momA, "momAcc": [x[1] for x in mo], "vs": vs, "lad": lad, "mpv": mpv, "mnv": mnv, "mvc": [mvc, round(near[mvc], 1)] if mvc is not None else None,
             "zge": zg_e, "flips": fl0, "flipsT": flT, "reg": reg,
             "gex": {"d0": rx(t0), "tot": rx(tT), "vol": rx(tv)},
             "auto": True, "gt": gt}
