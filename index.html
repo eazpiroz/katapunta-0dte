@@ -7,30 +7,34 @@
 <title>Flight Deck 0DTE</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&amp;family=Manrope:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
 <style>
-html,body{overflow-x:clip}body{margin:0;background:#0B0E13;font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
-svg text{font-variant-numeric:tabular-nums}
-a{color:#4C9AFF}a:hover{color:#8BBEFF}
+html,body{overflow-x:clip}body{margin:0;background:#08142B;font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
+svg text{font-family:'IBM Plex Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+h1,h2,h3{font-family:'Montserrat','Manrope',sans-serif}
+.num{font-family:'IBM Plex Mono',ui-monospace,monospace}
+a{color:#65B837}a:hover{color:#83DC28}
 </style>
 
 </head>
 <body>
 <div id="app"><div style="color:#8A94A3;font-family:Inter,system-ui,sans-serif;padding:24px">Cargando lectura…</div></div>
 <template id="tpl">
-<div style="background: #0B0E13; color: #E8ECF1; font-family: 'Inter', system-ui, sans-serif; min-height: 100vh; padding: 16px 20px 40px; box-sizing: border-box">
+<div style="background: #08142B; color: #E8EDF5; font-family: 'Manrope', system-ui, sans-serif; min-height: 100vh; padding: 16px 20px 40px; box-sizing: border-box">
 <div style="max-width: 1440px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px">
 
-<header style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px 24px; padding-bottom: 12px; border-bottom: 1px solid #232A35">
+<header style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px 24px; padding-bottom: 12px; border-bottom: 1px solid #22396A">
 <div style="display: flex; align-items: center; gap: 12px; flex: 1 1 280px; min-width: 0">
-<img src="mascota.webp" alt="Katapunta" width="56" height="56" style="flex: none; width: 56px; height: 56px">
+<img src="logo-katapunta.svg" alt="Katapunta" height="40" style="flex: none; height: 40px; width: auto; max-width: 190px">
+<div style="flex: none; width: 1px; align-self: stretch; background: #22396A"></div>
 <div style="display: flex; flex-direction: column; gap: 2px; min-width: 0">
-<div style="font-size: 11px; font-weight: 500; letter-spacing: 0.14em; color: #F2B544">FLIGHT DECK · 0DTE</div>
+<div style="font-size: 11px; font-weight: 500; letter-spacing: 0.14em; color: #65B837; font-family: 'Montserrat', sans-serif; font-weight: 600">FLIGHT DECK · 0DTE</div>
 <h1 style="margin: 0; font-size: 20px; font-weight: 600; letter-spacing: -0.02em">{{dayTitle}}</h1>
-<div style="font-size: 12px; color: #8A94A3">{{d.subtitle}}</div>
+<div style="font-size: 12px; color: #A3B0C6">{{d.subtitle}}</div>
 </div>
 </div>
-<div role="group" aria-label="Elegir subyacente" style="display: flex; flex-wrap: wrap; background: #12161D; border: 1px solid #232A35; border-radius: 10px; padding: 3px; gap: 3px">
+<div role="group" aria-label="Elegir subyacente" style="display: flex; flex-wrap: wrap; background: #10254D; border: 1px solid #22396A; border-radius: 10px; padding: 3px; gap: 3px">
 <template data-k="for" list="{{tabs}}" as="t" hint-placeholder-count="4">
 <button type="button" onClick="{{t.pick}}" aria-pressed="{{t.pressed}}" style="{{t.style}}">
 <span style="font-size: 14px; font-weight: 600">{{t.sym}}</span>
@@ -40,20 +44,20 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
 </div>
 <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; flex: 1 1 280px">
 <template data-k="if" value="{{showToggle}}" hint-placeholder-val="{{true}}">
-<div role="group" aria-label="Vista" style="display: flex; border: 1px solid #232A35; border-radius: 8px; overflow: hidden">
+<div role="group" aria-label="Vista" style="display: flex; border: 1px solid #22396A; border-radius: 8px; overflow: hidden">
 <button type="button" onClick="{{showSimple}}" aria-pressed="{{simplePressed}}" style="{{simpleBtnStyle}}">Simple</button>
 <button type="button" onClick="{{showFull}}" aria-pressed="{{fullPressed}}" style="{{fullBtnStyle}}">Completa</button>
 </div>
 </template>
-<div style="display: flex; align-items: center; gap: 8px; border: 1px solid #232A35; background: #12161D; padding: 6px 12px; border-radius: 999px; font-size: 12px">
-<span style="color: #8A94A3">Próximo evento</span>
-<span style="font-weight: 600; color: #E8ECF1">{{nextEv}}</span>
+<div style="display: flex; align-items: center; gap: 8px; border: 1px solid #22396A; background: #10254D; padding: 6px 12px; border-radius: 999px; font-size: 12px">
+<span style="color: #A3B0C6">Próximo evento</span>
+<span style="font-weight: 600; color: #E8EDF5">{{nextEv}}</span>
 </div>
 <div style="{{status.chip}}">
 <span style="{{status.dot}}"></span>
 {{status.txt}}
 </div>
-<span style="font-size: 11px; color: #808A99">{{readTxt}}</span>
+<span style="font-size: 11px; color: #A3B0C6">{{readTxt}}</span>
 </div>
 </header>
 
@@ -61,26 +65,26 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
 <section aria-label="Lectura del día" style="display: flex; flex-direction: column; gap: 6px">
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px">
 <template data-k="for" list="{{lect}}" as="lc" hint-placeholder-count="4">
-<div style="background: #12161D; border: 1px solid #232A35; border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px">
+<div style="background: #10254D; border: 1px solid #22396A; border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px">
 <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px">
-<div style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; color: #8A94A3"><span style="margin-right: 6px; color: #6F7A8A">{{lc.ic}}</span>{{lc.label}}</div>
+<div style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; color: #A3B0C6"><span style="margin-right: 6px; color: #A3B0C6">{{lc.ic}}</span>{{lc.label}}</div>
 <template data-k="if" value="{{lc.hasPill}}" hint-placeholder-val="{{false}}">
 <span style="font-size: 10px; font-weight: 600; letter-spacing: 0.08em; padding: 3px 8px; border-radius: 999px; border: 1px solid {{lc.pillCol}}; color: {{lc.pillCol}}; white-space: nowrap">{{lc.pill}}</span>
 </template>
 </div>
-<div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap"><span style="font-size: 30px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.1; color: {{lc.color}}">{{lc.value}}</span><span style="font-size: 13px; color: #8A94A3">{{lc.sub}}</span></div>
+<div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap"><span style="font-family: {{lc.vff}}; font-size: 28px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.1; color: {{lc.color}}">{{lc.value}}</span><span style="font-size: 13px; color: #A3B0C6">{{lc.sub}}</span></div>
 <template data-k="if" value="{{lc.hasDots}}" hint-placeholder-val="{{false}}">
 <div style="display: flex; flex-wrap: wrap; gap: 6px 12px">
 <template data-k="for" list="{{lc.dots}}" as="dt" hint-placeholder-count="3">
-<span style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #C9D1DC"><span style="width: 10px; height: 10px; border-radius: 50%; background: {{dt.col}}"></span>{{dt.tf}}</span>
+<span style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #C9D3E3"><span style="width: 10px; height: 10px; border-radius: 50%; background: {{dt.col}}"></span>{{dt.tf}}</span>
 </template>
 </div>
 </template>
 <template data-k="if" value="{{lc.hasDots2}}" hint-placeholder-val="{{false}}">
 <div style="display: flex; gap: 14px; align-items: center">
-<span style="font-size: 10px; letter-spacing: 0.08em; color: #8A94A3">REGLA NUEVA</span>
+<span style="font-size: 10px; letter-spacing: 0.08em; color: #A3B0C6">REGLA NUEVA</span>
 <template data-k="for" list="{{lc.dots2}}" as="dt" hint-placeholder-count="3">
-<span style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #C9D1DC"><span style="width: 10px; height: 10px; border-radius: 50%; background: {{dt.col}}"></span>{{dt.tf}}</span>
+<span style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #C9D3E3"><span style="width: 10px; height: 10px; border-radius: 50%; background: {{dt.col}}"></span>{{dt.tf}}</span>
 </template>
 </div>
 </template>
@@ -89,7 +93,7 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
 <div style="position: relative; height: 8px; background: #2A2414; border: 1px solid #4A3D1C; border-radius: 4px">
 <div style="{{lc.barMark}}"></div>
 </div>
-<div style="display: flex; justify-content: space-between; font-size: 11px; color: #808A99"><span>{{lc.barL}}</span><span>{{lc.barR}}</span></div>
+<div style="display: flex; justify-content: space-between; font-size: 11px; color: #A3B0C6"><span>{{lc.barL}}</span><span>{{lc.barR}}</span></div>
 </div>
 </template>
 <template data-k="if" value="{{lc.hasSpark}}" hint-placeholder-val="{{false}}">
@@ -108,27 +112,27 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
 <div style="{{lc.rng_dB}}"></div>
 <div style="{{lc.rng_px}}"></div>
 </div>
-<div style="display: flex; justify-content: space-between; font-size: 11px; color: #808A99"><span>{{lc.rngL}}</span><span>{{lc.rngR}}</span></div>
+<div style="display: flex; justify-content: space-between; font-size: 11px; color: #A3B0C6"><span>{{lc.rngL}}</span><span>{{lc.rngR}}</span></div>
 </div>
 </template>
-<div style="font-size: 12px; color: #8A94A3; line-height: 1.4; white-space: pre-line">{{lc.note}}</div>
+<div style="font-size: 12px; color: #A3B0C6; line-height: 1.4; white-space: pre-line">{{lc.note}}</div>
 </div>
 </template>
 </div>
-<div style="font-size: 11px; color: #808A99">{{simple.macro}}</div>
+<div style="font-size: 11px; color: #A3B0C6">{{simple.macro}}</div>
 </section>
 </template>
 
 <template data-k="if" value="{{isFull}}" hint-placeholder-val="{{false}}">
 <section aria-label="Cotizaciones con semáforo de dirección" style="display: flex; flex-direction: column; gap: 6px">
-<div style="display: flex; flex-wrap: wrap; background: #12161D; border: 1px solid #232A35; border-radius: 10px; overflow: hidden">
+<div style="display: flex; flex-wrap: wrap; background: #10254D; border: 1px solid #22396A; border-radius: 10px; overflow: hidden">
 <template data-k="for" list="{{tape}}" as="t" hint-placeholder-count="6">
-<div style="flex: 1 1 200px; min-width: 0; padding: 10px 14px; display: flex; flex-direction: column; gap: 5px; border-right: 1px solid #232A35; border-bottom: 1px solid #232A35; margin-bottom: -1px">
+<div style="flex: 1 1 200px; min-width: 0; padding: 10px 14px; display: flex; flex-direction: column; gap: 5px; border-right: 1px solid #22396A; border-bottom: 1px solid #22396A; margin-bottom: -1px">
 <div style="display: flex; align-items: center; gap: 8px">
-<span style="font-size: 12px; font-weight: 600; color: #C9D1DC">{{t.sym}}</span>
-<span style="font-size: 11px; color: #808A99; border: 1px solid #232A35; border-radius: 4px; padding: 0 5px; white-space: nowrap">{{t.feed}}</span>
+<span style="font-size: 12px; font-weight: 600; color: #C9D3E3">{{t.sym}}</span>
+<span style="font-size: 11px; color: #A3B0C6; border: 1px solid #22396A; border-radius: 4px; padding: 0 5px; white-space: nowrap">{{t.feed}}</span>
 <span role="img" aria-label="{{t.aria}}" style="margin-left: auto; display: flex; align-items: center; gap: 6px">
-<span style="display: flex; gap: 3px; padding: 3px 4px; background: #0B0E13; border: 1px solid #232A35; border-radius: 999px">
+<span style="display: flex; gap: 3px; padding: 3px 4px; background: #08142B; border: 1px solid #22396A; border-radius: 999px">
 <span style="width: 8px; height: 8px; border-radius: 50%; background: {{t.l1}}"></span>
 <span style="width: 8px; height: 8px; border-radius: 50%; background: {{t.l2}}"></span>
 <span style="width: 8px; height: 8px; border-radius: 50%; background: {{t.l3}}"></span>
@@ -137,14 +141,14 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
 </span>
 </div>
 <div style="display: flex; align-items: baseline; gap: 8px">
-<span style="font-size: 17px; font-weight: 500">{{t.px}}</span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 16px; font-weight: 500">{{t.px}}</span>
 <span style="font-size: 12px; color: {{t.chgColor}}">{{t.chg}}</span>
 </div>
-<div style="font-size: 11px; color: #808A99; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{t.why}}</div>
+<div style="font-size: 11px; color: #A3B0C6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{t.why}}</div>
 </div>
 </template>
 </div>
-<div style="font-size: 11px; color: #808A99">Semáforo sobre el precio del índice (SPX o NDX): verde = alcista, rojo = bajista, gris = neutral. VIX, VXN, DXY y la tasa a 10 años cuentan al revés: si suben, se pinta rojo. La línea de abajo dice qué hace el propio instrumento. Regla en 15m: precio vs EMA 20 y EMA 20 vs EMA 50. Es lectura, no señal de entrada.</div>
+<div style="font-size: 11px; color: #A3B0C6">Semáforo sobre el precio del índice (SPX o NDX): verde = alcista, rojo = bajista, gris = neutral. VIX, VXN, DXY y la tasa a 10 años cuentan al revés: si suben, se pinta rojo. La línea de abajo dice qué hace el propio instrumento. Regla en 15m: precio vs EMA 20 y EMA 20 vs EMA 50. Es lectura, no señal de entrada.</div>
 </section>
 
 <template data-k="if" value="{{d.hasWarn}}" hint-placeholder-val="{{false}}">
@@ -156,9 +160,9 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
 
 <section aria-label="Niveles clave" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px">
 <template data-k="for" list="{{kpis}}" as="k" hint-placeholder-count="4">
-<div style="background: #12161D; border: 1px solid #232A35; border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px">
-<div style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; color: #8A94A3">{{k.label}}</div>
-<div style="font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 500; letter-spacing: -0.02em"><span style="color: {{k.c1}}">{{k.v1}}</span><span style="color: #5C6573">{{k.sep}}</span><span style="color: {{k.c2}}">{{k.v2}}</span></div>
+<div style="background: #10254D; border: 1px solid #22396A; border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px">
+<div style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; color: #A3B0C6">{{k.label}}</div>
+<div style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 26px; font-weight: 500; letter-spacing: -0.03em"><span style="color: {{k.c1}}">{{k.v1}}</span><span style="color: #5E6F91">{{k.sep}}</span><span style="color: {{k.c2}}">{{k.v2}}</span></div>
 <template data-k="if" value="{{k.hasChip}}" hint-placeholder-val="{{false}}">
 <span style="{{k.chipStyle}}">{{k.chip}}</span>
 </template>
@@ -167,11 +171,11 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
 <div style="position: relative; height: 8px; background: #2A2414; border: 1px solid #4A3D1C; border-radius: 4px">
 <div style="{{k.barMark}}"></div>
 </div>
-<div style="display: flex; justify-content: space-between; gap: 6px; font-size: 11px; color: #808A99"><span>{{k.barL}}</span><span style="color: #C9D1DC">{{k.barMid}}</span><span>{{k.barR}}</span></div>
+<div style="display: flex; justify-content: space-between; gap: 6px; font-size: 11px; color: #A3B0C6"><span>{{k.barL}}</span><span style="color: #C9D3E3">{{k.barMid}}</span><span>{{k.barR}}</span></div>
 </div>
 </template>
-<div style="font-size: 13px; color: #8A94A3; line-height: 1.4">{{k.note}}</div>
-<div style="margin-top: auto; font-size: 11px; color: #808A99; border-top: 1px solid #232A35; padding-top: 8px">{{k.src}}</div>
+<div style="font-size: 13px; color: #A3B0C6; line-height: 1.4">{{k.note}}</div>
+<div style="margin-top: auto; font-size: 11px; color: #A3B0C6; border-top: 1px solid #22396A; padding-top: 8px">{{k.src}}</div>
 </div>
 </template>
 </section>
@@ -179,12 +183,12 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
 
 <section style="display: flex; flex-wrap: wrap; gap: 12px; align-items: stretch">
 <div style="flex: 999 1 640px; min-width: 0; display: flex; flex-direction: column; gap: 12px">
-<div style="background: #12161D; border: 1px solid #232A35; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+<div style="background: #10254D; border: 1px solid #22396A; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
 <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; align-items: baseline">
 <h2 style="margin: 0; font-size: 18px; font-weight: 600; letter-spacing: -0.01em">Mapa de niveles · {{d.sym}}</h2>
 <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px">
-<span style="font-size: 12px; color: #8A94A3">Perfil por strike</span>
-<div role="group" aria-label="Métrica del perfil por strike" style="display: flex; border: 1px solid #232A35; border-radius: 8px; overflow: hidden">
+<span style="font-size: 12px; color: #A3B0C6">Perfil por strike</span>
+<div role="group" aria-label="Métrica del perfil por strike" style="display: flex; border: 1px solid #22396A; border-radius: 8px; overflow: hidden">
 <button type="button" onClick="{{showOI}}" aria-pressed="{{oiPressed}}" style="{{oiBtnStyle}}">Open interest</button>
 <button type="button" onClick="{{showVol}}" aria-pressed="{{volPressed}}" style="{{volBtnStyle}}">Volumen</button>
 <button type="button" onClick="{{showGex}}" aria-pressed="{{gexPressed}}" style="{{gexBtnStyle}}">GEX OI</button>
@@ -194,37 +198,37 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
 </div>
 
 <template data-k="if" value="{{isSimple}}" hint-placeholder-val="{{true}}">
-<div style="display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12px; color: #A3ACB9">
+<div style="display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12px; color: #A3B0C6">
 <span style="display: flex; align-items: center; gap: 6px"><span style="width: 4px; height: 10px; background: #26A69A"></span><span style="width: 4px; height: 10px; background: #EF5350"></span>Velas 5m</span>
 <span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px dotted #EF5350"></span>EMA 9</span>
 <span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px solid #F5A35C"></span>SMA 20</span>
-<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; height: 9px; background: rgba(232, 236, 241, 0.12); border-top: 2px solid #7CD34B; border-bottom: 2px solid #E5534B"></span>Canal (call wall / put wall)</span>
-<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px dotted #E8ECF1"></span>Zero Gamma</span>
-<span style="display: flex; align-items: center; gap: 6px"><span style="width: 9px; height: 9px; border-radius: 50%; background: #FFFFFF"></span><span style="width: 9px; height: 9px; border-radius: 50%; border: 2px solid #E8ECF1; box-sizing: border-box"></span>PIN (lleno = certeza media+, hueco = baja)</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; height: 9px; background: rgba(232, 237, 245, 0.12); border-top: 2px solid #7CD34B; border-bottom: 2px solid #E5534B"></span>Canal (call wall / put wall)</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px dotted #E8EDF5"></span>Zero Gamma</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 9px; height: 9px; border-radius: 50%; background: #FFFFFF"></span><span style="width: 9px; height: 9px; border-radius: 50%; border: 2px solid #E8EDF5; box-sizing: border-box"></span>PIN (lleno = certeza media+, hueco = baja)</span>
 
 </div>
 </template>
 <template data-k="if" value="{{isFull}}" hint-placeholder-val="{{false}}">
-<div style="display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 11px; color: #8A94A3">
+<div style="display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 11px; color: #A3B0C6">
 <span style="display: flex; align-items: center; gap: 6px"><span style="width: 4px; height: 10px; background: #26A69A"></span><span style="width: 4px; height: 10px; background: #EF5350"></span>Velas 5m vie</span>
 <span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px solid #E879A6"></span>EMA 9</span>
 <span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px solid #F5A35C"></span>SMA 20</span>
 <span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px solid #A78BFA"></span>SMA 200</span>
 <span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; height: 9px; background: #2A2414; border: 1px dashed #7A6230"></span>EM lun</span>
 <span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px dashed #4C9AFF"></span>Gamma +</span>
-<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px dotted #C9D1DC"></span>Zero γ</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px dotted #C9D3E3"></span>Zero γ</span>
 <span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px dashed #FF7A45"></span><span style="width: 16px; border-top: 2px solid #FF7A45"></span>Gamma − · muro put</span>
 <span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px dotted #F2B544"></span>Cierre vie</span>
-<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 1px solid #5C6573"></span>Máx / mín vie</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 1px solid #5E6F91"></span>Máx / mín vie</span>
 </div>
-<div style="font-size: 11px; color: #808A99">Los puntos sobre el viernes marcan cuándo cambió un major en las lecturas de 15 min (Perfil γ, vencimiento 10/30); el detalle va abajo de la gráfica. En la zona del lunes, los niveles del vencimiento 11/02.</div>
+<div style="font-size: 11px; color: #A3B0C6">Los puntos sobre el viernes marcan cuándo cambió un major en las lecturas de 15 min (Perfil γ, vencimiento 10/30); el detalle va abajo de la gráfica. En la zona del lunes, los niveles del vencimiento 11/02.</div>
 </template>
 
 <div role="img" aria-label="{{chart.aria}}" style="display: grid; grid-template-columns: 52px minmax(0, 1fr) 72px minmax(200px, 22%); height: 480px">
 <div style="position: relative">
 <template data-k="for" list="{{chart.ticks}}" as="tk" hint-placeholder-count="4"><span style="{{tk.style}}">{{tk.label}}</span></template>
 </div>
-<div style="position: relative; overflow: hidden; border-left: 1px solid #232A35; border-bottom: 1px solid #232A35">
+<div style="position: relative; overflow: hidden; border-left: 1px solid #22396A; border-bottom: 1px solid #22396A">
 <template data-k="for" list="{{chart.ticks}}" as="tk" hint-placeholder-count="4"><div style="{{tk.grid}}"></div></template>
 <div style="{{chart.emStyle}}"></div>
 <div style="{{chart.pinBand}}"></div>
@@ -232,10 +236,10 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
 <span style="{{chart.zoneLabelStyle}}">{{chart.zoneLabel}}</span>
 <span style="{{chart.emLabel}}">{{emTag}}</span>
 <svg viewBox="0 0 1000 400" preserveAspectRatio="none" aria-hidden="true" style="position: absolute; inset: 0; width: 100%; height: 100%">
-<path d="{{chart.chFill}}" fill="rgba(232, 236, 241, 0.045)"></path>
+<path d="{{chart.chFill}}" fill="rgba(232, 237, 245, 0.045)"></path>
 <path d="{{chart.cwDyn}}" fill="none" stroke="#7CD34B" stroke-width="1.5" vector-effect="non-scaling-stroke" opacity="0.9"></path>
 <path d="{{chart.pwDyn}}" fill="none" stroke="#E5534B" stroke-width="1.5" vector-effect="non-scaling-stroke" opacity="0.9"></path>
-<path d="{{chart.zgDyn}}" fill="none" stroke="#E8ECF1" stroke-width="1.5" stroke-dasharray="2 3" vector-effect="non-scaling-stroke"></path>
+<path d="{{chart.zgDyn}}" fill="none" stroke="#E8EDF5" stroke-width="1.5" stroke-dasharray="2 3" vector-effect="non-scaling-stroke"></path>
 <path d="{{chart.wickUp}}" fill="none" stroke="#26A69A" stroke-width="1" vector-effect="non-scaling-stroke"></path>
 <path d="{{chart.wickDn}}" fill="none" stroke="#EF5350" stroke-width="1" vector-effect="non-scaling-stroke"></path>
 <path d="{{chart.bodyUp}}" fill="#26A69A"></path>
@@ -253,26 +257,26 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
 <template data-k="for" list="{{chart.levels}}" as="lv" hint-placeholder-count="7"><span style="{{lv.labelStyle}}">{{lv.t}}</span></template>
 <template data-k="for" list="{{chart.pills}}" as="pq" hint-placeholder-count="5"><span style="{{pq.style}}">{{pq.t}}</span></template>
 </div>
-<div style="position: relative; overflow: hidden; background: #0F1318; border-left: 1px solid #232A35; border-bottom: 1px solid #232A35">
-<div style="position: absolute; top: 0; bottom: 0; left: 50%; border-left: 1px solid #2A313C"></div>
+<div style="position: relative; overflow: hidden; background: #0B1A38; border-left: 1px solid #22396A; border-bottom: 1px solid #22396A">
+<div style="position: absolute; top: 0; bottom: 0; left: 50%; border-left: 1px solid #2C4478"></div>
 <template data-k="for" list="{{chart.ticks}}" as="tk" hint-placeholder-count="4"><div style="{{tk.grid}}"></div><span style="{{tk.pstyle}}">{{tk.label}}</span></template>
 <template data-k="for" list="{{chart.levels}}" as="lv" hint-placeholder-count="7"><div style="{{lv.profLine}}"></div></template>
 <template data-k="for" list="{{prof}}" as="pr" hint-placeholder-count="20">
 <div style="{{pr.row}}">
 <div style="display: flex; justify-content: flex-end; align-items: center; gap: 4px; min-width: 0">
-<span style="font-size: 11px; color: #E8ECF1; white-space: nowrap">{{pr.lL}}</span>
+<span style="font-size: 11px; color: #E8EDF5; white-space: nowrap">{{pr.lL}}</span>
 <div style="{{pr.lBar}}"></div>
 </div>
 <div style="display: flex; align-items: center; gap: 4px; min-width: 0">
 <div style="{{pr.rBar}}"></div>
-<span style="font-size: 11px; color: #E8ECF1; white-space: nowrap">{{pr.rL}}</span>
+<span style="font-size: 11px; color: #E8EDF5; white-space: nowrap">{{pr.rL}}</span>
 </div>
 </div>
 </template>
 </div>
 </div>
 <template data-k="if" value="{{chart.hasSem}}" hint-placeholder-val="{{false}}">
-<div style="display: grid; grid-template-columns: 52px minmax(0, 1fr) 72px minmax(200px, 22%); align-items: center; font-size: 11px; color: #8A94A3">
+<div style="display: grid; grid-template-columns: 52px minmax(0, 1fr) 72px minmax(200px, 22%); align-items: center; font-size: 11px; color: #A3B0C6">
 <span style="font-weight: 600; letter-spacing: 0.06em">FILTRO</span>
 <svg viewBox="0 0 1000 10" preserveAspectRatio="none" aria-label="Historial del filtro de entrada por vela de 5 minutos" style="width: 100%; height: 12px; display: block">
 <path d="{{chart.semG}}" fill="#2FB67C"></path>
@@ -283,28 +287,28 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
 <span></span>
 </div>
 </template>
-<div style="display: grid; grid-template-columns: 52px minmax(0, 1fr) 72px minmax(200px, 22%); font-size: 11px; color: #808A99">
+<div style="display: grid; grid-template-columns: 52px minmax(0, 1fr) 72px minmax(200px, 22%); font-size: 11px; color: #A3B0C6">
 <span></span>
 <div style="position: relative; height: 16px">
 <template data-k="for" list="{{chart.xt}}" as="x" hint-placeholder-count="6"><span style="{{x.style}}">{{x.label}}</span></template>
 </div>
-<span style="padding-left: 8px">hora CDMX</span>
-<div style="display: flex; justify-content: space-between; padding: 0 8px; font-weight: 600"><span style="color: #FF7A45">{{profL}}</span><span style="color: #808A99; font-weight: 500">{{profScale}}</span><span style="color: #4C9AFF">{{profR}}</span></div>
+<span style="padding-left: 8px">hora ET</span>
+<div style="display: flex; justify-content: space-between; padding: 0 8px; font-weight: 600"><span style="color: #FF7A45">{{profL}}</span><span style="color: #A3B0C6; font-weight: 500">{{profScale}}</span><span style="color: #4C9AFF">{{profR}}</span></div>
 </div>
 
 </div>
 
 <template data-k="if" value="{{isFull}}" hint-placeholder-val="{{false}}">
-<div style="background: #12161D; border: 1px solid #232A35; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 12px; flex: 1 1 auto">
+<div style="background: #10254D; border: 1px solid #22396A; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 12px; flex: 1 1 auto">
 <h2 style="margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.01em">Dónde coinciden las fuentes</h2>
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px">
 <template data-k="for" list="{{d.confluence}}" as="c" hint-placeholder-count="3">
-<div style="display: flex; flex-direction: column; gap: 8px; padding-top: 10px; border-top: 1px solid #232A35">
+<div style="display: flex; flex-direction: column; gap: 8px; padding-top: 10px; border-top: 1px solid #22396A">
 <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 8px">
-<span style="font-size: 20px; font-weight: 500; letter-spacing: -0.01em; color: {{c.color}}">{{c.k}}</span>
-<span style="font-size: 11px; color: #8A94A3">{{c.count}}</span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 19px; font-weight: 500; letter-spacing: -0.02em; color: {{c.color}}">{{c.k}}</span>
+<span style="font-size: 11px; color: #A3B0C6">{{c.count}}</span>
 </div>
-<ul style="margin: 0; padding-left: 16px; display: flex; flex-direction: column; gap: 4px; font-size: 13px; line-height: 1.4; color: #C9D1DC">
+<ul style="margin: 0; padding-left: 16px; display: flex; flex-direction: column; gap: 4px; font-size: 13px; line-height: 1.4; color: #C9D3E3">
 <template data-k="for" list="{{c.items}}" as="i" hint-placeholder-count="3"><li>{{i}}</li></template>
 </ul>
 </div>
@@ -317,51 +321,51 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
 </section>
 
 <template data-k="if" value="{{isSimple}}" hint-placeholder-val="{{true}}">
-<section aria-label="Estructuras" style="background: #12161D; border: 1px solid #232A35; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<section aria-label="Estructuras" style="background: #10254D; border: 1px solid #22396A; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
 <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap">
 <h2 style="margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.01em">Estructuras · qué favorece el entorno · {{d.sym}}</h2>
-<span style="font-size: 11px; color: #808A99">●●● encaja bien · ●●○ encaja con reservas · ●○○ encaja poco</span>
+<span style="font-size: 11px; color: #A3B0C6">●●● encaja bien · ●●○ encaja con reservas · ●○○ encaja poco</span>
 </div>
 <template data-k="if" value="{{hasFil}}" hint-placeholder-val="{{false}}">
-<div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; background: #0E1218; border: 1px solid {{filC}}">
+<div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; background: #0B1A38; border: 1px solid {{filC}}">
 <span style="width: 12px; height: 12px; border-radius: 50%; flex: none; background: {{filC}}"></span>
-<span style="font-size: 14px; font-weight: 600; color: #E8ECF1">{{filT}}</span>
+<span style="font-size: 14px; font-weight: 600; color: #E8EDF5">{{filT}}</span>
 </div>
 </template>
 <div style="overflow-x: auto">
 <div style="min-width: 680px; display: flex; flex-direction: column">
-<div style="display: grid; grid-template-columns: 170px 70px minmax(0, 1fr) minmax(0, 1fr); gap: 12px; font-size: 11px; font-weight: 500; letter-spacing: 0.08em; color: #8A94A3; padding: 0 0 6px">
+<div style="display: grid; grid-template-columns: 170px 70px minmax(0, 1fr) minmax(0, 1fr); gap: 12px; font-size: 11px; font-weight: 500; letter-spacing: 0.08em; color: #A3B0C6; padding: 0 0 6px">
 <span>ESTRUCTURA</span><span>ENCAJE</span><span>POR QUÉ</span><span>REFERENCIA</span>
 </div>
 <template data-k="for" list="{{est}}" as="es" hint-placeholder-count="5">
-<div style="display: grid; grid-template-columns: 170px 70px minmax(0, 1fr) minmax(0, 1fr); gap: 12px; align-items: center; padding: 10px 0; border-top: 1px solid #232A35; font-size: 13px">
+<div style="display: grid; grid-template-columns: 170px 70px minmax(0, 1fr) minmax(0, 1fr); gap: 12px; align-items: center; padding: 10px 0; border-top: 1px solid #22396A; font-size: 13px">
 <span style="font-weight: 600">{{es.name}}</span>
 <span role="img" aria-label="{{es.aria}}" style="display: flex; gap: 4px">
 <span style="width: 10px; height: 10px; border-radius: 50%; background: {{es.d1}}"></span>
 <span style="width: 10px; height: 10px; border-radius: 50%; background: {{es.d2}}"></span>
 <span style="width: 10px; height: 10px; border-radius: 50%; background: {{es.d3}}"></span>
 </span>
-<span style="color: #C9D1DC">{{es.why}}</span>
-<span style="color: #E8ECF1; font-weight: 500">{{es.ref}}</span>
+<span style="color: #C9D3E3">{{es.why}}</span>
+<span style="color: #E8EDF5; font-weight: 500">{{es.ref}}</span>
 </div>
 </template>
 </div>
 </div>
-<div style="font-size: 11px; color: #808A99; line-height: 1.5; border-top: 1px solid #232A35; padding-top: 8px">Reglas fijas: iron condor con gamma positiva por volumen, sin momentum y VIX bajando (cortos en delta 15). Verticales vendidos detrás del techo/piso y del delta 15, a favor del momentum. Verticales comprados solo con momentum fuerte alineado en 5m, 15m y 1H, mejor si acelera o hay gamma negativa. Alas de 10; precios a mitad de la cadena. Describe el entorno; no es recomendación de entrada. Detalle técnico, agenda completa y bitácora en la vista Completa.</div>
+<div style="font-size: 11px; color: #A3B0C6; line-height: 1.5; border-top: 1px solid #22396A; padding-top: 8px">Reglas fijas: iron condor con gamma positiva por volumen, sin momentum y VIX bajando (cortos en delta 15). Verticales vendidos detrás del techo/piso y del delta 15, a favor del momentum. Verticales comprados solo con momentum fuerte alineado en 5m, 15m y 1H, mejor si acelera o hay gamma negativa. Alas de 10; precios a mitad de la cadena. Describe el entorno; no es recomendación de entrada. Detalle técnico, agenda completa y bitácora en la vista Completa.</div>
 </section>
 </template>
 
 <template data-k="if" value="{{isFull}}" hint-placeholder-val="{{false}}">
 <section style="display: flex; flex-wrap: wrap; gap: 12px; align-items: stretch">
-<div style="flex: 1 1 420px; min-width: 0; background: #12161D; border: 1px solid #232A35; border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 12px">
+<div style="flex: 1 1 420px; min-width: 0; background: #10254D; border: 1px solid #22396A; border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 12px">
 <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap">
 <h2 style="margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.01em">Técnico multi-timeframe</h2>
-<span style="font-size: 12px; color: #8A94A3">{{d.sym}} al cierre {{d.closeTxt}}</span>
+<span style="font-size: 12px; color: #A3B0C6">{{d.sym}} al cierre {{d.closeTxt}}</span>
 </div>
 <div style="overflow-x: auto">
 <table style="width: 100%; border-collapse: collapse; font-size: 13px; min-width: 440px">
 <thead>
-<tr style="color: #8A94A3; font-size: 12px; text-align: right">
+<tr style="color: #A3B0C6; font-size: 12px; text-align: right">
 <th style="text-align: left; font-weight: 500; padding: 6px 4px">TF</th>
 <th style="font-weight: 500; padding: 6px 4px">RSI</th>
 <th style="font-weight: 500; padding: 6px 4px">MACD / señal</th>
@@ -372,8 +376,8 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
 </thead>
 <tbody>
 <template data-k="for" list="{{d.tech}}" as="t" hint-placeholder-count="3">
-<tr style="border-top: 1px solid #232A35; font-family: 'Inter', sans-serif; text-align: right">
-<td style="text-align: left; padding: 10px 4px; font-family: 'Inter', sans-serif; font-weight: 600">{{t.tf}}</td>
+<tr style="border-top: 1px solid #22396A; font-family: 'IBM Plex Mono', ui-monospace, monospace; text-align: right">
+<td style="text-align: left; padding: 10px 4px; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-weight: 600">{{t.tf}}</td>
 <td style="padding: 10px 4px; color: {{t.rsiColor}}">{{t.rsi}}</td>
 <td style="padding: 10px 4px">{{t.macd}}</td>
 <td style="padding: 10px 4px; color: {{t.e20Color}}">{{t.e20}}</td>
@@ -384,35 +388,35 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
 </tbody>
 </table>
 </div>
-<div style="font-size: 12px; color: #808A99">Azul: precio arriba de la media · naranja: precio debajo · RSI &lt; 40 naranja, &gt; 60 azul</div>
-<div style="font-size: 11px; color: #808A99; border-top: 1px solid #232A35; padding-top: 8px">Fuente: TradingView · cierre vie 30-oct</div>
+<div style="font-size: 12px; color: #A3B0C6">Azul: precio arriba de la media · naranja: precio debajo · RSI &lt; 40 naranja, &gt; 60 azul</div>
+<div style="font-size: 11px; color: #A3B0C6; border-top: 1px solid #22396A; padding-top: 8px">Fuente: TradingView · cierre vie 30-oct</div>
 </div>
 
-<div style="flex: 1 1 300px; min-width: 0; background: #12161D; border: 1px solid #232A35; border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 12px">
-<h2 style="margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.01em">Agenda del lunes</h2>
-<div style="background: #0F1A2A; border: 1px solid #23395A; border-radius: 8px; padding: 10px 12px; font-size: 13px; color: #C9D1DC">Fin del horario de verano en EE.UU.: la apertura queda a las <strong style="color: #E8ECF1">8:30</strong> y el cierre a las <strong style="color: #E8ECF1">15:00</strong> hora CDMX.</div>
+<div style="flex: 1 1 300px; min-width: 0; background: #10254D; border: 1px solid #22396A; border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.01em">{{agTitle}}</h2>
+<div style="background: #0B1A38; border: 1px solid #22396A; border-radius: 8px; padding: 10px 12px; font-size: 13px; color: #C9D3E3">Horario de Nueva York: apertura <strong style="color: #E8EDF5">9:30</strong> y cierre <strong style="color: #E8EDF5">16:00</strong> ET.</div>
 <template data-k="for" list="{{events}}" as="e" hint-placeholder-count="3">
-<div style="display: grid; grid-template-columns: 52px 1fr; gap: 12px; padding: 8px 0; border-top: 1px solid #232A35">
-<span style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600">{{e.time}}</span>
+<div style="display: grid; grid-template-columns: 52px 1fr; gap: 12px; padding: 8px 0; border-top: 1px solid #22396A">
+<span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 14px; font-weight: 600">{{e.time}}</span>
 <div style="display: flex; flex-direction: column; gap: 3px">
 <span style="font-size: 14px; font-weight: 500">{{e.name}}</span>
-<span style="font-size: 12px; color: #8A94A3">{{e.detail}}</span>
+<span style="font-size: 12px; color: #A3B0C6">{{e.detail}}</span>
 </div>
 </div>
 </template>
-<div style="font-size: 11px; color: #808A99; border-top: 1px solid #232A35; padding-top: 8px">Fuente: TradingView · calendario económico EE.UU.</div>
+<div style="font-size: 11px; color: #A3B0C6; border-top: 1px solid #22396A; padding-top: 8px">Fuente: TradingView · calendario económico EE.UU.</div>
 </div>
 </section>
 
-<section style="background: #12161D; border: 1px solid #232A35; border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 12px">
+<section style="background: #10254D; border: 1px solid #22396A; border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 12px">
 <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px">
 <h2 style="margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.01em">Bitácora de lecturas · {{d.sym}}</h2>
-<span style="font-size: 12px; color: #8A94A3">Cada corte queda guardado con su resultado al cierre</span>
+<span style="font-size: 12px; color: #A3B0C6">Cada corte queda guardado con su resultado al cierre</span>
 </div>
 <div style="overflow-x: auto">
 <table style="width: 100%; border-collapse: collapse; font-size: 13px; min-width: 860px">
 <thead>
-<tr style="color: #8A94A3; font-size: 12px; text-align: left">
+<tr style="color: #A3B0C6; font-size: 12px; text-align: left">
 <th style="font-weight: 500; padding: 6px 8px">Sesión</th>
 <th style="font-weight: 500; padding: 6px 8px">Corte</th>
 <th style="font-weight: 500; padding: 6px 8px">Zero γ</th>
@@ -424,14 +428,14 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
 </thead>
 <tbody>
 <template data-k="for" list="{{d.log}}" as="l" hint-placeholder-count="2">
-<tr style="border-top: 1px solid #232A35; vertical-align: top">
+<tr style="border-top: 1px solid #22396A; vertical-align: top">
 <td style="padding: 10px 8px; font-weight: 600">{{l.day}}</td>
-<td style="padding: 10px 8px; color: #8A94A3">{{l.cut}}</td>
-<td style="padding: 10px 8px; font-family: 'Inter', sans-serif">{{l.zg}}</td>
-<td style="padding: 10px 8px; font-family: 'Inter', sans-serif">{{l.gm}}</td>
-<td style="padding: 10px 8px; font-family: 'Inter', sans-serif">{{l.range}}</td>
-<td style="padding: 10px 8px; font-family: 'Inter', sans-serif">{{l.close}}</td>
-<td style="padding: 10px 8px; color: #C9D1DC">{{l.result}}</td>
+<td style="padding: 10px 8px; color: #A3B0C6">{{l.cut}}</td>
+<td style="padding: 10px 8px; font-family: 'IBM Plex Mono', ui-monospace, monospace">{{l.zg}}</td>
+<td style="padding: 10px 8px; font-family: 'IBM Plex Mono', ui-monospace, monospace">{{l.gm}}</td>
+<td style="padding: 10px 8px; font-family: 'IBM Plex Mono', ui-monospace, monospace">{{l.range}}</td>
+<td style="padding: 10px 8px; font-family: 'IBM Plex Mono', ui-monospace, monospace">{{l.close}}</td>
+<td style="padding: 10px 8px; color: #C9D3E3">{{l.result}}</td>
 </tr>
 </template>
 </tbody>
@@ -440,12 +444,12 @@ a{color:#4C9AFF}a:hover{color:#8BBEFF}
 </section>
 </template>
 
-<footer style="font-size: 12px; color: #808A99; line-height: 1.5">Herramienta de lectura de mercado. No es recomendación de inversión. {{d.footer}}</footer>
+<footer style="font-size: 12px; color: #A3B0C6; line-height: 1.5">Herramienta de lectura de mercado. No es recomendación de inversión. {{d.footer}}</footer>
 
 </div>
 </div>
 </template>
-<script>window.BUILD='c2bf0cd5';
+<script>window.BUILD='b148429f';
 (function(){
   const tpl = document.getElementById('tpl');
   const mount = document.getElementById('app');
@@ -535,7 +539,7 @@ class Component extends DCLogic {
   }
   renderVals() {
     const LIVE = window.LIVE_DATA;
-    const up = '#4C9AFF', dn = '#FF7A45', neu = '#E8ECF1', cyan = '#F2B544', yel = '#C9D1DC';
+    const up = '#4C9AFF', dn = '#FF7A45', neu = '#E8EDF5', cyan = '#F2B544', yel = '#C9D3E3';
     const DAY = LIVE.day || {};
     const view = LIVE.on ? 'simple' : (this.state.view || 'simple');
     const isSimple = view === 'simple';
@@ -556,7 +560,7 @@ class Component extends DCLogic {
       { sym: 'DXY', feed: 'RT', px: '101.96', chg: '+0.11%', chgColor: neu, n: 101.963, e20: 101.912, e50: 101.880, tol: 0.02, inv: true },
       { sym: 'US10Y', feed: 'RT', px: '4.933%', chg: '−0.08%', chgColor: neu, n: 4.933, e20: 4.931, e50: 4.933, tol: 0.002, inv: true }
     ];
-    const SEM = { g: '#26A69A', y: '#8A94A3', r: '#EF5350', off: '#262C36' };
+    const SEM = { g: '#26A69A', y: '#A3B0C6', r: '#EF5350', off: '#22396A' };
     const sem = t => {
       const dx = t.n - t.e20;
       const pos = Math.abs(dx) <= t.tol ? 0 : (dx > 0 ? 1 : -1);
@@ -603,7 +607,7 @@ class Component extends DCLogic {
           { tf: '5m', rsi: '62.5', rsiColor: up, macd: '3.9 / −1.3', e20: '7,563.3', e20Color: up, e50: '7,573.3', e50Color: up, adx: '33.3' }
         ],
         log: [
-          { day: 'Vie 30-oct', cut: '13:59 CDMX · Perfil γ latest', zg: '7,580.9', gm: '7,580 / 7,590', range: '±1σ 7,557 – 7,605', close: '7,580.07', result: 'Cerró a 0.3 pts del major long gamma (State 7,580.4). El mínimo 7,527.6 rompió −1σ a media sesión.' },
+          { day: 'Vie 30-oct', cut: '15:59 ET · Perfil γ latest', zg: '7,580.9', gm: '7,580 / 7,590', range: '±1σ 7,557 – 7,605', close: '7,580.07', result: 'Cerró a 0.3 pts del major long gamma (State 7,580.4). El mínimo 7,527.6 rompió −1σ a media sesión.' },
           { day: 'Lun 2-nov', cut: 'Pre-apertura · Perfil γ next + Cboe', zg: '7,593.4', gm: '7,650 / 7,500', range: 'EM 7,514 – 7,646', close: '—', result: 'Pendiente' }
         ],
         footer: 'Fuentes: TradingView (SPX, SPY, VIX en tiempo real; ES1! con 10 min de retraso), Cboe delayed quotes (15 min), Perfil γ (lectura manual).'
@@ -694,7 +698,7 @@ class Component extends DCLogic {
         footer: 'Fuentes: TradingView (QQQ y VXN en tiempo real; NDX con 15 min y NQ1! con 10 min de retraso), Cboe delayed quotes (15 min), Perfil γ (lectura manual).'
       }
     };
-    const LC = { up: '#4C9AFF', dn: '#FF7A45', zg: '#C9D1DC', am: '#F2B544', th: '#5C6573' };
+    const LC = { up: '#4C9AFF', dn: '#FF7A45', zg: '#C9D3E3', am: '#F2B544', th: '#5E6F91' };
     const CH = {
       SPX: {
         lo: 7480, hi: 7680, ticks: [7650, 7600, 7550, 7500], em: [7514, 7646], fmt: 0,
@@ -808,7 +812,7 @@ class Component extends DCLogic {
     const LS = {
       SPX: [
         { v: 7650, c: LC.up, s: 'dash', t: 'Techo 7,650 · 2 fuentes' },
-        { v: 7600, c: '#E8ECF1', s: 'solid', t: 'PIN 7,600 · 4 fuentes' },
+        { v: 7600, c: '#E8EDF5', s: 'solid', t: 'PIN 7,600 · 4 fuentes' },
         { v: 7593.39, c: LC.zg, s: 'dot', t: 'Zero γ 7,593' },
         { v: 7580.07, c: LC.am, s: 'dot', t: 'Cierre vie 7,580' },
         { v: 7500, c: LC.dn, s: 'solid', t: 'Piso 7,500 · 3 fuentes' }
@@ -816,12 +820,12 @@ class Component extends DCLogic {
       SPY: [
         { v: 760, c: LC.up, s: 'dash', t: 'Techo 760 · 4 fuentes' },
         { v: 755.72, c: LC.am, s: 'dot', t: 'Cierre vie 755.72' },
-        { v: 755.59, c: '#E8ECF1', s: 'solid', t: 'PIN / zero γ 755.6 · 3 fuentes' },
+        { v: 755.59, c: '#E8EDF5', s: 'solid', t: 'PIN / zero γ 755.6 · 3 fuentes' },
         { v: 750, c: LC.dn, s: 'solid', t: 'Piso 750 · 3 fuentes' }
       ],
       QQQ: [
         { v: 700, c: LC.up, s: 'dash', t: 'Techo 700 · 3 fuentes' },
-        { v: 695, c: '#E8ECF1', s: 'solid', t: 'Zona OI 695 · 3 fuentes' },
+        { v: 695, c: '#E8EDF5', s: 'solid', t: 'Zona OI 695 · 3 fuentes' },
         { v: 690.49, c: LC.am, s: 'dot', t: 'Cierre vie 690.49' },
         { v: 688.39, c: LC.zg, s: 'dot', t: 'Zero γ 688.4' },
         { v: 680, c: LC.dn, s: 'solid', t: 'Piso 680 · 3 fuentes' }
@@ -862,7 +866,7 @@ class Component extends DCLogic {
       let chF = '';
       (dyn.c || []).forEach((cv, i) => { const pv = (dyn.p || [])[i]; if (cv == null || pv == null) return; chF += 'M' + (i * W).toFixed(1) + ' ' + Y(cv).toFixed(1) + 'H' + ((i + 1) * W).toFixed(1) + 'V' + Y(pv).toFixed(1) + 'H' + (i * W).toFixed(1) + 'Z'; });
       // PIN por lectura: punto lleno (certeza media o más) o hueco (baja)
-      const pinDots = (cfg.pinPts || []).filter(q => q.v >= lo && q.v <= hi).map(q => ({ style: 'position: absolute; width: 9px; height: 9px; border-radius: 50%; box-sizing: border-box; left: calc(' + xp(q.i).toFixed(2) + '% - 4.5px); top: calc(' + P(q.v).toFixed(2) + '% - 4.5px); ' + (q.f ? 'background: #FFFFFF; border: 1px solid #0B0E13' : 'background: transparent; border: 2px solid #E8ECF1'), title: q.title }));
+      const pinDots = (cfg.pinPts || []).filter(q => q.v >= lo && q.v <= hi).map(q => ({ style: 'position: absolute; width: 9px; height: 9px; border-radius: 50%; box-sizing: border-box; left: calc(' + xp(q.i).toFixed(2) + '% - 4.5px); top: calc(' + P(q.v).toFixed(2) + '% - 4.5px); ' + (q.f ? 'background: #FFFFFF; border: 1px solid #08142B' : 'background: transparent; border: 2px solid #E8EDF5'), title: q.title }));
       // pastillas del eje derecho (como TradingView)
       let pl = -99;
       const pills = (cfg.pills || []).filter(q => q.v >= lo && q.v <= hi).map(q => Object.assign({}, q, { p: P(q.v) })).sort((a, b) => a.p - b.p).map(q => { const pp = Math.max(q.p, pl + 4.6); pl = pp; return { t: q.t, style: 'position: absolute; left: 4px; top: calc(' + Math.min(pp, 97).toFixed(2) + '% - 9px); font-size: 12px; font-weight: 700; padding: 1px 6px; border-radius: 3px; white-space: nowrap; background: ' + q.bg + '; color: ' + q.fg + (q.bd ? '; border: 1px solid ' + q.bd : '') }; });
@@ -876,7 +880,7 @@ class Component extends DCLogic {
       const ZT = { SPX: 10, SPY: 1, QQQ: 1, NDX: 50 };
       const MT = { SPX: 10, SPY: 1, QQQ: 1, NDX: 50 };
       const fv = x => x.toLocaleString('en-US', { maximumFractionDigits: x > 1000 ? 0 : 2 });
-      const tAt = i => { const m = (cfg.start || 450) + 5 * (i + 1); return Math.floor(m / 60) + ':' + String(m % 60).padStart(2, '0'); };
+      const tAt = i => fmtET((cfg.start || 450) + 5 * (i + 1));
       const events = [];
       if (cfg.live && cfg.events) cfg.events.forEach(e => events.push(e));
       if (!cfg.live && gx.c && gx.p && gx.z) {
@@ -898,7 +902,7 @@ class Component extends DCLogic {
       }
       const evMarks = events.map(e => ({
         title: tAt(e.i) + ' · ' + e.text,
-        dot: 'position: absolute; width: 9px; height: 9px; border-radius: 50%; background: ' + e.col + '; border: 2px solid #0B0E13; left: calc(' + xp(e.i).toFixed(2) + '% - 6px); top: calc(' + Math.max(1, Math.min(99, P(e.v))).toFixed(2) + '% - 6px)'
+        dot: 'position: absolute; width: 9px; height: 9px; border-radius: 50%; background: ' + e.col + '; border: 2px solid #08142B; left: calc(' + xp(e.i).toFixed(2) + '% - 6px); top: calc(' + Math.max(1, Math.min(99, P(e.v))).toFixed(2) + '% - 6px)'
       }));
       const evList = events.slice().reverse().map(e => ({ time: tAt(e.i), col: e.col, text: e.text }));
       const evSummary = events.length + (cfg.live ? ' cambios hoy' : ' cambios en la sesión del viernes') + ' · filtro: majors ≥ ' + fv(MT[sym] || 10) + ' y zero γ ≥ ' + fv(ZT[sym] || 10) + ', o cruce del precio';
@@ -912,43 +916,43 @@ class Component extends DCLogic {
           t: lv.t,
           lineStyle: 'position: absolute; left: ' + (!simple && lv.c !== LC.am && lv.s !== 'thin' ? '80%' : '0') + '; right: 0; top: ' + lv.p.toFixed(2) + '%; border-top: ' + lineFor(lv.s) + lv.c,
           profLine: 'position: absolute; left: 0; right: 0; top: ' + lv.p.toFixed(2) + '%; opacity: 0.5; border-top: ' + lineFor(lv.s) + lv.c,
-          labelStyle: 'position: absolute; left: 8px; top: calc(' + Math.min(lp, 97).toFixed(2) + '% - 9px); font-size: 13px; font-weight: 600; white-space: nowrap; color: ' + (lv.s === 'thin' ? '#8A94A3' : lv.c)
+          labelStyle: 'position: absolute; left: 8px; top: calc(' + Math.min(lp, 97).toFixed(2) + '% - 9px); font-size: 13px; font-weight: 600; white-space: nowrap; color: ' + (lv.s === 'thin' ? '#A3B0C6' : lv.c)
         };
       });
       const fmtN = x => x.toLocaleString('en-US');
       const ticks = cfg.ticks.map(tv => ({
         label: fmtN(tv),
-        style: 'position: absolute; right: 8px; top: calc(' + P(tv).toFixed(2) + '% - 8px); font-size: 12px; color: #8A94A3',
-        grid: 'position: absolute; left: 0; right: 0; top: ' + P(tv).toFixed(2) + '%; border-top: 1px solid #1A1F27',
-        pstyle: 'position: absolute; left: 4px; top: calc(' + P(tv).toFixed(2) + '% - 7px); font-size: 10px; color: #8A94A3; pointer-events: none'
+        style: 'position: absolute; right: 8px; top: calc(' + P(tv).toFixed(2) + '% - 8px); font-size: 12px; color: #A3B0C6',
+        grid: 'position: absolute; left: 0; right: 0; top: ' + P(tv).toFixed(2) + '%; border-top: 1px solid #17305E',
+        pstyle: 'position: absolute; left: 4px; top: calc(' + P(tv).toFixed(2) + '% - 7px); font-size: 10px; color: #A3B0C6; pointer-events: none'
       }));
       const emTop = P(cfg.em[1]), emBot = P(cfg.em[0]);
       const st0 = cfg.start || 450;
-      const xt = [0, 18, 36, 54, 72].map(ix => ({ label: Math.floor((st0 + 5 * ix) / 60) + ':' + String((st0 + 5 * ix) % 60).padStart(2, '0'), style: 'position: absolute; top: 2px; left: ' + xp(ix).toFixed(2) + '%; transform: translateX(-50%); white-space: nowrap' }));
-      if (!cfg.live) xt.push({ label: '8:30 lun', style: 'position: absolute; top: 2px; left: 80%; transform: translateX(-50%); white-space: nowrap; color: #C9D1DC' });
+      const xt = [0, 18, 36, 54, 72].map(ix => ({ label: fmtET(st0 + 5 * ix), style: 'position: absolute; top: 2px; left: ' + xp(ix).toFixed(2) + '%; transform: translateX(-50%); white-space: nowrap' }));
+      if (!cfg.live) xt.push({ label: fmtET(510) + ' lun', style: 'position: absolute; top: 2px; left: 80%; transform: translateX(-50%); white-space: nowrap; color: #C9D3E3' });
       return {
         wickUp: wu || 'M0 0', wickDn: wd || 'M0 0', bodyUp: bu || 'M0 0', bodyDn: bd || 'M0 0',
         ema9: curve(ema(9)), ema21: curve(sma(20)), sma200: cfg.cabina ? 'M0 0' : curve(s200), chFill: chF || 'M0 0', pinDots: pinDots, pills: pills, cabina: !!cfg.cabina, noCabina: !cfg.cabina, zgDyn: stepN(dyn.z), cwDyn: stepN(dyn.c), pwDyn: stepN(dyn.p), shPos: shP || 'M0 0', shNeg: shN || 'M0 0', semG: semP.g || 'M0 0', semA: semP.a || 'M0 0', semR: semP.r || 'M0 0', hasSem: !!(cfg.sem && cfg.sem.some(Boolean)),
         events: evMarks, evList: evList, evSummary: evSummary,
         emStyle: cfg.cabina ? 'display: none' : 'position: absolute; left: 0; right: 0; top: ' + emTop.toFixed(2) + '%; height: ' + (emBot - emTop).toFixed(2) + '%; background: rgba(242, 181, 68, 0.06); border-top: 1px dashed rgba(242, 181, 68, 0.45); border-bottom: 1px dashed rgba(242, 181, 68, 0.45)',
         pinBand: cfg.pinz ? 'position: absolute; left: 0; right: 0; top: ' + P(cfg.pinz[1]).toFixed(2) + '%; height: ' + (P(cfg.pinz[0]) - P(cfg.pinz[1])).toFixed(2) + '%; background: rgba(232, 210, 122, 0.10); border-top: 1px dashed rgba(232, 210, 122, 0.55); border-bottom: 1px dashed rgba(232, 210, 122, 0.55)' : 'display: none',
-        zoneStyle: cfg.live ? 'display: none' : 'position: absolute; top: 0; bottom: 0; left: 80%; right: 0; background: #0F1318; border-left: 1px dashed #3A4352',
-        zoneLabelStyle: cfg.live ? 'display: none' : 'position: absolute; top: 6px; left: calc(80% + 8px); font-size: 11px; color: #8A94A3; white-space: nowrap',
-        zoneLabel: 'Lun 2-nov · abre 8:30',
+        zoneStyle: cfg.live ? 'display: none' : 'position: absolute; top: 0; bottom: 0; left: 80%; right: 0; background: #0B1A38; border-left: 1px dashed #3A5287',
+        zoneLabelStyle: cfg.live ? 'display: none' : 'position: absolute; top: 6px; left: calc(80% + 8px); font-size: 11px; color: #A3B0C6; white-space: nowrap',
+        zoneLabel: 'Lun 2-nov · abre ' + fmtET(510) + ' ET',
         emLabel: cfg.cabina ? 'display: none' : 'position: absolute; left: ' + (cfg.live ? '8px' : 'calc(80% + 8px)') + '; top: calc(' + emTop.toFixed(2) + '% + 4px); font-size: 11px; color: #F2B544; white-space: nowrap',
         levels, ticks, xt,
-        off: offList.map(of => ({ t: of.t, style: 'position: absolute; left: 8px; ' + (of.dir === 'up' ? 'top: ' : 'bottom: ') + (6 + 26 * (stackN[of.dir]++)) + 'px; font-size: 11px; font-weight: 500; white-space: nowrap; padding: 2px 6px; border-radius: 4px; background: #12161D; border: 1px solid #232A35; color: ' + of.c })),
+        off: offList.map(of => ({ t: of.t, style: 'position: absolute; left: 8px; ' + (of.dir === 'up' ? 'top: ' : 'bottom: ') + (6 + 26 * (stackN[of.dir]++)) + 'px; font-size: 11px; font-weight: 500; white-space: nowrap; padding: 2px 6px; border-radius: 4px; background: #10254D; border: 1px solid #22396A; color: ' + of.c })),
         aria: 'Velas de 5 minutos de ' + sym + ' del viernes con VWAP, movimiento esperado y niveles de gamma y open interest para el lunes'
       };
     };
     const d = D[tk];
-    const G = '#26A69A', R = '#EF5350', N = '#8A94A3';
+    const G = '#26A69A', R = '#EF5350', N = '#A3B0C6';
     const SIMPLE = {
       SPX: {
         macro: 'Sin alertas macro: DXY +0.11% · US10Y −0.08% · ES1! 7,614 en pre-market',
         lect: [
           { label: 'RÉGIMEN GAMMA', value: 'Gamma negativa', color: '#FF7A45', note: '13 pts bajo el zero γ (7,593): los movimientos tienden a amplificarse.' },
-          { label: 'TENDENCIA', value: 'Lateral · 1H bajista', color: '#C9D1DC', dots: [{ tf: '5m', col: N }, { tf: '15m', col: N }, { tf: '1H', col: R }], note: 'Precio vs EMA 20 y EMA 20 vs EMA 50 en cada temporalidad.' },
+          { label: 'TENDENCIA', value: 'Lateral · 1H bajista', color: '#C9D3E3', dots: [{ tf: '5m', col: N }, { tf: '15m', col: N }, { tf: '1H', col: R }], note: 'Precio vs EMA 20 y EMA 20 vs EMA 50 en cada temporalidad.' },
           { label: 'VOLATILIDAD', value: 'VIX 19.42', color: R, note: '+12.9% el viernes; en 15m ya perdió su EMA 20.' },
           { label: 'RANGO ESPERADO · LUN', value: '7,514 – 7,646', color: '#F2B544', bar: { pos: 50, l: '−66 pts', r: '+66 pts' }, note: '±0.87% · precio al centro antes de abrir.' }
         ],
@@ -963,8 +967,8 @@ class Component extends DCLogic {
       SPY: {
         macro: 'Sin alertas macro: DXY +0.11% · US10Y −0.08% · ES1! 7,614 en pre-market',
         lect: [
-          { label: 'RÉGIMEN GAMMA', value: 'Gamma en el límite', color: '#C9D1DC', note: 'Precio $0.13 arriba del zero γ (755.59): cualquier baja lo voltea a negativa.' },
-          { label: 'TENDENCIA', value: 'Lateral · 1H bajista', color: '#C9D1DC', dots: [{ tf: '5m', col: N }, { tf: '15m', col: N }, { tf: '1H', col: R }], note: 'Precio vs EMA 20 y EMA 20 vs EMA 50 en cada temporalidad.' },
+          { label: 'RÉGIMEN GAMMA', value: 'Gamma en el límite', color: '#C9D3E3', note: 'Precio $0.13 arriba del zero γ (755.59): cualquier baja lo voltea a negativa.' },
+          { label: 'TENDENCIA', value: 'Lateral · 1H bajista', color: '#C9D3E3', dots: [{ tf: '5m', col: N }, { tf: '15m', col: N }, { tf: '1H', col: R }], note: 'Precio vs EMA 20 y EMA 20 vs EMA 50 en cada temporalidad.' },
           { label: 'VOLATILIDAD', value: 'VIX 19.42', color: R, note: '+12.9% el viernes; en 15m ya perdió su EMA 20.' },
           { label: 'RANGO ESPERADO · LUN', value: '748.89 – 762.55', color: '#F2B544', bar: { pos: 50, l: '−$6.83', r: '+$6.83' }, note: '±0.90% · precio al centro antes de abrir.' }
         ],
@@ -993,6 +997,8 @@ class Component extends DCLogic {
         ]
       }
     };
+    const etOff = (() => { try { const now = new Date(); const m = tz => { const p = Object.fromEntries(new Intl.DateTimeFormat('en-US', { timeZone: tz, hourCycle: 'h23', year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' }).formatToParts(now).map(x => [x.type, x.value])); return Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute) / 60000; }; return Math.round(m('America/New_York') - m('America/Mexico_City')); } catch (e) { return 60; } })();
+    const fmtET = mn => { const m = ((Math.round(mn) + etOff) % 1440 + 1440) % 1440; return Math.floor(m / 60) + ':' + String(m % 60).padStart(2, '0'); };
     const toMin = s => { const p = String(s).split(':'); return +p[0] * 60 + +p[1]; };
     const L = LIVE.on && LIVE[tk] && LIVE[tk].reads.length ? LIVE[tk] : null;
     const lr = L ? L.reads[L.reads.length - 1] : null;
@@ -1025,7 +1031,7 @@ class Component extends DCLogic {
       const vTxt = vt > 0 ? volName + ' subiendo' : vt < 0 ? volName + ' bajando' : volName + ' lateral';
       const cl = s => Math.max(1, Math.min(3, s));
       const vsTxt = (k, alt) => { const v = lr.vs && lr.vs[k]; if (!v || !v[0]) return alt; const sold = k === 'bc' || k === 'bp'; const wd = Math.abs(v[1] - v[0]); const pr = v[2] || 0; return (sold ? 'Vender ' + fv2(v[0]) + ' / comprar ' + fv2(v[1]) + ' · crédito ' + pr.toFixed(2) + ' · riesgo máx $' + Math.round((wd - pr) * 100) : 'Comprar ' + fv2(v[0]) + ' / vender ' + fv2(v[1]) + ' · débito ' + pr.toFixed(2) + ' · ganancia máx $' + Math.round((wd - pr) * 100)) + ' por contrato'; };
-      const vcol = vt > 0 ? R : vt < 0 ? G : '#8A94A3';
+      const vcol = vt > 0 ? R : vt < 0 ? G : '#A3B0C6';
       const c15 = (lr.vix && lr.vix.c15) || [];
       const clo = Math.min(...c15.map(x => Math.min(x[2], x[4]))), chi = Math.max(...c15.map(x => Math.max(x[1], x[4]))), cspan = (chi - clo) || 1;
       const yy = v => ((chi - v) / cspan * 100).toFixed(1);
@@ -1040,7 +1046,7 @@ class Component extends DCLogic {
       const rp = v => ((v - rlo) / ((rhi - rlo) || 1) * 100).toFixed(1);
       const seg = (a, b, bg, h, top) => 'position: absolute; top: ' + top + 'px; height: ' + h + 'px; left: ' + rp(a) + '%; width: calc(' + rp(b) + '% - ' + rp(a) + '%); background: ' + bg + '; border-radius: 3px';
       const tick = (v, c, h, top, w) => 'position: absolute; top: ' + top + 'px; height: ' + h + 'px; left: calc(' + rp(v) + '% - ' + (w / 2) + 'px); width: ' + w + 'px; background: ' + c + '; border-radius: 1px';
-      const rng = { open: seg(lr.em[0], lr.em[1], '#2B3240', 14, 3), rem: seg(rr[0], rr[1], '#6B5420', 8, 6), dA: d15 ? tick(d15[0], '#C9D1DC', 20, 0, 2) : 'display: none', dB: d15 ? tick(d15[1], '#C9D1DC', 20, 0, 2) : 'display: none', px: tick(lr.px, '#F2B544', 24, -2, 4) };
+      const rng = { open: seg(lr.em[0], lr.em[1], '#2C4478', 14, 3), rem: seg(rr[0], rr[1], '#6B5420', 8, 6), dA: d15 ? tick(d15[0], '#C9D3E3', 20, 0, 2) : 'display: none', dB: d15 ? tick(d15[1], '#C9D3E3', 20, 0, 2) : 'display: none', px: tick(lr.px, '#F2B544', 24, -2, 4) };
       // PIN
       const pinOn = !!(lr.pinm && lr.pin);
       // PIN: 4 métodos, certeza y 3 bullets
@@ -1073,7 +1079,7 @@ class Component extends DCLogic {
         const alt = gR && cp ? rnd((cp + cn) / 2) !== prim ? rnd((cp + cn) / 2) : null : anc && anc[0] !== prim ? anc[0] : ks.filter(k => k !== prim).reduce((b, k) => Math.abs(k - ctr) < Math.abs(b - ctr) ? k : b, null);
         PN = { cert, prim, alt, z0, z1, mpV, anc, gR, cn, cp };
       }
-      const certCol = PN ? (PN.cert === 'ALTA' ? '#5BD69A' : PN.cert === 'MEDIA' ? '#F2B544' : '#8A94A3') : '#8A94A3';
+      const certCol = PN ? (PN.cert === 'ALTA' ? '#5BD69A' : PN.cert === 'MEDIA' ? '#F2B544' : '#A3B0C6') : '#A3B0C6';
       // series del perfil γ por vela de 5 min: historia de Perfil γ (day.gx) o, si no hay, lecturas manuales
       const nC = L.c.length, gxs = (DAY.gx && DAY.gx[tk]) || null;
       const gzS = [], gcS = [], gpS = [], gnS = [];
@@ -1114,7 +1120,7 @@ class Component extends DCLogic {
       if (cwN && pwN && lr.px <= cwN && lr.px >= pwN) fuera = 0;
       const tendencia = !noG && fuera >= 3 && ((nv != null && nv < 0) || gneg);
       const nvTxt = nv == null ? '' : 'GEX ' + (nv >= 0 ? '+' : '−') + fv2(Math.round(Math.abs(nv)));
-      const fil = noG ? { c: '#8A94A3', t: 'Sin lectura del perfil γ: no hay filtro de entrada' }
+      const fil = noG ? { c: '#A3B0C6', t: 'Sin lectura del perfil γ: no hay filtro de entrada' }
         : tendencia ? { c: R, t: 'Tendencia: precio ' + (lado > 0 ? 'arriba del call wall' : 'abajo del put wall') + ' ' + fuera * 5 + ' min' + (nvTxt ? ', ' + nvTxt : '') + ' · no IC, no vender el lado ' + (lado > 0 ? 'de calls' : 'de puts') }
         : enLim ? { c: '#F2B544', t: 'Régimen indefinido: precio a ' + fv2(Math.round(Math.abs(dz) * 10) / 10) + ' pts del Zero Gamma · esperar' }
         : { c: (gneg || intens === 'fuerte −') ? '#F2B544' : G, t: 'Condiciones para vender prima: ' + (gpos ? 'rango' : 'gamma negativa') + (nvTxt ? ' (' + nvTxt + ')' : '') + ', precio a ' + fv2(Math.round(Math.abs(dz))) + ' pts del Zero Gamma · ' + (intens === 'fuerte +' ? 'IC en rango restante' : intens === 'fuerte −' ? (dz < 0 ? 'solo bear call (lado de calls), en Delta 10' : 'solo bull put (lado de puts), en Delta 10') : 'IC en Delta 15') };
@@ -1122,9 +1128,9 @@ class Component extends DCLogic {
         fil: fil,
         macro: lr.macro || '',
         lect: [
-          noG ? { label: 'RÉGIMEN GAMMA', ic: '◐', pill: 'SIN LECTURA', pillCol: '#F2B544', value: 'Sin lectura', color: '#8A94A3', note: '⚠ Falta la lectura del perfil γ (más de 30 min). Sin ella no hay régimen.' }
-              : { label: 'RÉGIMEN GAMMA', ic: '◐', pill: tendencia ? 'TENDENCIA' : enLim ? 'LÍMITE' : gpos ? (intens === 'fuerte +' ? 'RANGO FUERTE' : 'RANGO') : gneg ? (intens === 'fuerte −' ? 'TENDENCIA FUERTE' : 'AMPLIFICA') : 'LÍMITE', pillCol: gpos ? '#4C9AFF' : gneg ? '#FF7A45' : '#8A94A3', value: gpos ? 'Gamma +' : gneg ? 'Gamma −' : 'En el límite', color: gpos ? '#4C9AFF' : gneg ? '#FF7A45' : '#C9D1DC', note: '• Zero Gamma ' + fv2(lr.zg) + '\n• Distancia al precio ' + (dz >= 0 ? '+' : '−') + (Math.round(Math.abs(dz) * 10) / 10).toFixed(1) + (intens ? '\n• Intensidad ' + nvTxt + ' (' + intens + ') · rango 15m típico ~' + (intens === 'fuerte +' ? 9 : intens === 'fuerte −' ? 16 : 12) + ' pts' : '') + '\n• Canal (majors por volumen, se mueven con el precio) ' + fv2(lr.pwv || lr.mnv || lr.mn) + ' – ' + fv2(lr.cwv || lr.mpv || lr.mp) + '\n• ' + (gpos ? 'Amortigua → rango' : gneg ? 'Amplifica → tendencia' : 'Cualquier movimiento cambia el régimen') + '\n• ' + (lr.gt ? 'Lectura ' + lr.gt : 'Estimado') },
-          { label: 'MOMENTUM', ic: '➚', pill: momA ? (momAcc ? 'ACELERANDO' : 'ALINEADO') : mom.filter(v => v).length + '/3', pillCol: momA > 0 ? G : momA < 0 ? R : '#8A94A3', value: momA > 0 ? 'Alcista 3/3' : momA < 0 ? 'Bajista 3/3' : 'Sin alinear', color: momA > 0 ? G : momA < 0 ? R : '#C9D1DC', dots: ['5m', '15m', '1H'].map((t, i) => ({ tf: t, col: mom[i] > 0 ? G : mom[i] < 0 ? R : N })), note: (momA ? (momAcc ? 'Acelerando (MACD 5m creciendo). ' : 'Sin aceleración en 5m. ') : '') + 'Fuerte = EMA 9 sobre/bajo EMA 21 con ambas inclinadas, precio vs SMA 20 (media de Bollinger), RSI 14 vs 50, histograma MACD y precio vs VWAP, en 5m, 15m y 1H a la vez. Sirve para compras direccionales.' + (gpos && !momA ? ' Gamma positiva por volumen: día de rango.' : '') + (lr.fz ? ' ' + lr.fz : '') },
+          noG ? { label: 'RÉGIMEN GAMMA', ic: '◐', pill: 'SIN LECTURA', pillCol: '#F2B544', value: 'Sin lectura', color: '#A3B0C6', note: '⚠ Falta la lectura del perfil γ (más de 30 min). Sin ella no hay régimen.' }
+              : { label: 'RÉGIMEN GAMMA', ic: '◐', pill: tendencia ? 'TENDENCIA' : enLim ? 'LÍMITE' : gpos ? (intens === 'fuerte +' ? 'RANGO FUERTE' : 'RANGO') : gneg ? (intens === 'fuerte −' ? 'TENDENCIA FUERTE' : 'AMPLIFICA') : 'LÍMITE', pillCol: gpos ? '#4C9AFF' : gneg ? '#FF7A45' : '#A3B0C6', value: gpos ? 'Gamma +' : gneg ? 'Gamma −' : 'En el límite', color: gpos ? '#4C9AFF' : gneg ? '#FF7A45' : '#C9D3E3', note: '• Zero Gamma ' + fv2(lr.zg) + '\n• Distancia al precio ' + (dz >= 0 ? '+' : '−') + (Math.round(Math.abs(dz) * 10) / 10).toFixed(1) + (intens ? '\n• Intensidad ' + nvTxt + ' (' + intens + ') · rango 15m típico ~' + (intens === 'fuerte +' ? 9 : intens === 'fuerte −' ? 16 : 12) + ' pts' : '') + '\n• Canal (majors por volumen, se mueven con el precio) ' + fv2(lr.pwv || lr.mnv || lr.mn) + ' – ' + fv2(lr.cwv || lr.mpv || lr.mp) + '\n• ' + (gpos ? 'Amortigua → rango' : gneg ? 'Amplifica → tendencia' : 'Cualquier movimiento cambia el régimen') + '\n• ' + (lr.gt ? 'Lectura ' + fmtET(toMin(lr.gt)) + ' ET' : 'Estimado') },
+          { label: 'MOMENTUM', ic: '➚', pill: momA ? (momAcc ? 'ACELERANDO' : 'ALINEADO') : mom.filter(v => v).length + '/3', pillCol: momA > 0 ? G : momA < 0 ? R : '#A3B0C6', value: momA > 0 ? 'Alcista 3/3' : momA < 0 ? 'Bajista 3/3' : 'Sin alinear', color: momA > 0 ? G : momA < 0 ? R : '#C9D3E3', dots: ['5m', '15m', '1H'].map((t, i) => ({ tf: t, col: mom[i] > 0 ? G : mom[i] < 0 ? R : N })), note: (momA ? (momAcc ? 'Acelerando (MACD 5m creciendo). ' : 'Sin aceleración en 5m. ') : '') + 'Fuerte = EMA 9 sobre/bajo EMA 21 con ambas inclinadas, precio vs SMA 20 (media de Bollinger), RSI 14 vs 50, histograma MACD y precio vs VWAP, en 5m, 15m y 1H a la vez. Sirve para compras direccionales.' + (gpos && !momA ? ' Gamma positiva por volumen: día de rango.' : '') + (lr.fz ? ' ' + lr.fz : '') },
           { label: volName, ic: '∿', pill: lr.vix.nh ? 'MÁX. DEL DÍA' : '', pillCol: R, value: vt > 0 ? '▲ Subiendo' : vt < 0 ? '▼ Bajando' : '► Lateral', color: vcol, spark: spark, note: (lr.vix.nh ? '⚠ Nuevo máximo del día · ' : '') + 'Velas de 15m · amarillo = SMA 20' },
           { label: 'RANGO RESTANTE', ic: '↔', sub: '±' + fv2(Math.round((rr[1] - rr[0]) / 2)), value: fv2(rr[0]) + ' – ' + fv2(rr[1]), color: '#F2B544', rng: 1, rng_open: rng.open, rng_rem: rng.rem, rng_dA: rng.dA, rng_dB: rng.dB, rng_px: rng.px, rngL: fv2(rlo), rngR: fv2(rhi), note: (d15 ? 'Delta 15: ' + fv2(d15[0]) + ' / ' + fv2(d15[1]) + '\n' : '') + 'Apertura (fijo): ' + fv2(lr.em[0]) + ' – ' + fv2(lr.em[1]) },
           PN ? { label: pinOn ? 'PIN DE CIERRE' : 'PIN · IMÁN', ic: '◎', pill: 'CERTEZA ' + PN.cert, pillCol: certCol, value: fv2(PN.prim), sub: PN.alt ? 'alterno ' + fv2(PN.alt) : '', color: '#E8D27A', note: (PN.gR && PN.cp ? '• Canal por volumen ' + fv2(Math.round(PN.cn)) + ' – ' + fv2(Math.round(PN.cp)) + ' (3–4 nov: precio dentro 96–98% del día)' : '• Zona ' + fv2(Math.round(PN.z0)) + ' – ' + fv2(Math.round(PN.z1)) + (lr.iman ? ' · imán ' + fv2(lr.iman) : '') + ' · max pain ' + fv2(PN.mpV)) + '\n• Ancla: ' + fv2(PN.anc[0]) + ' tiene el mayor OI de la zona (' + fv2(PN.anc[1] + PN.anc[2]) + ')' + '\n• ' + (PN.gR ? 'Regla: PIN = major − por volumen (' + fv2(Math.round(PN.cn * 10) / 10) + '); se mueve con el precio' : gneg ? 'Gamma negativa: PIN poco confiable' + (lr.mnv ? ' · nodo − ' + fv2(lr.mnv) : '') : 'Se rompe si 15m cierra abajo del Zero Gamma (' + fv2(lr.zg) + ')' + ((lr.pwv || lr.mnv) ? ' → ' + fv2(lr.pwv || lr.mnv) : '')) + (lr.pinmov ? '\n⚠ ' + lr.pinmov : '') }
@@ -1143,7 +1149,7 @@ class Component extends DCLogic {
       const prevClose = (DAY.prev && DAY.prev[tk]) || { SPX: 7580.07, SPY: 755.72, QQQ: 690.49 }[tk];
       LS[tk] = [
         { v: lr.techo[0], c: '#00BCD4', s: gpos ? 'faint' : 'dash', t: 'Techo ' + fv2(lr.techo[0]) + ' ' + nf(lr.techo) + (gpos ? ' frágil' : '') },
-        lr.pin ? { v: lr.pin[0], c: '#E8ECF1', s: 'solid', t: (lr.pinm ? 'PIN cierre ' + fv2(lr.pin[0]) : (toMin(lr.t) < 780 ? 'Imán ' : 'PIN ') + fv2(lr.pin[0]) + ' ' + nf(lr.pin)) } : null,
+        lr.pin ? { v: lr.pin[0], c: '#E8EDF5', s: 'solid', t: (lr.pinm ? 'PIN cierre ' + fv2(lr.pin[0]) : (toMin(lr.t) < 780 ? 'Imán ' : 'PIN ') + fv2(lr.pin[0]) + ' ' + nf(lr.pin)) } : null,
         { v: lr.zg, c: LC.zg, s: 'none', t: 'Zero Gamma ' + fv2(lr.zg) },
         (lr.cwv || lr.mpv) ? { v: lr.cwv || lr.mpv, c: '#7CD34B', s: 'none', t: 'Call wall ' + fv2(lr.cwv || lr.mpv) } : null,
         (lr.pwv || lr.mnv) ? { v: lr.pwv || lr.mnv, c: '#E5534B', s: 'none', t: 'Put wall ' + fv2(lr.pwv || lr.mnv) } : null,
@@ -1180,14 +1186,14 @@ class Component extends DCLogic {
         const v = late ? (r.pwv || (r.gt ? r.mn : null) || (r.pin ? r.pin[0] : null)) : (r.iman || null);
         if (v == null) return;
         seenI[i] = pinPts.length;
-        pinPts.push({ i, v, f: late && semS[i] !== 'r', title: r.t + ' · PIN ' + fv2(v) });
+        pinPts.push({ i, v, f: late && semS[i] !== 'r', title: fmtET(toMin(r.t)) + ' · PIN ' + fv2(v) });
       });
       const pinNow = PN ? PN.prim : null;
       const pills = [
-        cwN ? { v: cwN, t: fv2(Math.round(cwN)), bg: '#7CD34B', fg: '#0B0E13' } : null,
+        cwN ? { v: cwN, t: fv2(Math.round(cwN)), bg: '#7CD34B', fg: '#08142B' } : null,
         pwN ? { v: pwN, t: fv2(Math.round(pwN)), bg: '#E5534B', fg: '#FFFFFF' } : null,
-        lr.zg ? { v: lr.zg, t: fv2(Math.round(lr.zg)), bg: '#0B0E13', fg: '#E8ECF1', bd: '#E8ECF1' } : null,
-        pinNow && toMin(lr.t) >= 780 ? { v: pinNow, t: '◉ ' + fv2(pinNow), bg: '#FFFFFF', fg: '#0B0E13' } : null,
+        lr.zg ? { v: lr.zg, t: fv2(Math.round(lr.zg)), bg: '#08142B', fg: '#E8EDF5', bd: '#E8EDF5' } : null,
+        pinNow && toMin(lr.t) >= 780 ? { v: pinNow, t: '◉ ' + fv2(pinNow), bg: '#FFFFFF', fg: '#08142B' } : null,
         { v: lr.px, t: fv2(lr.px), bg: '#4C9AFF', fg: '#FFFFFF' }
       ].filter(Boolean);
       liveCfg = { live: true, start: 510, lo, hi, ticks, em: lr.em, ohlc: { o: L.o, h: L.h, l: L.l, c: L.c, v: L.v }, pre: (L.pre && L.pre.length ? L.pre : (PRE[tk] || []).concat(CH[tk].ohlc.c)), off: [], events: [], dyn: { z: gzS, c: gcS, p: gpS }, sem: semS, pinz: null, cabina: true, pinPts: pinPts, pills: pills };
@@ -1198,12 +1204,14 @@ class Component extends DCLogic {
     const AG = DAY.agenda || [[540, '9:00 · ISM manufactura'], [615, '10:15 · Goolsbee (Fed)']];
     const nowMin = lr ? toMin(lr.t) : 0;
     const nextAg = AG.find(a => a[0] > nowMin);
-    const nextEv = nextAg ? nextAg[1] : 'Sin más eventos hoy';
+    const agTxt = a => fmtET(a[0]) + ' · ' + String(a[1]).replace(/^\s*\d{1,2}:\d{2}\s*·\s*/, '');
+    const nextEv = nextAg ? agTxt(nextAg) : 'Sin más eventos hoy';
+    const agEvents = AG.map(a => ({ time: fmtET(a[0]), name: String(a[1]).replace(/^\s*\d{1,2}:\d{2}\s*·\s*/, ''), detail: a[2] || '' }));
     const status = lr
-      ? { txt: (nowMin < 510 ? 'Pre-market' : (nowMin >= 900 ? 'Cierre' : 'En vivo')) + ' · lectura ' + lr.t + ' CDMX', chip: 'display: flex; align-items: center; gap: 8px; border: 1px solid #1F4D47; background: #0F2421; color: #5FD4C4; padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 500', dot: 'width: 7px; height: 7px; border-radius: 50%; background: #26A69A' }
+      ? { txt: (nowMin < 510 ? 'Pre-market' : (nowMin >= 900 ? 'Cierre' : 'En vivo')) + ' · lectura ' + fmtET(nowMin) + ' ET', chip: 'display: flex; align-items: center; gap: 8px; border: 1px solid #1F4D47; background: #0F2421; color: #5FD4C4; padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 500', dot: 'width: 7px; height: 7px; border-radius: 50%; background: #26A69A' }
       : { txt: 'Mercado cerrado · cierre vie 30-oct', chip: 'display: flex; align-items: center; gap: 8px; border: 1px solid #6B2E2C; background: #24151A; color: #F08A84; padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 500', dot: 'width: 7px; height: 7px; border-radius: 50%; background: #F08A84' };
     const nxt = lr ? nowMin + 15 : 0;
-    const readTxt = lr && lr.auto ? 'Cadena Schwab cada minuto' + (lr.gt ? ' · perfil γ ' + lr.gt : '') : lr ? (nowMin >= 900 ? 'Sesión cerrada' : 'Próxima lectura ~' + Math.floor(nxt / 60) + ':' + String(nxt % 60).padStart(2, '0')) : 'Lectura manual · dom 1-nov CDMX';
+    const readTxt = lr && lr.auto ? 'Cadena Schwab cada minuto' + (lr.gt ? ' · perfil γ ' + fmtET(toMin(lr.gt)) + ' ET' : '') : lr ? (nowMin >= 900 ? 'Sesión cerrada' : 'Próxima lectura ~' + fmtET(nxt) + ' ET') : 'Lectura manual · dom 1-nov';
     const GEXS = {
       SPX: {7450:-240,7460:-57,7470:-31,7480:-40,7490:-241,7500:-729,7510:-78,7520:-110,7530:-62,7540:-152,7550:-514,7560:-93,7570:-316,7580:-138,7590:-272,7600:-1156,7610:-183,7620:-263,7630:-88,7640:-142,7650:-374,7660:54,7670:-4,7680:-36,7690:-7,7700:-161,7710:-9,7720:9},
       SPY: {743:-4.2,744:-7.0,745:-36.1,746:-18.0,747:-7.5,748:-7.8,749:-5.4,750:-123.5,751:-12.9,752:-14.0,753:-22.8,754:-32.9,755:-100.7,756:-36.1,757:-107.6,758:-28.2,759:-61.0,760:-169.4,761:-8.5,762:-11.4,763:-19.0,764:-22.4,765:-97.8,766:-4.0,767:13.5,768:0.5,769:8.1,770:13.9},
@@ -1244,19 +1252,19 @@ class Component extends DCLogic {
         pLabel: fmt(r[pi]),
         cBar: 'height: 11px; border-radius: 0 3px 3px 0; background: #4C9AFF; width: ' + (cw * 0.8).toFixed(1) + '%',
         pBar: 'height: 11px; border-radius: 3px 0 0 3px; background: #FF7A45; width: ' + (pw * 0.8).toFixed(1) + '%',
-        rowStyle: 'display: grid; grid-template-columns: 1fr 72px 1fr; align-items: center; height: 17px; border-radius: 4px;' + (spot ? ' background: #2A2414; outline: 1px solid #F2B544;' : ''),
-        kStyle: "text-align: center; font-family: 'Inter', sans-serif; font-size: 12px;" + (spot ? ' color: #F2B544; font-weight: 600' : ' color: #C9D1DC')
+        rowStyle: 'display: grid; grid-template-columns: 1fr 72px 1fr; align-items: center; height: 17px; border-radius: 4px;' + (spot ? ' background: #13321F; outline: 1px solid #65B837;' : ''),
+        kStyle: "text-align: center; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px;" + (spot ? ' color: #83DC28; font-weight: 600' : ' color: #C9D3E3')
       };
     });
-    const on = 'background: #232A35; color: #E8ECF1; border: 0; padding: 8px 12px; font: 500 12px Inter, sans-serif; cursor: pointer; min-height: 32px';
-    const off = 'background: transparent; color: #8A94A3; border: 0; padding: 8px 12px; font: 500 12px Inter, sans-serif; cursor: pointer; min-height: 32px';
-    const tabOn = 'display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 84px; min-height: 44px; padding: 5px 12px; border-radius: 7px; border: 1px solid #F2B544; background: #2A2414; color: #E8ECF1; cursor: pointer; text-align: left';
-    const tabOff = 'display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 84px; min-height: 44px; padding: 5px 12px; border-radius: 7px; border: 1px solid transparent; background: transparent; color: #C9D1DC; cursor: pointer; text-align: left';
+    const on = 'background: #22396A; color: #E8EDF5; border: 0; padding: 8px 12px; font: 500 12px Manrope, sans-serif; cursor: pointer; min-height: 32px';
+    const off = 'background: transparent; color: #A3B0C6; border: 0; padding: 8px 12px; font: 500 12px Manrope, sans-serif; cursor: pointer; min-height: 32px';
+    const tabOn = 'display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 84px; min-height: 44px; padding: 5px 12px; border-radius: 7px; border: 1px solid #65B837; background: #13321F; color: #E8EDF5; cursor: pointer; text-align: left';
+    const tabOff = 'display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 84px; min-height: 44px; padding: 5px 12px; border-radius: 7px; border: 1px solid transparent; background: transparent; color: #C9D3E3; cursor: pointer; text-align: left';
     const tabs = [['SPX', 'S&P 500 índice'], ['SPY', 'S&P 500 ETF'], ['NDX', 'Nasdaq 100 índice'], ['QQQ', 'Nasdaq 100 ETF']].filter(([s]) => !(isSimple && s === 'NDX')).map(([s, sub]) => ({
       sym: s, sub,
       pressed: tk === s ? 'true' : 'false',
       style: tk === s ? tabOn : tabOff,
-      subColor: tk === s ? '#F7D58C' : '#808A99',
+      subColor: tk === s ? '#83DC28' : '#A3B0C6',
       pick: () => this.setState({ tk: s })
     }));
     return {
@@ -1280,11 +1288,11 @@ class Component extends DCLogic {
       simpleBtnStyle: isSimple ? on : off,
       fullBtnStyle: isSimple ? off : on,
       simple: SIMPLE[tk] || SIMPLE.SPX,
-      lect: (SIMPLE[tk] || SIMPLE.SPX).lect.map(x => Object.assign({ hasDots: !!x.dots, hasDots2: !!x.dots2, hasBar: !!x.bar, hasSpark: !!x.spark, hasRng: !!x.rng, hasPill: !!x.pill, pill: x.pill || '', pillCol: x.pillCol || '#8A94A3', ic: x.ic || '', sub: x.sub || '', barMark: x.bar ? 'position: absolute; top: -4px; left: calc(' + x.bar.pos + '% - 1.5px); width: 3px; height: 14px; border-radius: 2px; background: #F2B544' : '', barL: x.bar ? x.bar.l : '', barR: x.bar ? x.bar.r : '' }, x)),
-      filC: ((SIMPLE[tk] || SIMPLE.SPX).fil || {}).c || '#8A94A3', filT: ((SIMPLE[tk] || SIMPLE.SPX).fil || {}).t || '', hasFil: !!((SIMPLE[tk] || SIMPLE.SPX).fil),
-      est: (SIMPLE[tk] || SIMPLE.SPX).est.map(e => ({ name: e[0], why: e[2], ref: e[3], aria: e[1] + ' de 3', d1: e[1] >= 1 ? '#E8ECF1' : '#2A313C', d2: e[1] >= 2 ? '#E8ECF1' : '#2A313C', d3: e[1] >= 3 ? '#E8ECF1' : '#2A313C' })),
+      lect: (SIMPLE[tk] || SIMPLE.SPX).lect.map(x => Object.assign({ vff: /[A-Za-zÁÉÍÓÚáéíóúñ]{3,}/.test(String(x.value)) ? "'Montserrat', 'Manrope', sans-serif" : "'IBM Plex Mono', ui-monospace, monospace", hasDots: !!x.dots, hasDots2: !!x.dots2, hasBar: !!x.bar, hasSpark: !!x.spark, hasRng: !!x.rng, hasPill: !!x.pill, pill: x.pill || '', pillCol: x.pillCol || '#A3B0C6', ic: x.ic || '', sub: x.sub || '', barMark: x.bar ? 'position: absolute; top: -4px; left: calc(' + x.bar.pos + '% - 1.5px); width: 3px; height: 14px; border-radius: 2px; background: #F2B544' : '', barL: x.bar ? x.bar.l : '', barR: x.bar ? x.bar.r : '' }, x)),
+      filC: ((SIMPLE[tk] || SIMPLE.SPX).fil || {}).c || '#A3B0C6', filT: ((SIMPLE[tk] || SIMPLE.SPX).fil || {}).t || '', hasFil: !!((SIMPLE[tk] || SIMPLE.SPX).fil),
+      est: (SIMPLE[tk] || SIMPLE.SPX).est.map(e => ({ name: e[0], why: e[2], ref: e[3], aria: e[1] + ' de 3', d1: e[1] >= 1 ? '#E8EDF5' : '#2C4478', d2: e[1] >= 2 ? '#E8EDF5' : '#2C4478', d3: e[1] >= 3 ? '#E8EDF5' : '#2C4478' })),
       kpis: d.kpis.map(k => {
-        const tones = { neg: ['#FF7A45', '#2A1A12', '#5C3320'], pos: ['#4C9AFF', '#111D2E', '#24406B'], edge: ['#C9D1DC', '#1A1F27', '#3A4352'] };
+        const tones = { neg: ['#FF7A45', '#2A1A12', '#5C3320'], pos: ['#4C9AFF', '#111D2E', '#24406B'], edge: ['#C9D3E3', '#17305E', '#3A5287'] };
         const t = tones[k.tone] || tones.edge;
         return Object.assign({}, k, {
           hasChip: !!k.chip,
@@ -1301,11 +1309,7 @@ class Component extends DCLogic {
       volPressed: mode === 'vol' ? 'true' : 'false',
       oiBtnStyle: mode === 'oi' ? on : off,
       volBtnStyle: mode === 'vol' ? on : off,
-      events: [
-        { time: '9:00', name: 'ISM Manufacturing PMI (oct)', detail: 'Importancia alta · estimado 54.6 · anterior 54.5' },
-        { time: '9:00', name: 'ISM Manufacturing Employment (oct)', detail: 'Importancia media · anterior 52.7' },
-        { time: '10:15', name: 'Discurso de Goolsbee (Fed)', detail: 'Importancia media' }
-      ]
+      events: agEvents, agTitle: LIVE.on ? 'Agenda de hoy · ET' : 'Agenda · ET'
     };
   }
 }

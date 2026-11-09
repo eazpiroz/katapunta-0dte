@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="190" height="40" viewBox="0 0 190 40" role="img" aria-label="Katapunta">
+  <!-- Marcador provisional: se reemplaza por el logo horizontal oficial de Katapunta -->
+  <rect x="1" y="4" width="32" height="32" rx="8" fill="#10254D" stroke="#22396A"/>
+  <path d="M11 11v18M11 20l9-9M13.5 18l7.5 11" fill="none" stroke="#65B837" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="24.5" cy="11" r="2" fill="#83DC28"/>
+  <text x="42" y="26.5" fill="#E8EDF5" font-family="Montserrat, 'Arial Black', Arial, sans-serif" font-size="17" font-weight="700" letter-spacing="1.6">KATAPUNTA</text>
+</svg>
