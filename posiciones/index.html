@@ -280,6 +280,11 @@ function calc(r){
         else if(slPct!=null&&out.capt<=-slPct*0.8) out.alerts.push(["bad","Cerca del SL "+slPct+"%"]);
       }
     }
+    if(tp==null&&sl!=null&&p!=null&&r.etapa==="abierta"){
+      const below=r.slAbajo!==false;
+      if(below?p<=sl:p>=sl) out.alerts.push(["bad","SL "+fmt(sl)+" tocado"]);
+      else if(below?p<=sl*1.02:p>=sl*0.98) out.alerts.push(["bad","Cerca del SL "+fmt(sl)]);
+    }
   }
   return out;
 }
@@ -295,7 +300,7 @@ function barHTML(c){
     if(c.capt==null) return '<div class="barlab"><span>TP al '+c.tpPct+'% de la prima</span><span>falta prima actual</span></div>';
     const lo=c.slPct!=null?-c.slPct:0, w=Math.max(0,Math.min(100,(c.capt-lo)/(c.tpPct-lo)*100));
     const mk=c.slPct!=null?'<div class="mk" style="left:'+((0-lo)/(c.tpPct-lo)*100).toFixed(1)+'%" title="Entrada"></div>':'';
-    return '<div class="bar" aria-hidden="true"><div class="track"'+(c.slPct!=null?'':' style="background:var(--sunk)"')+'></div>'+mk+'<div class="now" style="left:'+w.toFixed(1)+'%"></div></div><div class="barlab"><span>'+(c.slPct!=null?'SL −'+c.slPct+'%':'0% · sin SL')+'</span><span>'+(c.capt>=0?'+':'−')+Math.abs(Math.round(c.capt))+'% sobre la prima</span><span>TP +'+c.tpPct+'%</span></div>';
+    return '<div class="bar" aria-hidden="true"><div class="track"'+(c.slPct!=null?'':' style="background:var(--sunk)"')+'></div>'+mk+'<div class="now" style="left:'+w.toFixed(1)+'%"></div></div><div class="barlab"><span>'+(c.slPct!=null?'SL −'+c.slPct+'%':c.sl!=null?'0% · SL subyacente '+fmt(c.sl):'0% · sin SL')+'</span><span>'+(c.capt>=0?'+':'−')+Math.abs(Math.round(c.capt))+'% sobre la prima</span><span>TP +'+c.tpPct+'%</span></div>';
   }
   if(c.tp==null||(c.sl==null&&!c.sinSL)) return "";
   const pc=v=>Math.max(0,Math.min(100,v*100)).toFixed(1)+"%";
