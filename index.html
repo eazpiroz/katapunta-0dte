@@ -449,7 +449,7 @@ a{color:#65B837}a:hover{color:#83DC28}
 </div>
 </div>
 </template>
-<script>window.BUILD='b147137f';
+<script>window.BUILD='294c75af';
 (function(){
   const tpl = document.getElementById('tpl');
   const mount = document.getElementById('app');
@@ -585,7 +585,7 @@ class Component extends DCLogic {
     const D = {
       SPX: {
         sym: 'SPX', spot: 7580, closeTxt: '7,580.07', tickers: spxTickers,
-        subtitle: 'SPX · vencimiento SPXW 11/02 · precio del viernes 30-oct · lectura neutral: niveles y estructura, sin señales de operar',
+        subtitle: 'SPX · SIN DATOS DE HOY: ejemplo estático, no usar para operar',
         hasWarn: false, warn: '',
         kpis: [
           { label: 'MOVIMIENTO ESPERADO · LUN', v1: '7,514 – 7,646', c1: cyan, sep: '', v2: '', c2: cyan, bar: { pos: 50, l: '7,514', mid: 'Cierre 7,580 · 50%', r: '7,646' }, note: 'Straddle ATM 66 pts (±0.87%). En vivo: cuánto del rango ya se consumió.', src: 'Fuente: Cboe · SPXW 11/02 · delay 15 min' },
@@ -614,7 +614,7 @@ class Component extends DCLogic {
       },
       SPY: {
         sym: 'SPY', spot: 756, closeTxt: '755.72', tickers: spxTickers,
-        subtitle: 'SPY · vencimiento 11/02 · precio del viernes 30-oct · lectura neutral: niveles y estructura, sin señales de operar',
+        subtitle: 'SPY · SIN DATOS DE HOY: ejemplo estático, no usar para operar',
         hasWarn: false, warn: '',
         kpis: [
           { label: 'MOVIMIENTO ESPERADO · LUN', v1: '748.89 – 762.55', c1: cyan, sep: '', v2: '', c2: cyan, bar: { pos: 50, l: '748.89', mid: 'Cierre 755.72 · 50%', r: '762.55' }, note: 'Straddle ATM $6.83 (±0.90%). En vivo: cuánto del rango ya se consumió.', src: 'Fuente: Cboe · SPY 11/02 · delay 15 min' },
@@ -642,7 +642,7 @@ class Component extends DCLogic {
       },
       NDX: {
         sym: 'NDX', spot: 28400, closeTxt: '28,384.85', tickers: ndxTickers,
-        subtitle: 'NDX · vencimiento NDXP 11/02 · precio del viernes 30-oct · lectura neutral: niveles y estructura, sin señales de operar',
+        subtitle: 'NDX · SIN DATOS DE HOY: ejemplo estático, no usar para operar',
         hasWarn: true,
         warn: 'El vencimiento diario de NDX (NDXP) casi no tiene open interest: el mayor strike suma 89 contratos. Los muros de OI y el GEX propio no son confiables aquí; Perfil γ y el straddle sí sirven como referencia. Además, NDX llega con 15 min de retraso en tu plan de TradingView.',
         kpis: [
@@ -671,7 +671,7 @@ class Component extends DCLogic {
       },
       QQQ: {
         sym: 'QQQ', spot: 690, closeTxt: '690.49', tickers: ndxTickers,
-        subtitle: 'QQQ · vencimiento 11/02 · precio del viernes 30-oct · lectura neutral: niveles y estructura, sin señales de operar',
+        subtitle: 'QQQ · SIN DATOS DE HOY: ejemplo estático, no usar para operar',
         hasWarn: false, warn: '',
         kpis: [
           { label: 'MOVIMIENTO ESPERADO · LUN', v1: '680.40 – 700.58', c1: cyan, sep: '', v2: '', c2: cyan, bar: { pos: 50, l: '680.40', mid: 'Cierre 690.49 · 50%', r: '700.58' }, note: 'Straddle ATM $10.09 (±1.46%). En vivo: cuánto del rango ya se consumió.', src: 'Fuente: Cboe · QQQ 11/02 · delay 15 min' },
@@ -1209,9 +1209,9 @@ class Component extends DCLogic {
     const agEvents = AG.map(a => ({ time: fmtET(a[0]), name: String(a[1]).replace(/^\s*\d{1,2}:\d{2}\s*·\s*/, ''), detail: a[2] || '' }));
     const status = lr
       ? { txt: (nowMin < 510 ? 'Pre-market' : (nowMin >= 900 ? 'Cierre' : 'En vivo')) + ' · lectura ' + fmtET(nowMin) + ' ET', chip: 'display: flex; align-items: center; gap: 8px; border: 1px solid #1F4D47; background: #0F2421; color: #5FD4C4; padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 500', dot: 'width: 7px; height: 7px; border-radius: 50%; background: #26A69A' }
-      : { txt: 'Mercado cerrado · cierre vie 30-oct', chip: 'display: flex; align-items: center; gap: 8px; border: 1px solid #6B2E2C; background: #24151A; color: #F08A84; padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 500', dot: 'width: 7px; height: 7px; border-radius: 50%; background: #F08A84' };
+      : { txt: 'Sin datos de hoy · recolector apagado', chip: 'display: flex; align-items: center; gap: 8px; border: 1px solid #6B2E2C; background: #24151A; color: #F08A84; padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 500', dot: 'width: 7px; height: 7px; border-radius: 50%; background: #F08A84' };
     const nxt = lr ? nowMin + 15 : 0;
-    const readTxt = lr && lr.auto ? 'Cadena Schwab cada minuto' + (lr.gt ? ' · perfil γ ' + fmtET(toMin(lr.gt)) + ' ET' : '') : lr ? (nowMin >= 900 ? 'Sesión cerrada' : 'Próxima lectura ~' + fmtET(nxt) + ' ET') : 'Lectura manual · dom 1-nov';
+    const readTxt = lr && lr.auto ? 'Cadena Schwab cada minuto' + (lr.gt ? ' · perfil γ ' + fmtET(toMin(lr.gt)) + ' ET' : '') : lr ? (nowMin >= 900 ? 'Sesión cerrada' : 'Próxima lectura ~' + fmtET(nxt) + ' ET') : 'Los paneles de abajo son un ejemplo, no el mercado de hoy';
     const GEXS = {
       SPX: {7450:-240,7460:-57,7470:-31,7480:-40,7490:-241,7500:-729,7510:-78,7520:-110,7530:-62,7540:-152,7550:-514,7560:-93,7570:-316,7580:-138,7590:-272,7600:-1156,7610:-183,7620:-263,7630:-88,7640:-142,7650:-374,7660:54,7670:-4,7680:-36,7690:-7,7700:-161,7710:-9,7720:9},
       SPY: {743:-4.2,744:-7.0,745:-36.1,746:-18.0,747:-7.5,748:-7.8,749:-5.4,750:-123.5,751:-12.9,752:-14.0,753:-22.8,754:-32.9,755:-100.7,756:-36.1,757:-107.6,758:-28.2,759:-61.0,760:-169.4,761:-8.5,762:-11.4,763:-19.0,764:-22.4,765:-97.8,766:-4.0,767:13.5,768:0.5,769:8.1,770:13.9},
