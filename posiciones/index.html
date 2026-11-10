@@ -1,0 +1,599 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="icon" type="image/png" href="data:image/png;base64,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">
+</head>
+<body>
+<title>Posiciones Katapunta</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: mesa de control en una columna; resumen arriba, luego secciones por tipo de posición; tarjetas que se apilan en el celular */
+:root{
+  --bg:#F3F4F7; --surface:#FFFFFF; --sunk:#ECEFF4; --ink:#0E1A2E; --muted:#56627A; --line:#D9DEE7;
+  --brand:#0A1B39; --gold:#9C7322; --gold-soft:#F6EEDC;
+  --good:#1D7552; --good-bg:#E2F2EA; --warn:#8F5E00; --warn-bg:#FAEFD6; --bad:#AE3229; --bad-bg:#FBE5E2; --info:#2B4F86; --info-bg:#E6EDF8;
+  --track-sl:#E7B7B1; --track-tp:#A9D8C2;
+  --f-display:"Archivo",system-ui,sans-serif; --f-body:"Archivo",system-ui,sans-serif; --f-num:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0A111D; --surface:#111B2B; --sunk:#0D1624; --ink:#E6EBF2; --muted:#9AA7BA; --line:#22304A;
+  --brand:#E3C27A; --gold:#E3C27A; --gold-soft:#2A2414;
+  --good:#61C49B; --good-bg:#10291F; --warn:#E9B24E; --warn-bg:#2E2410; --bad:#F2887E; --bad-bg:#341816; --info:#93B4E6; --info-bg:#16233A;
+  --track-sl:#5A2A26; --track-tp:#1D4A38; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0A111D; --surface:#111B2B; --sunk:#0D1624; --ink:#E6EBF2; --muted:#9AA7BA; --line:#22304A;
+  --brand:#E3C27A; --gold:#E3C27A; --gold-soft:#2A2414;
+  --good:#61C49B; --good-bg:#10291F; --warn:#E9B24E; --warn-bg:#2E2410; --bad:#F2887E; --bad-bg:#341816; --info:#93B4E6; --info-bg:#16233A;
+  --track-sl:#5A2A26; --track-tp:#1D4A38; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+.wrap{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+header.top{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:flex-end;justify-content:space-between}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:600}
+h1{font-family:var(--f-display);font-size:30px;line-height:1.1;margin:2px 0 0;font-weight:700;letter-spacing:-.01em;color:var(--brand);text-wrap:balance}
+.status{font-size:13px;color:var(--muted);margin-top:6px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--muted);display:inline-block}
+.dot.live{background:var(--good)} .dot.err{background:var(--bad)} .dot.stale{background:var(--warn)}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+button,.btn{font:inherit;font-size:14px;font-weight:600;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:9px 14px;cursor:pointer;min-height:40px}
+button:hover{border-color:var(--muted)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+button.primary{background:var(--brand);border-color:var(--brand);color:var(--bg)}
+button.ghost{background:transparent}
+button.danger{color:var(--bad)}
+button.small{font-size:13px;padding:6px 10px;min-height:34px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.stat .k{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.stat .v{font-size:24px;font-weight:600;margin-top:2px}
+.stat.alert .v{color:var(--warn)}
+.filters{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-size:13px;font-weight:600;border-radius:999px;padding:6px 12px;border:1px solid var(--line);background:transparent;min-height:34px;color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--brand);color:var(--bg);border-color:var(--brand)}
+section.block{display:flex;flex-direction:column;gap:10px}
+section.block>h2{font-family:var(--f-display);font-size:17px;font-weight:700;margin:0;display:flex;align-items:baseline;gap:8px}
+section.block>h2 .count{font-family:var(--f-num);font-size:13px;color:var(--muted);font-weight:500}
+.sub{font-size:13px;color:var(--muted);margin:-6px 0 0}
+.list{display:flex;flex-direction:column;gap:10px}
+.empty{border:1px dashed var(--line);border-radius:10px;padding:16px;color:var(--muted);font-size:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:12px}
+.card.flag-bad{box-shadow:inset 0 0 0 1px var(--bad)} .card.flag-warn{box-shadow:inset 0 0 0 1px var(--warn)} .card.flag-good{box-shadow:inset 0 0 0 1px var(--good)}
+.row1{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:baseline;justify-content:space-between}
+.tk{font-family:var(--f-display);font-size:20px;font-weight:700;letter-spacing:.01em}
+.what{font-size:14px;color:var(--muted)}
+.tags{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.tag{font-size:12px;font-weight:600;border-radius:6px;padding:3px 8px;background:var(--sunk);color:var(--muted)}
+.tag.good{background:var(--good-bg);color:var(--good)} .tag.warn{background:var(--warn-bg);color:var(--warn)} .tag.bad{background:var(--bad-bg);color:var(--bad)} .tag.info{background:var(--info-bg);color:var(--info)} .tag.ex{background:var(--gold-soft);color:var(--gold)}
+.figs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px 14px}
+.fig .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.fig .v{font-family:var(--f-num);font-variant-numeric:tabular-nums;font-size:15px;font-weight:500}
+.pos{color:var(--good)} .neg{color:var(--bad)}
+.bar{position:relative;height:30px;margin:4px 6px 0}
+.bar .track{position:absolute;left:0;right:0;top:11px;height:8px;border-radius:4px;background:linear-gradient(90deg,var(--track-sl),var(--sunk) 35%,var(--sunk) 65%,var(--track-tp))}
+.bar .mk{position:absolute;top:7px;width:2px;height:16px;background:var(--muted);transform:translateX(-1px)}
+.bar .best{position:absolute;top:9px;width:12px;height:12px;border-radius:50%;border:2px solid var(--gold);background:var(--surface);transform:translateX(-6px)}
+.bar .now{position:absolute;top:8px;width:14px;height:14px;border-radius:50%;background:var(--ink);border:2px solid var(--surface);transform:translateX(-7px)}
+.bar .end{position:absolute;top:-2px;font-size:11px;font-family:var(--f-num);color:var(--muted)}
+.bar .end.l{left:0;transform:translateX(-6px)} .bar .end.r{right:0;transform:translateX(6px)}
+.barlab{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);font-family:var(--f-num)}
+.note{font-size:14px;color:var(--muted);border-top:1px solid var(--line);padding-top:10px}
+.cardact{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.inline{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;border-top:1px solid var(--line);padding-top:10px}
+details.closed>summary{cursor:pointer;font-family:var(--f-display);font-size:17px;font-weight:700;list-style:none;display:flex;gap:8px;align-items:baseline}
+details.closed>summary::-webkit-details-marker{display:none}
+details.closed>summary::before{content:"▸";color:var(--muted);font-size:13px}
+details.closed[open]>summary::before{content:"▾"}
+details.closed .list{margin-top:10px}
+#panel{background:var(--surface);border:1px solid var(--gold);border-radius:12px;padding:18px}
+#panel h2{margin:0 0 4px;font-family:var(--f-display);font-size:19px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 14px;margin-top:14px}
+.grid .full{grid-column:1/-1}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600;color:var(--muted)}
+label.f input,label.f select,label.f textarea{font:inherit;font-size:15px;font-weight:400;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 10px;min-height:42px;width:100%}
+label.f textarea{min-height:70px;resize:vertical}
+label.f .hint{font-weight:400;font-size:12px}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+fieldset{border:0;padding:0;margin:0;min-width:0}
+legend{font-size:13px;font-weight:600;color:var(--muted);margin-bottom:6px;padding:0}
+.err{color:var(--bad);font-size:13px;min-height:18px}
+.formact{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}
+.banner{border-radius:10px;padding:12px 14px;font-size:14px;background:var(--info-bg);color:var(--info)}
+.banner.bad{background:var(--bad-bg);color:var(--bad)}
+.foot{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+@media (max-width:640px){
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .figs{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .grid{grid-template-columns:minmax(0,1fr)}
+  h1{font-size:26px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="eyebrow">Katapunta · Monitor de posiciones</div>
+      <h1>Posiciones</h1>
+      <div class="status" id="status"><span class="dot" id="dot"></span><span id="statusText">Conectando con la base…</span></div>
+    </div>
+    <div class="actions">
+      <button type="button" class="ghost small" id="btnExamples" hidden>Borrar ejemplos</button>
+      <button type="button" class="primary" id="btnNew" hidden>+ Nueva posición</button>
+    </div>
+  </header>
+
+  <div id="pageBanner" class="banner" hidden></div>
+
+  <div class="stats">
+    <div class="stat"><div class="k">Abiertas</div><div class="v num" id="sOpen">—</div></div>
+    <div class="stat alert"><div class="k">Alertas</div><div class="v num" id="sAlerts">—</div></div>
+    <div class="stat"><div class="k">Candidatos</div><div class="v num" id="sCand">—</div></div>
+    <div class="stat"><div class="k">P&amp;L abierto</div><div class="v num" id="sPnl">—</div></div>
+  </div>
+
+  <div class="filters" role="group" aria-label="Filtrar por motor" id="filters">
+    <button type="button" class="chip" data-motor="todos" aria-pressed="true">Todos</button>
+    <button type="button" class="chip" data-motor="swing" aria-pressed="false">Swing</button>
+    <button type="button" class="chip" data-motor="scalping" aria-pressed="false">Scalping</button>
+    <button type="button" class="chip" data-motor="wheel" aria-pressed="false">Wheel</button>
+    <button type="button" class="chip" data-motor="leaps" aria-pressed="false">LEAPS</button>
+  </div>
+
+  <section id="panel" hidden aria-labelledby="panelTitle">
+    <h2 id="panelTitle">Nueva posición</h2>
+    <p class="sub" style="margin:0">El TP y el SL se fijan sobre el precio del subyacente. Sin ellos la posición no se registra.</p>
+    <form id="form" novalidate>
+      <div class="grid">
+        <fieldset class="full"><legend>Etapa</legend><div class="seg" id="segEtapa">
+          <button type="button" class="chip" data-v="candidato">Candidato</button>
+          <button type="button" class="chip" data-v="abierta">Abierta</button>
+        </div></fieldset>
+        <label class="f">Motor<select id="fMotor"><option value="swing">Swing</option><option value="scalping">Scalping</option><option value="wheel">Wheel</option><option value="leaps">LEAPS</option></select></label>
+        <label class="f">Instrumento<select id="fInst"><option value="opcion">Opción</option><option value="accion">Acción</option></select></label>
+        <label class="f">Ticker<input id="fTicker" autocomplete="off" placeholder="AAPL" style="text-transform:uppercase"></label>
+        <label class="f">Fecha<input id="fFecha" type="date"></label>
+
+        <label class="f opt">Estructura<select id="fEstr">
+          <option>Compra de call</option><option>Compra de put</option><option>Call spread comprado</option><option>Put spread comprado</option>
+          <option>Put vendido</option><option>Call cubierto</option><option>Spread vendido</option><option>Otra</option></select></label>
+        <label class="f opt">Vencimiento<input id="fVenc" type="date"></label>
+        <label class="f opt">Strikes<input id="fStrikes" placeholder="230 / 240" autocomplete="off"></label>
+        <label class="f opt">Contratos<input id="fContr" type="number" min="0" step="1" inputmode="numeric"></label>
+        <label class="f opt">Prima de entrada<span class="hint">Por acción, ej. 2.35</span><input id="fPrima" type="number" step="0.01" inputmode="decimal"></label>
+        <label class="f opt">Prima actual<span class="hint">Captura manual hasta tener la API de Schwab</span><input id="fPrimaAct" type="number" step="0.01" inputmode="decimal"></label>
+        <label class="f opt">Subyacente al entrar<input id="fSubEnt" type="number" step="0.01" inputmode="decimal"></label>
+
+        <label class="f stk">Cantidad de acciones<input id="fQty" type="number" step="1" inputmode="numeric"></label>
+        <label class="f stk">Precio de entrada<input id="fPx" type="number" step="0.01" inputmode="decimal"></label>
+
+        <label class="f">Take profit (subyacente)<input id="fTP" type="number" step="0.01" inputmode="decimal"></label>
+        <label class="f">Stop loss (subyacente)<input id="fSL" type="number" step="0.01" inputmode="decimal"></label>
+        <label class="f opt">TP por prima (%)<span class="hint">Vendidas: % de la prima capturado. Compradas: % de ganancia</span><input id="fTpPct" type="number" step="1" min="1" inputmode="numeric"></label>
+        <label class="f opt">SL por prima (%)<span class="hint">Pérdida máxima como % de la prima de entrada</span><input id="fSlPct" type="number" step="1" min="1" inputmode="numeric"></label>
+        <label class="f">Stop loss<select id="fSinSL"><option value="">Con stop</option><option value="1">Sin stop</option></select></label>
+        <label class="f full">Plan pendiente<span class="hint">Si aún no defines TP/SL: ej. Largo plazo, Definir tras earnings</span><input id="fPlan" autocomplete="off"></label>
+
+        <label class="f cand">Nivel de activación<input id="fNivel" type="number" step="0.01" inputmode="decimal"></label>
+        <label class="f cand">Se activa si el precio<select id="fCruce"><option value="arriba">Cruza hacia arriba</option><option value="abajo">Cruza hacia abajo</option></select></label>
+        <label class="f full cand">Condición de entrada<input id="fCond" autocomplete="off" placeholder="Cierre diario sobre la resistencia con volumen"></label>
+        <label class="f full">Tesis / notas<textarea id="fTesis"></textarea></label>
+      </div>
+      <div class="err" id="formErr" role="alert"></div>
+      <div class="formact">
+        <button type="button" class="ghost" id="btnCancel">Cancelar</button>
+        <button type="submit" class="primary" id="btnSave">Guardar</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="block" aria-labelledby="hOpt">
+    <h2 id="hOpt">Opciones abiertas <span class="count" id="cOpt"></span></h2>
+    <div class="list" id="lOpt"><div class="empty">Cargando posiciones…</div></div>
+  </section>
+
+  <section class="block" aria-labelledby="hStk">
+    <h2 id="hStk">Acciones abiertas <span class="count" id="cStk"></span></h2>
+    <div class="list" id="lStk"><div class="empty">Cargando posiciones…</div></div>
+  </section>
+
+  <section class="block" aria-labelledby="hCand">
+    <h2 id="hCand">Candidatos <span class="count" id="cCand"></span></h2>
+    <p class="sub">Validados con el Analista. Se marcan "Listo" cuando el precio cruza su nivel de activación.</p>
+    <div class="list" id="lCand"><div class="empty">Cargando candidatos…</div></div>
+  </section>
+
+  <details class="closed" id="dClosed">
+    <summary>Cerradas <span class="count num" id="cClosed" style="font-size:13px;color:var(--muted);font-weight:500"></span></summary>
+    <div class="list" id="lClosed"></div>
+  </details>
+
+  <p class="foot">Alertas provisionales mientras se define el Playbook: <b>cerca de TP</b> al 80% del recorrido, <b>cerca de SL</b> al 20%, <b>devolviendo ganancia</b> cuando la posición ya avanzó 30% hacia el TP y devuelve la mitad desde su mejor precio. Precios de TradingView; las primas de opciones son captura manual. Horario de Nueva York (ET). Herramienta de seguimiento: no envía órdenes.</p>
+</div>
+
+<script>
+(function(){
+const MCP_SERVER="TradingView", MCP_TOOL="mcp-tv-get-symbol-data-batch", COL="posiciones";
+const EXCH=["NASDAQ","NYSE","AMEX"];
+const CREDIT=new Set(["Put vendido","Call cubierto","Spread vendido"]);
+const MOTOR_LBL={swing:"Swing",scalping:"Scalping",wheel:"Wheel",leaps:"LEAPS"};
+const $=id=>document.getElementById(id);
+let db=null, mcp=null, canEdit=false, rows=[], quotes={}, quoteAt=null, filter="todos";
+let watchUnsub=null, watchKey="", editingId=null, formEtapa="abierta", closingId=null, deletingId=null, priceState="idle";
+const bestWritten={};
+
+try{const f=localStorage.getItem("kp-pos-filter"); if(f) filter=f;}catch(e){}
+
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const n=v=>(v===null||v===undefined||v===""||isNaN(+v))?null:+v;
+const fmt=(v,d=2)=>v==null?"—":Number(v).toLocaleString("es-MX",{minimumFractionDigits:d,maximumFractionDigits:d});
+const money=v=>v==null?"—":(v<0?"−$":"$")+Math.abs(v).toLocaleString("es-MX",{maximumFractionDigits:0});
+const signed=v=>v==null?"":(v>=0?"pos":"neg");
+const TZ="America/New_York";
+const hora=t=>new Date(t).toLocaleTimeString("es-MX",{hour:"2-digit",minute:"2-digit",hour12:false,timeZone:TZ});
+const today=()=>new Date().toLocaleDateString("en-CA",{timeZone:TZ});
+function dte(v){ if(!v) return null; const t=today(); return Math.round((Date.parse(v+"T00:00:00Z")-Date.parse(t+"T00:00:00Z"))/86400000); }
+function priceOf(r){ const q=quotes[(r.ticker||"").toUpperCase()]; return q?q.p:null; }
+
+/* ---------- cálculos ---------- */
+function calc(r){
+  const tp=n(r.tp), sl=n(r.sl), p=priceOf(r);
+  const e0 = r.instrumento==="accion" ? n(r.precioEntrada) : n(r.subyacenteEntrada);
+  const out={p,tp,sl,e0,dir: (tp!=null&&sl!=null)?(tp>sl?1:-1):1, prog:null, alerts:[], pnl:null, capital:null};
+  const tpPct=n(r.tpPct), slPct=n(r.slPct), sinSL=!!r.sinSL, plan=(r.plan||"").trim();
+  out.tpPct=tpPct; out.slPct=slPct; out.sinSL=sinSL;
+  const noTP=tp==null&&tpPct==null, noSL=sl==null&&slPct==null&&!sinSL;
+  if(r.etapa==="abierta" && (noTP||noSL)) out.alerts.push(plan?["info",plan]:["warn",noTP?"Falta definir TP":"Falta definir SL"]);
+  const base = sl!=null ? sl : (sinSL && tp!=null && e0!=null && tp!==e0 ? e0 : null);
+  const span = (tp!=null&&base!=null&&tp!==base)?(tp-base):null;
+  const at=v=>span==null||v==null?null:(v-base)/span;
+  if(sl==null && base!=null) out.dir = tp>base?1:-1;
+  out.prog=at(p); out.progE=at(e0);
+  const best=n(r.mejor); out.progB=at(best);
+  if(r.etapa==="abierta" && out.prog!=null){
+    if(out.prog>=1) out.alerts.push(["good","TP alcanzado"]);
+    else if(out.prog<=0 && sl!=null) out.alerts.push(["bad","SL tocado"]);
+    else if(out.prog>=0.8) out.alerts.push(["good","Cerca de TP"]);
+    else if(out.prog<=0.2 && sl!=null) out.alerts.push(["bad","Cerca de SL"]);
+    if(out.progE!=null && out.progB!=null && out.prog<1){
+      const gBest=out.progB-out.progE, gNow=out.prog-out.progE;
+      if(gBest>=0.3 && (gBest-gNow)/gBest>=0.5) out.alerts.push(["warn","Devolviendo "+Math.round((gBest-gNow)/gBest*100)+"% desde el máximo"]);
+    }
+  }
+  if(r.instrumento==="accion"){
+    const q=n(r.cantidad), px=n(r.precioEntrada);
+    if(q!=null&&px!=null){ out.capital=q*px; if(p!=null) out.pnl=(p-px)*q*out.dir; }
+  }else{
+    const c=n(r.contratos), pe=n(r.primaEntrada), pa=n(r.primaActual), credit=CREDIT.has(r.estructura);
+    if(c!=null&&pe!=null){ if(!credit) out.capital=pe*c*100; if(pa!=null) out.pnl=(pa-pe)*c*100*(credit?-1:1); }
+    if((tpPct!=null||slPct!=null)&&pe&&pa!=null){
+      out.capt = credit ? (pe-pa)/pe*100 : (pa-pe)/pe*100;
+      if(r.etapa==="abierta"){
+        if(tpPct!=null&&out.capt>=tpPct) out.alerts.push(["good","TP "+tpPct+"% alcanzado"]);
+        else if(slPct!=null&&out.capt<=-slPct) out.alerts.push(["bad","SL "+slPct+"% tocado"]);
+        else if(tpPct!=null&&out.capt>=tpPct*0.8) out.alerts.push(["good","Cerca del TP "+tpPct+"%"]);
+        else if(slPct!=null&&out.capt<=-slPct*0.8) out.alerts.push(["bad","Cerca del SL "+slPct+"%"]);
+      }
+    }
+  }
+  return out;
+}
+function candReady(r){
+  const p=priceOf(r), lv=n(r.nivel); if(p==null||lv==null) return null;
+  return {ready: r.cruce==="abajo"? p<=lv : p>=lv, dist:(lv-p)/p*100};
+}
+
+/* ---------- render ---------- */
+function visible(r){ return filter==="todos"||r.motor===filter; }
+function barHTML(c){
+  if(c.tp==null&&c.tpPct!=null){
+    if(c.capt==null) return '<div class="barlab"><span>TP al '+c.tpPct+'% de la prima</span><span>falta prima actual</span></div>';
+    const lo=c.slPct!=null?-c.slPct:0, w=Math.max(0,Math.min(100,(c.capt-lo)/(c.tpPct-lo)*100));
+    const mk=c.slPct!=null?'<div class="mk" style="left:'+((0-lo)/(c.tpPct-lo)*100).toFixed(1)+'%" title="Entrada"></div>':'';
+    return '<div class="bar" aria-hidden="true"><div class="track"'+(c.slPct!=null?'':' style="background:var(--sunk)"')+'></div>'+mk+'<div class="now" style="left:'+w.toFixed(1)+'%"></div></div><div class="barlab"><span>'+(c.slPct!=null?'SL −'+c.slPct+'%':'0% · sin SL')+'</span><span>'+(c.capt>=0?'+':'−')+Math.abs(Math.round(c.capt))+'% sobre la prima</span><span>TP +'+c.tpPct+'%</span></div>';
+  }
+  if(c.tp==null||(c.sl==null&&!c.sinSL)) return "";
+  const pc=v=>Math.max(0,Math.min(100,v*100)).toFixed(1)+"%";
+  let h='<div class="bar" aria-hidden="true"><div class="track"></div>';
+  if(c.progE!=null) h+='<div class="mk" style="left:'+pc(c.progE)+'" title="Entrada"></div>';
+  if(c.progB!=null) h+='<div class="best" style="left:'+pc(c.progB)+'" title="Mejor precio"></div>';
+  if(c.prog!=null) h+='<div class="now" style="left:'+pc(c.prog)+'" title="Precio actual"></div>';
+  h+='</div><div class="barlab"><span>'+(c.sl!=null?'SL '+fmt(c.sl):'Entrada · sin SL')+'</span><span>'+(c.prog==null?"sin precio":Math.round(c.prog*100)+"% del recorrido")+'</span><span>TP '+fmt(c.tp)+'</span></div>';
+  return h;
+}
+function tagsHTML(r,c){
+  let t='<span class="tag">'+esc(MOTOR_LBL[r.motor]||r.motor)+'</span>';
+  if(r.ejemplo) t+='<span class="tag ex">Ejemplo</span>';
+  (c?c.alerts:[]).forEach(a=>t+='<span class="tag '+a[0]+'">'+esc(a[1])+'</span>');
+  return '<div class="tags">'+t+'</div>';
+}
+function actHTML(r){
+  if(!canEdit) return "";
+  let a='<div class="cardact">';
+  if(r.etapa==="candidato") a+='<button type="button" class="small" data-act="open" data-id="'+r.id+'">Abrir</button>';
+  if(r.etapa==="abierta") a+='<button type="button" class="small" data-act="close" data-id="'+r.id+'">Cerrar</button>';
+  a+='<button type="button" class="small ghost" data-act="edit" data-id="'+r.id+'">Editar</button>';
+  a+= deletingId===r.id ? '<button type="button" class="small danger" data-act="delok" data-id="'+r.id+'">Confirmar borrado</button>'
+                        : '<button type="button" class="small ghost danger" data-act="del" data-id="'+r.id+'">Borrar</button>';
+  a+='</div>';
+  if(closingId===r.id){
+    a+='<div class="inline"><label class="f" style="flex:1 1 160px">P&amp;L realizado ($)<input id="cPnl" type="number" step="1" inputmode="decimal"></label>'+
+       '<label class="f" style="flex:2 1 200px">Nota de cierre<input id="cNota" autocomplete="off"></label>'+
+       '<button type="button" class="small primary" data-act="closeok" data-id="'+r.id+'">Guardar cierre</button>'+
+       '<button type="button" class="small ghost" data-act="closecancel">Cancelar</button><div class="err" id="closeErr" style="flex-basis:100%"></div></div>';
+  }
+  return a;
+}
+function flagClass(c){ const k=c.alerts.map(a=>a[0]); return k.includes("bad")?"flag-bad":k.includes("warn")?"flag-warn":k.includes("good")?"flag-good":""; }
+function optCard(r){
+  const c=calc(r), d=dte(r.vencimiento);
+  return '<article class="card '+flagClass(c)+'"><div class="row1"><div><span class="tk">'+esc(r.ticker)+'</span> <span class="what">'+esc(r.estructura||"")+(r.strikes?" · "+esc(r.strikes):"")+'</span></div>'+tagsHTML(r,c)+'</div>'+
+    '<div class="figs">'+
+    fig("Subyacente",c.p==null?"—":fmt(c.p))+
+    fig("Vence",r.vencimiento?(d!=null?d+" días":"—"):"—")+
+    fig("Prima ent. / act.",fmt(n(r.primaEntrada))+" / "+fmt(n(r.primaActual)))+
+    fig("P&L ("+(n(r.contratos)??"—")+" ctr.)",'<span class="'+signed(c.pnl)+'">'+money(c.pnl)+'</span>')+
+    '</div>'+barHTML(c)+(r.tesis?'<div class="note">'+esc(r.tesis)+'</div>':"")+actHTML(r)+'</article>';
+}
+function stkCard(r){
+  const c=calc(r), pct=(c.p!=null&&n(r.precioEntrada))?((c.p-n(r.precioEntrada))/n(r.precioEntrada)*100*c.dir):null;
+  return '<article class="card '+flagClass(c)+'"><div class="row1"><div><span class="tk">'+esc(r.ticker)+'</span> <span class="what">'+fmt(n(r.cantidad),0)+' acciones'+(c.dir<0?" · corto":"")+'</span></div>'+tagsHTML(r,c)+'</div>'+
+    '<div class="figs">'+fig("Precio",c.p==null?"—":fmt(c.p))+fig("Entrada",fmt(n(r.precioEntrada)))+
+    fig("P&L",'<span class="'+signed(c.pnl)+'">'+money(c.pnl)+'</span>')+fig("Rend.",'<span class="'+signed(pct)+'">'+(pct==null?"—":fmt(pct,1)+"%")+'</span>')+
+    '</div>'+barHTML(c)+(r.tesis?'<div class="note">'+esc(r.tesis)+'</div>':"")+actHTML(r)+'</article>';
+}
+function candCard(r){
+  const cr=candReady(r), p=priceOf(r);
+  let st=cr==null?'<span class="tag">Sin nivel o sin precio</span>':cr.ready?'<span class="tag good">Listo para abrir</span>':'<span class="tag info">A '+fmt(Math.abs(cr.dist),1)+'% del nivel</span>';
+  return '<article class="card'+(cr&&cr.ready?" flag-good":"")+'"><div class="row1"><div><span class="tk">'+esc(r.ticker)+'</span> <span class="what">'+(r.instrumento==="accion"?"Acción":esc(r.estructura||"Opción"))+'</span></div><div class="tags">'+tagsHTML(r,null).replace(/^<div class="tags">|<\/div>$/g,"")+st+'</div></div>'+
+    '<div class="figs">'+fig("Precio",p==null?"—":fmt(p))+fig("Activación",(r.cruce==="abajo"?"≤ ":"≥ ")+fmt(n(r.nivel)))+fig("TP",fmt(n(r.tp)))+fig("SL",fmt(n(r.sl)))+'</div>'+
+    (r.condicion?'<div class="note"><b>Condición:</b> '+esc(r.condicion)+'</div>':"")+(r.tesis?'<div class="note">'+esc(r.tesis)+'</div>':"")+actHTML(r)+'</article>';
+}
+function closedCard(r){
+  const pnl=n(r.pnlRealizado);
+  return '<article class="card"><div class="row1"><div><span class="tk">'+esc(r.ticker)+'</span> <span class="what">'+(r.instrumento==="accion"?"Acción":esc(r.estructura||"Opción"))+' · cerrada '+esc(r.fechaCierre||"")+'</span></div>'+tagsHTML(r,null)+'</div>'+
+    '<div class="figs">'+fig("P&L realizado",'<span class="'+signed(pnl)+'">'+money(pnl)+'</span>')+fig("Abierta",esc(r.fecha||"—"))+fig("TP",fmt(n(r.tp)))+fig("SL",fmt(n(r.sl)))+'</div>'+
+    (r.notaCierre?'<div class="note">'+esc(r.notaCierre)+'</div>':"")+actHTML(r)+'</article>';
+}
+function fig(k,v){ return '<div class="fig"><div class="k">'+k+'</div><div class="v">'+v+'</div></div>'; }
+function fill(listId,countId,items,card,emptyMsg){
+  $(countId).textContent=items.length?String(items.length):"";
+  $(listId).innerHTML=items.length?items.map(card).join(""):'<div class="empty">'+emptyMsg+'</div>';
+}
+function render(){
+  const vis=rows.filter(visible);
+  const open=vis.filter(r=>r.etapa==="abierta"), cand=vis.filter(r=>r.etapa==="candidato"), closed=vis.filter(r=>r.etapa==="cerrada");
+  const opt=open.filter(r=>r.instrumento!=="accion"), stk=open.filter(r=>r.instrumento==="accion");
+  const ord=(a,b)=>calc(b).alerts.length-calc(a).alerts.length||String(a.ticker).localeCompare(b.ticker);
+  const addHint=canEdit?' Agrega una con "+ Nueva posición".':"";
+  fill("lOpt","cOpt",opt.sort(ord),optCard,"Sin opciones abiertas."+addHint);
+  fill("lStk","cStk",stk.sort(ord),stkCard,"Sin acciones abiertas."+addHint);
+  fill("lCand","cCand",cand,candCard,"Sin candidatos. Después del cierre, registra aquí los swings que valides con el Analista.");
+  fill("lClosed","cClosed",closed.sort((a,b)=>String(b.fechaCierre).localeCompare(a.fechaCierre)),closedCard,"Aún no hay posiciones cerradas.");
+  let alerts=0,pnl=0,hasPnl=false;
+  open.forEach(r=>{const c=calc(r); alerts+=c.alerts.length; if(c.pnl!=null){pnl+=c.pnl;hasPnl=true;}});
+  cand.forEach(r=>{const cr=candReady(r); if(cr&&cr.ready) alerts++;});
+  $("sOpen").textContent=open.length; $("sAlerts").textContent=alerts; $("sCand").textContent=cand.length;
+  $("sPnl").textContent=hasPnl?money(pnl):"—"; $("sPnl").className="v num "+(hasPnl?signed(pnl):"");
+  document.querySelectorAll("#filters .chip").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.motor===filter)));
+  $("btnExamples").hidden=!(canEdit&&rows.some(r=>r.ejemplo));
+}
+
+/* ---------- precios en vivo ---------- */
+function setStatus(kind,text){ $("dot").className="dot "+kind; $("statusText").textContent=text; }
+function symbolsWanted(){
+  const set=new Set();
+  rows.filter(r=>r.etapa!=="cerrada"&&r.ticker).forEach(r=>{
+    const t=r.ticker.toUpperCase();
+    if(r.simbolo) set.add(r.simbolo); else EXCH.forEach(e=>set.add(e+":"+t));
+  });
+  return [...set].slice(0,50);
+}
+function rewatch(){
+  if(!mcp) return;
+  const syms=symbolsWanted(), key=syms.slice().sort().join(",");
+  if(key===watchKey) return;
+  watchKey=key; if(watchUnsub){watchUnsub();watchUnsub=null;}
+  if(!syms.length){ setStatus("", "Sin posiciones que vigilar."); return; }
+  setStatus("stale","Consultando precios en TradingView…");
+  watchUnsub=mcp.watchTool(MCP_SERVER,MCP_TOOL,{symbols:syms,columns:["close","change"]},onQuotes,{refetchInterval:60000,cache:{staleTime:30000}});
+}
+function onQuotes(ev){
+  if(ev.type==="data"){
+    const pl=ev.result&&ev.result.payload; const data=pl&&pl.data;
+    if(!data){ setStatus("err","TradingView respondió sin datos de precios."); return; }
+    const found={};
+    Object.keys(data).forEach(sym=>{ const v=data[sym]; if(v&&v.close!=null){ const t=sym.split(":")[1]; if(!found[t]) found[t]={p:+v.close,chg:v.change,sym}; } });
+    quotes=Object.assign({},quotes,found);
+    quoteAt=(ev.result.cache&&ev.result.cache.storedAt)||Date.now();
+    setStatus("live","Precios de TradingView · "+hora(quoteAt)+" ET · se actualizan cada minuto");
+    persistDerived();
+    render();
+  }else{
+    const e=ev.error||{}, c=e.code;
+    const msg = c==="needs_reauth"?"Reconecta TradingView en claude.ai → Configuración → Conectores."
+      : c==="server_not_connected"?"Agrega el conector de TradingView en claude.ai → Configuración → Conectores para ver precios en vivo."
+      : c==="selection_required"?"Elige qué conector de TradingView usar en el aviso de claude.ai."
+      : c==="not_in_manifest"?"Los precios en vivo están desactivados para esta página en esta vista."
+      : c==="blocked_by_policy"||c==="approval_required"?"Tu organización no permite este conector aquí."
+      : c==="server_unavailable"||c==="rate_limited"?"TradingView no responde; se reintenta solo."
+      : c==="tool_error"?"TradingView reportó un error: "+(e.message||"")
+      : c==="not_granted"||c==="capability_disabled"||c==="capability_removed"?"Precios en vivo no disponibles en esta vista."
+      : "No se pudieron leer precios ("+(c||"error")+").";
+    const keep = c==="server_unavailable"||c==="rate_limited"||c==="upstream_error";
+    if(!keep) quotes={};
+    setStatus(keep&&quoteAt?"stale":"err", keep&&quoteAt? msg+" Último dato "+hora(quoteAt)+"." : msg);
+    render();
+  }
+}
+/* guarda el exchange encontrado y el mejor precio (para medir devolución) */
+function persistDerived(){
+  if(!db||!canEdit) return;
+  rows.forEach(r=>{
+    const q=quotes[(r.ticker||"").toUpperCase()]; if(!q) return;
+    const patch={};
+    if(!r.simbolo) patch.simbolo=q.sym;
+    if(r.etapa==="abierta"){
+      const c=calc(r); const best=n(r.mejor);
+      const better = best==null ? true : (c.dir>0 ? q.p>best : q.p<best);
+      if(better && bestWritten[r.id]!==q.p){ patch.mejor=q.p; bestWritten[r.id]=q.p; }
+    }
+    if(Object.keys(patch).length) db.doc(COL+"/"+r.id).update(patch).catch(()=>{});
+  });
+}
+
+/* ---------- formulario ---------- */
+const F=["fSlPct","fPlan","fTpPct","fSinSL","fMotor","fInst","fTicker","fFecha","fEstr","fVenc","fStrikes","fContr","fPrima","fPrimaAct","fSubEnt","fQty","fPx","fTP","fSL","fNivel","fCruce","fCond","fTesis"];
+const MAP={fSlPct:"slPct",fPlan:"plan",fTpPct:"tpPct",fSinSL:"sinSL",fMotor:"motor",fInst:"instrumento",fTicker:"ticker",fFecha:"fecha",fEstr:"estructura",fVenc:"vencimiento",fStrikes:"strikes",fContr:"contratos",fPrima:"primaEntrada",fPrimaAct:"primaActual",fSubEnt:"subyacenteEntrada",fQty:"cantidad",fPx:"precioEntrada",fTP:"tp",fSL:"sl",fNivel:"nivel",fCruce:"cruce",fCond:"condicion",fTesis:"tesis"};
+const NUMF=new Set(["fSlPct","fTpPct","fContr","fPrima","fPrimaAct","fSubEnt","fQty","fPx","fTP","fSL","fNivel"]);
+function syncForm(){
+  const opt=$("fInst").value==="opcion", cand=formEtapa==="candidato";
+  document.querySelectorAll("#form .opt").forEach(el=>el.hidden=!opt);
+  document.querySelectorAll("#form .stk").forEach(el=>el.hidden=opt);
+  document.querySelectorAll("#form .cand").forEach(el=>el.hidden=!cand);
+  document.querySelectorAll("#segEtapa .chip").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.v===formEtapa)));
+}
+function openForm(r,etapa){
+  editingId=r?r.id:null; formEtapa=etapa||(r?r.etapa:"abierta");
+  if(formEtapa==="cerrada") formEtapa="abierta";
+  F.forEach(id=>{ const k=MAP[id]; const el=$(id); el.value = r&&r[k]!=null ? r[k] : ""; });
+  $("fSinSL").value = r&&r.sinSL ? "1" : "";
+  if(!r){ $("fMotor").value=filter!=="todos"?filter:"swing"; $("fInst").value="opcion"; $("fEstr").value="Compra de call"; $("fCruce").value="arriba"; }
+  if(!$("fFecha").value) $("fFecha").value=today();
+  $("panelTitle").textContent = r ? (etapa==="abierta"&&r.etapa==="candidato" ? "Abrir "+r.ticker : "Editar "+r.ticker) : "Nueva posición";
+  $("formErr").textContent=""; syncForm(); $("panel").hidden=false;
+  $("panel").scrollIntoView({behavior:"smooth",block:"start"}); setTimeout(()=>$("fTicker").focus({preventScroll:true}),250);
+}
+function closeForm(){ $("panel").hidden=true; editingId=null; }
+async function saveForm(ev){
+  ev.preventDefault();
+  const d={etapa:formEtapa};
+  F.forEach(id=>{ const k=MAP[id]; let v=$(id).value.trim(); if(NUMF.has(id)) v = v===""?null:Number(v); d[k]=v===""?null:v; });
+  d.ticker=(d.ticker||"").toUpperCase();
+  const err=m=>{ $("formErr").textContent=m; };
+  if(!d.ticker) return err("Escribe el ticker.");
+  d.sinSL = d.sinSL==="1"||d.sinSL===true;
+  const hasPlan=!!(d.plan&&String(d.plan).trim());
+  if(d.tp==null&&d.tpPct==null&&!hasPlan) return err("El take profit es obligatorio (precio del subyacente o % de la prima), o escribe el plan pendiente.");
+  if(d.sl==null&&d.slPct==null&&!d.sinSL&&!hasPlan) return err("Define el stop loss, márcalo Sin stop o escribe el plan pendiente.");
+  if(d.sinSL) d.sl=null;
+  if(d.tp!=null&&d.sl!=null&&d.tp===d.sl) return err("El TP y el SL no pueden ser el mismo precio.");
+  if(d.etapa==="abierta"){
+    if(d.instrumento==="accion"){ if(d.cantidad==null||d.precioEntrada==null) return err("Para una acción abierta captura cantidad y precio de entrada."); }
+    else{
+      if(d.contratos==null||d.primaEntrada==null) return err("Para una opción abierta captura contratos y prima de entrada.");
+    }
+    const ref=d.instrumento==="accion"?d.precioEntrada:d.subyacenteEntrada, lo=Math.min(d.tp??Infinity,d.sl??-Infinity), hi=Math.max(d.tp??-Infinity,d.sl??Infinity);
+    if(ref!=null&&d.instrumento==="accion"&&(ref<=lo||ref>=hi)) return err("El precio de entrada debe quedar entre el SL y el TP.");
+  }
+  if(d.etapa==="candidato"&&d.nivel==null) return err("Un candidato necesita su nivel de activación.");
+  if(d.instrumento==="accion"){ d.tpPct=null; d.slPct=null; ["estructura","vencimiento","strikes","contratos","primaEntrada","primaActual","subyacenteEntrada"].forEach(k=>d[k]=null); }
+  else { d.cantidad=null; d.precioEntrada=null; }
+  if(d.etapa!=="candidato"){ d.nivel=null; }
+  $("btnSave").disabled=true;
+  try{
+    if(editingId){
+      const prev=rows.find(r=>r.id===editingId)||{};
+      if(prev.ticker!==d.ticker) d.simbolo=null;
+      if(prev.etapa==="candidato"&&d.etapa==="abierta") d.mejor=null;
+      await db.doc(COL+"/"+editingId).update(d);
+    }else{
+      d.creado=new Date().toISOString(); d.mejor=null; d.simbolo=null;
+      await db.collection(COL).add(d);
+    }
+    closeForm();
+  }catch(e){ err(e&&e.code==="quota_exceeded"?"La base está llena: borra posiciones cerradas antiguas.":"No se pudo guardar ("+(e&&e.code||"error")+"). Intenta de nuevo."); }
+  finally{ $("btnSave").disabled=false; }
+}
+
+/* ---------- eventos ---------- */
+$("filters").addEventListener("click",e=>{ const b=e.target.closest(".chip"); if(!b) return; filter=b.dataset.motor; try{localStorage.setItem("kp-pos-filter",filter);}catch(x){} render(); });
+$("segEtapa").addEventListener("click",e=>{ const b=e.target.closest(".chip"); if(!b) return; formEtapa=b.dataset.v; syncForm(); });
+$("fInst").addEventListener("change",syncForm);
+$("form").addEventListener("submit",saveForm);
+$("form").addEventListener("input",()=>{ $("formErr").textContent=""; });
+$("btnCancel").addEventListener("click",closeForm);
+$("btnNew").addEventListener("click",()=>openForm(null));
+$("btnExamples").addEventListener("click",async()=>{
+  const ex=rows.filter(r=>r.ejemplo);
+  if($("btnExamples").dataset.confirm!=="1"){ $("btnExamples").dataset.confirm="1"; $("btnExamples").textContent="Confirmar: borrar "+ex.length+" ejemplos"; return; }
+  $("btnExamples").disabled=true;
+  for(const r of ex){ try{ await db.doc(COL+"/"+r.id).delete(); }catch(e){} }
+  $("btnExamples").disabled=false; $("btnExamples").dataset.confirm=""; $("btnExamples").textContent="Borrar ejemplos";
+});
+document.addEventListener("click",async e=>{
+  const b=e.target.closest("[data-act]"); if(!b||!canEdit) return;
+  const r=rows.find(x=>x.id===b.dataset.id), act=b.dataset.act;
+  if(act==="edit") return openForm(r);
+  if(act==="open") return openForm(r,"abierta");
+  if(act==="close"){ closingId=r.id; deletingId=null; render(); setTimeout(()=>{const i=$("cPnl"); i&&i.focus();},0); return; }
+  if(act==="closecancel"){ closingId=null; render(); return; }
+  if(act==="closeok"){
+    const v=$("cPnl").value.trim();
+    if(v===""||isNaN(+v)){ $("closeErr").textContent="Captura el P&L realizado, aunque sea 0."; return; }
+    b.disabled=true;
+    try{ await db.doc(COL+"/"+r.id).update({etapa:"cerrada",pnlRealizado:+v,notaCierre:$("cNota").value.trim()||null,fechaCierre:today()}); closingId=null; }
+    catch(x){ $("closeErr").textContent="No se pudo guardar el cierre. Intenta de nuevo."; b.disabled=false; }
+    return;
+  }
+  if(act==="del"){ deletingId=r.id; closingId=null; render(); return; }
+  if(act==="delok"){ b.disabled=true; try{ await db.doc(COL+"/"+r.id).delete(); }catch(x){} deletingId=null; return; }
+});
+
+/* ---------- vista pública (katapunta.com): lee la foto horaria ---------- */
+const PUBLIC_URL="https://0dte.katapunta.com/posiciones.json";
+async function startPublic(){
+  $("btnNew").hidden=true;
+  $("pageBanner").hidden=false;
+  $("pageBanner").textContent="Vista pública de solo lectura · los precios se actualizan cada hora en horario de mercado (ET).";
+  const load=async()=>{
+    try{
+      const r=await fetch(PUBLIC_URL+"?t="+Date.now(),{cache:"no-store"});
+      if(!r.ok) throw new Error(r.status);
+      const j=await r.json();
+      rows=(j.rows||[]); quotes=j.quotes||{}; quoteAt=j.actualizado?Date.parse(j.actualizado):null;
+      const old=quoteAt&&(Date.now()-quoteAt>2*3600*1000);
+      setStatus(old?"stale":"live","Precios de TradingView · actualizado "+(quoteAt?new Date(quoteAt).toLocaleDateString("es-MX",{day:"numeric",month:"short",timeZone:TZ})+" "+hora(quoteAt)+" ET":"—")+" · cada hora");
+      render();
+    }catch(e){
+      setStatus("err","No se pudo leer la foto de posiciones. Reintentando…");
+      if(!rows.length) ["lOpt","lStk","lCand"].forEach(id=>$(id).innerHTML='<div class="empty">Sin datos por ahora.</div>');
+    }
+  };
+  await load(); setInterval(()=>{ if(!document.hidden) load(); },5*60000);
+}
+
+/* ---------- arranque ---------- */
+async function start(){
+  if(!window.claude||!claude.use){ return startPublic(); }
+  const [dbNs,mcpNs,userNs]=await Promise.all([claude.use("db"),claude.use("mcp"),claude.use("user")]);
+  db=dbNs; mcp=mcpNs;
+  canEdit = userNs ? await userNs.canEdit() : false;
+  $("btnNew").hidden=!canEdit;
+  if(!db){
+    $("pageBanner").hidden=false; $("pageBanner").className="banner bad";
+    $("pageBanner").textContent="La base de posiciones no está disponible en esta vista. Recarga la página desde claude.ai.";
+    ["lOpt","lStk","lCand"].forEach(id=>$(id).innerHTML='<div class="empty">Sin conexión con la base.</div>');
+    setStatus("err","Sin base de datos."); return;
+  }
+  if(!mcp) setStatus("err","Precios en vivo no disponibles en esta vista.");
+  if(!canEdit){ $("pageBanner").hidden=false; $("pageBanner").textContent="Vista de solo lectura: ves todas las posiciones y números, pero no puedes modificarlas."; }
+  db.collection(COL).onSnapshot(snap=>{
+    rows=snap.docs.map(d=>Object.assign({id:d.id},d.data()));
+    render(); rewatch();
+  },e=>{
+    $("pageBanner").hidden=false; $("pageBanner").className="banner bad";
+    $("pageBanner").textContent=e&&e.code==="revoked"?"Esta vista perdió acceso a la base.":"Se interrumpió la conexión con la base. Recarga la página.";
+  });
+}
+render(); start();
+})();
+</script>
+
+</body>
+</html>
