@@ -987,18 +987,22 @@ class Component extends DCLogic {
         const mid = (cp && cn) ? (cp + cn) / 2 : null;
         const ms = [mid, mpV, cen, nk].filter(v => v != null && isFinite(v));
         const tm = toMin(lr.t);
-        const gR = !!(tm >= 780 && cn);   // regla 4-nov (aprobada): desde 13:00 PIN = major − por volumen; alterno = punto medio de majors
+        const nvG = (lr.gt && lr.nv != null) ? +lr.nv : null;   // net GEX por volumen (perfil γ manual, ≤30 min)
+        const gP = !!(tm >= 780 && cp && nvG != null && nvG >= 200);   // regla #10 EN PRUEBA (11-nov): γ+ fuerte → PIN = major + por volumen
+        const gR = !!(tm >= 780 && cn && !gP);   // regla 4-nov (aprobada): desde 13:00 PIN = major − por volumen; alterno = punto medio de majors
+        const gMid = !!(gR && nvG != null && nvG >= 0 && nvG < 200);   // γ entre 0 y +200: certeza baja, se muestran las dos
+        const sp = w.length ? w.reduce((b, x) => { const v = Math.exp(-(((x[0] - lr.px) / sig) ** 2) / 2) * Math.abs(x[6]); return v > b[1] ? [x[0], v] : b; }, [null, -1])[0] : null;   // strike más probable
         const rnd = v => Math.round(v / (tk === 'SPX' ? 5 : 1)) * (tk === 'SPX' ? 5 : 1);
-        const ctr = gR ? cn : pinOn ? lr.pin[0] : ms.reduce((a, v) => a + v, 0) / ms.length;
+        const ctr = gP ? cp : gR ? cn : pinOn ? lr.pin[0] : ms.reduce((a, v) => a + v, 0) / ms.length;
         const spread = Math.max(...ms) - Math.min(...ms);
         const tl = { SPX: [5, 15], SPY: [0.5, 1.5], QQQ: [0.5, 1.5] }[tk] || [5, 15];
-        const cert = gR ? (tm >= 840 && Math.abs(lr.px - cn) <= tl[0] ? 'ALTA' : 'MEDIA') : gneg ? 'BAJA' : tm >= 840 && spread <= tl[0] ? 'ALTA' : (tm >= 780 && spread <= tl[1]) || (tm >= 840) ? 'MEDIA' : 'BAJA';
-        const prim = gR ? rnd(cn) : ks.reduce((b, k) => Math.abs(k - ctr) < Math.abs(b - ctr) ? k : b, ks[0]);
+        const cert = gP ? (Math.abs(lr.px - cp) <= tl[1] ? 'MEDIA' : 'BAJA') : gMid ? 'BAJA' : gR ? (tm >= 840 && Math.abs(lr.px - cn) <= tl[0] ? 'ALTA' : 'MEDIA') : gneg ? 'BAJA' : tm >= 840 && spread <= tl[0] ? 'ALTA' : (tm >= 780 && spread <= tl[1]) || (tm >= 840) ? 'MEDIA' : 'BAJA';
+        const prim = gP ? rnd(cp) : gR ? rnd(cn) : ks.reduce((b, k) => Math.abs(k - ctr) < Math.abs(b - ctr) ? k : b, ks[0]);
         const z0 = ctr - sig / 2, z1 = ctr + sig / 2;
         const inZ = near.filter(x => x[0] >= z0 - mt / 2 && x[0] <= z1 + mt / 2);
         const anc = inZ.reduce((b, x) => (x[1] + x[2] > b[1] + b[2]) ? x : b, inZ[0] || near[0]);
-        const alt = gR && cp ? rnd((cp + cn) / 2) !== prim ? rnd((cp + cn) / 2) : null : anc && anc[0] !== prim ? anc[0] : ks.filter(k => k !== prim).reduce((b, k) => Math.abs(k - ctr) < Math.abs(b - ctr) ? k : b, null);
-        PN = { cert, prim, alt, z0, z1, mpV, anc, gR, cn, cp };
+        const alt = gP ? (sp != null && rnd(sp) !== prim ? rnd(sp) : rnd(cn)) : gMid && cp ? rnd(cp) : gR && cp ? rnd((cp + cn) / 2) !== prim ? rnd((cp + cn) / 2) : null : anc && anc[0] !== prim ? anc[0] : ks.filter(k => k !== prim).reduce((b, k) => Math.abs(k - ctr) < Math.abs(b - ctr) ? k : b, null);
+        PN = { cert, prim, alt, z0, z1, mpV, anc, gR, gP, gMid, nvG, cn, cp };
       }
       const certCol = PN ? (PN.cert === 'ALTA' ? '#5BD69A' : PN.cert === 'MEDIA' ? '#F2B544' : '#A3B0C6') : '#A3B0C6';
       // series del perfil γ por vela de 5 min: historia de Gexbot (day.gx) o, si no hay, lecturas manuales
@@ -1054,7 +1058,7 @@ class Component extends DCLogic {
           { label: 'MOMENTUM', ic: '➚', pill: momA ? (momAcc ? 'ACELERANDO' : 'ALINEADO') : mom.filter(v => v).length + '/3', pillCol: momA > 0 ? G : momA < 0 ? R : '#A3B0C6', value: momA > 0 ? 'Alcista 3/3' : momA < 0 ? 'Bajista 3/3' : 'Sin alinear', color: momA > 0 ? G : momA < 0 ? R : '#C9D3E3', dots: ['5m', '15m', '1H'].map((t, i) => ({ tf: t, col: mom[i] > 0 ? G : mom[i] < 0 ? R : N })), note: (momA ? (momAcc ? 'Acelerando (MACD 5m creciendo). ' : 'Sin aceleración en 5m. ') : '') + 'Fuerte = EMA 9 sobre/bajo EMA 21 con ambas inclinadas, precio vs SMA 20 (media de Bollinger), RSI 14 vs 50, histograma MACD y precio vs VWAP, en 5m, 15m y 1H a la vez. Sirve para compras direccionales.' + (gpos && !momA ? ' Gamma positiva por volumen: día de rango.' : '') + (lr.fz ? ' ' + lr.fz : '') },
           { label: volName, ic: '∿', pill: lr.vix.nh ? 'MÁX. DEL DÍA' : '', pillCol: R, value: vt > 0 ? '▲ Subiendo' : vt < 0 ? '▼ Bajando' : '► Lateral', color: vcol, spark: spark, note: (lr.vix.nh ? '⚠ Nuevo máximo del día · ' : '') + 'Velas de 15m · amarillo = SMA 20' },
           { label: 'RANGO RESTANTE', ic: '↔', sub: '±' + fv2(Math.round((rr[1] - rr[0]) / 2)), value: fv2(rr[0]) + ' – ' + fv2(rr[1]), color: '#F2B544', rng: 1, rng_open: rng.open, rng_rem: rng.rem, rng_dA: rng.dA, rng_dB: rng.dB, rng_px: rng.px, rngL: fv2(rlo), rngR: fv2(rhi), note: (d15 ? 'Delta 15: ' + fv2(d15[0]) + ' / ' + fv2(d15[1]) + '\n' : '') + 'Apertura (fijo): ' + fv2(lr.em[0]) + ' – ' + fv2(lr.em[1]) },
-          PN ? { label: pinOn ? 'PIN DE CIERRE' : 'PIN · IMÁN', ic: '◎', pill: 'CERTEZA ' + PN.cert, pillCol: certCol, value: fv2(PN.prim), sub: PN.alt ? 'alterno ' + fv2(PN.alt) : '', color: '#E8D27A', note: (PN.gR && PN.cp ? '• Canal por volumen ' + fv2(Math.round(PN.cn)) + ' – ' + fv2(Math.round(PN.cp)) + ' (3–4 nov: precio dentro 96–98% del día)' : '• Zona ' + fv2(Math.round(PN.z0)) + ' – ' + fv2(Math.round(PN.z1)) + (lr.iman ? ' · imán ' + fv2(lr.iman) : '') + ' · max pain ' + fv2(PN.mpV)) + '\n• Ancla: ' + fv2(PN.anc[0]) + ' tiene el mayor OI de la zona (' + fv2(PN.anc[1] + PN.anc[2]) + ')' + '\n• ' + (PN.gR ? 'Regla: PIN = major − por volumen (' + fv2(Math.round(PN.cn * 10) / 10) + '); se mueve con el precio' : gneg ? 'Gamma negativa: PIN poco confiable' + (lr.mnv ? ' · nodo − ' + fv2(lr.mnv) : '') : 'Se rompe si 15m cierra abajo del Zero Gamma (' + fv2(lr.zg) + ')' + ((lr.pwv || lr.mnv) ? ' → ' + fv2(lr.pwv || lr.mnv) : '')) + (lr.pinmov ? '\n⚠ ' + lr.pinmov : '') }
+          PN ? { label: pinOn ? 'PIN DE CIERRE' : 'PIN · IMÁN', ic: '◎', pill: 'CERTEZA ' + PN.cert, pillCol: certCol, value: fv2(PN.prim), sub: PN.alt ? 'alterno ' + fv2(PN.alt) : '', color: '#E8D27A', note: ((PN.gR || PN.gP) && PN.cp ? '• Canal por volumen ' + fv2(Math.round(PN.cn)) + ' – ' + fv2(Math.round(PN.cp)) + ' (3–4 nov: precio dentro 96–98% del día)' : '• Zona ' + fv2(Math.round(PN.z0)) + ' – ' + fv2(Math.round(PN.z1)) + (lr.iman ? ' · imán ' + fv2(lr.iman) : '') + ' · max pain ' + fv2(PN.mpV)) + '\n• Ancla: ' + fv2(PN.anc[0]) + ' tiene el mayor OI de la zona (' + fv2(PN.anc[1] + PN.anc[2]) + ')' + '\n• ' + (PN.gP ? 'Gamma + fuerte (' + fv2(Math.round(PN.nvG)) + '): PIN = major + por volumen (' + fv2(Math.round(PN.cp * 10) / 10) + ') · regla en prueba; alterno = strike más probable' : PN.gMid ? 'Gamma + débil (' + fv2(Math.round(PN.nvG)) + '): regla major − con certeza baja; alterno = major + (' + fv2(Math.round(PN.cp)) + ')' : PN.gR ? 'Regla: PIN = major − por volumen (' + fv2(Math.round(PN.cn * 10) / 10) + '); se mueve con el precio' : gneg ? 'Gamma negativa: PIN poco confiable' + (lr.mnv ? ' · nodo − ' + fv2(lr.mnv) : '') : 'Se rompe si 15m cierra abajo del Zero Gamma (' + fv2(lr.zg) + ')' + ((lr.pwv || lr.mnv) ? ' → ' + fv2(lr.pwv || lr.mnv) : '')) + (lr.pinmov ? '\n⚠ ' + lr.pinmov : '') }
              : { label: 'PIN · IMÁN', ic: '◎', value: lr.iman ? 'Imán ' + fv2(lr.iman) : '—', color: '#E8D27A', note: 'Sin cadena para estimar el PIN' },
           lr.t10 ? { label: 'TOP 10 DEL S&P', ic: '◉', pill: lr.t10.sem > 0 ? 'VERDE' : lr.t10.sem < 0 ? 'ROJO' : 'ÁMBAR', pillCol: lr.t10.sem > 0 ? G : lr.t10.sem < 0 ? R : '#F2B544', value: (lr.t10.sem > 0 ? '● ' : lr.t10.sem < 0 ? '● ' : '● ') + (lr.t10.w >= 0 ? '+' : '−') + Math.abs(lr.t10.w).toFixed(2) + '%', color: lr.t10.sem > 0 ? G : lr.t10.sem < 0 ? R : '#F2B544', dots: lr.t10.s.map(x => ({ tf: x[0], col: x[1] > 0 ? G : x[1] < 0 ? R : N })), note: lr.t10.up + ' de ' + lr.t10.n + ' suben desde la apertura · promedio ponderado por peso en el índice (~40% del S&P)' } : null
         ].filter(Boolean),
@@ -1104,7 +1108,8 @@ class Component extends DCLogic {
       L.reads.forEach(r => {
         const mm = toMin(r.t); const i = Math.min(Math.max(0, Math.floor((mm - 510) / 5)), Math.max(0, nC - 1));
         const late = mm >= 780;
-        const v = late ? (r.pwv || (r.gt ? r.mn : null) || (r.pin ? r.pin[0] : null)) : (r.iman || null);
+        const gpR = late && r.gt && r.nv != null && +r.nv >= 200;
+        const v = gpR ? (r.cwv || r.mp) : late ? (r.pwv || (r.gt ? r.mn : null) || (r.pin ? r.pin[0] : null)) : (r.iman || null);
         if (v == null) return;
         seenI[i] = pinPts.length;
         pinPts.push({ i, v, f: late && semS[i] !== 'r', title: fmtET(toMin(r.t)) + ' · PIN ' + fv2(v) });
