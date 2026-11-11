@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Resultados Katapunta</title>
+<link rel="icon" type="image/png" href="__FAV__">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Manrope:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+:root{
+  --bg:#F4F6F9; --surface:#FFFFFF; --sunk:#EAEEF3; --ink:#10254D; --muted:#4A5568; --line:#D9DEE7;
+  --brand:#65B837; --navy:#10254D; --good:#3D7F1E; --good-bg:#E7F4DF; --bad:#B3362D; --bad-bg:#FBE5E2; --warn:#8F5E00; --warn-bg:#FAEFD6;
+  --grid:#E3E7EE; --chipbg:#10254D; --chipfg:#FFFFFF; --lineC:#10254D;
+  --f-d:"Montserrat",system-ui,sans-serif; --f-b:"Manrope",system-ui,sans-serif; --f-n:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#08142B; --surface:#10254D; --sunk:#0C1D3D; --ink:#E8EDF5; --muted:#A3B0C6; --line:#22396A; --grid:#1B3160;
+  --good:#83DC28; --good-bg:#17300F; --bad:#F2887E; --bad-bg:#341816; --warn:#E9B24E; --warn-bg:#2E2410; --chipbg:#E8EDF5; --chipfg:#10254D; --lineC:#E8EDF5; color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#08142B; --surface:#10254D; --sunk:#0C1D3D; --ink:#E8EDF5; --muted:#A3B0C6; --line:#22396A; --grid:#1B3160;
+  --good:#83DC28; --good-bg:#17300F; --bad:#F2887E; --bad-bg:#341816; --warn:#E9B24E; --warn-bg:#2E2410; --chipbg:#E8EDF5; --chipfg:#10254D; --lineC:#E8EDF5; color-scheme:dark}
+*{box-sizing:border-box} [hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-b);font-size:15px;line-height:1.45;
+  padding:18px max(16px,env(safe-area-inset-right,0px)) 48px max(16px,env(safe-area-inset-left,0px))}
+.wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+.num{font-family:var(--f-n);font-variant-numeric:tabular-nums}
+.brand b{font-family:var(--f-d);font-weight:800;letter-spacing:.06em;font-size:14px} .brand b span{color:var(--brand)}
+h1{font-family:var(--f-d);font-size:28px;font-weight:800;margin:2px 0 0}
+.sub{color:var(--muted);font-size:14px;margin:0}
+.banner{border-radius:12px;padding:10px 14px;font-size:13px;background:var(--sunk);color:var(--muted)}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font:inherit;font-size:14px;font-weight:600;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--ink);padding:7px 13px;min-height:38px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--chipbg);border-color:var(--chipbg);color:var(--chipfg)}
+.chip:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.kpi .k{font-size:12px;font-weight:700;color:var(--muted)}
+.kpi .v{font-family:var(--f-n);font-size:22px;font-weight:600;margin-top:2px}
+.kpi .d{font-size:12px;color:var(--muted);margin-top:2px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.panel h2{font-family:var(--f-d);font-size:17px;font-weight:700;margin:0;display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.panel h2 small{font-family:var(--f-b);font-weight:500;font-size:13px;color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:right;font-size:12px;font-weight:700;color:var(--muted);padding:6px 8px;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left}
+td{text-align:right;padding:8px;border-bottom:1px solid var(--line)} td.num,th{white-space:nowrap} td:first-child{white-space:nowrap}
+tr:last-child td{border-bottom:0}
+tfoot td{font-weight:700;border-top:2px solid var(--line)}
+.pos{color:var(--good)} .neg{color:var(--bad)}
+.chart{width:100%;height:auto;display:block}
+.chart text{font-family:var(--f-n);font-size:11px;fill:var(--muted)}
+.tip{font-size:13px;color:var(--muted);min-height:18px}
+.empty{border:1px dashed var(--line);border-radius:12px;padding:14px;color:var(--muted);font-size:14px}
+.foot{color:var(--muted);font-size:12px;text-align:center}
+.scroll{overflow-x:auto}
+@media (max-width:640px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))} h1{font-size:24px} .hide-s{display:none} table{font-size:13px} td,th{padding:7px 5px} .kpi .v{font-size:19px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand"><b>KATA<span>P</span>UNTA</b> <span class="sub">· Resultados</span></div>
+    <h1>Resultados</h1>
+    <p class="sub">P&amp;L por motor · realizado (Bitácora y posiciones cerradas) y abierto (Posiciones) · horario de Nueva York (ET)</p>
+  </header>
+  <div class="banner" id="banner">Cargando…</div>
+
+  <div class="seg" id="periodo" role="group" aria-label="Periodo">
+    <button class="chip" data-p="semana" aria-pressed="false">Semana</button>
+    <button class="chip" data-p="mes" aria-pressed="false">Mes</button>
+    <button class="chip" data-p="anio" aria-pressed="false">Año</button>
+    <button class="chip" data-p="todo" aria-pressed="true">Todo</button>
+  </div>
+
+  <section class="kpis" aria-label="Indicadores">
+    <div class="kpi"><div class="k">P&amp;L realizado</div><div class="v" id="kReal">—</div><div class="d" id="kRealD">bruto, sin comisiones</div></div>
+    <div class="kpi"><div class="k">P&amp;L abierto</div><div class="v" id="kOpen">—</div><div class="d" id="kOpenD">posiciones vivas</div></div>
+    <div class="kpi"><div class="k">% de acierto</div><div class="v" id="kWin">—</div><div class="d" id="kWinD">operaciones cerradas</div></div>
+    <div class="kpi"><div class="k">Factor de ganancia</div><div class="v" id="kPF">—</div><div class="d" id="kPFD">ganado ÷ perdido</div></div>
+  </section>
+
+  <section class="panel" aria-labelledby="hCurve">
+    <h2 id="hCurve">P&amp;L realizado por día <small id="curveSub"></small></h2>
+    <div id="chartBox"></div>
+    <div class="tip" id="tip" aria-live="polite">Toca una barra para ver el día.</div>
+  </section>
+
+  <section class="panel" aria-labelledby="hMotor">
+    <h2 id="hMotor">Por motor <small>realizado del periodo · abierto hoy</small></h2>
+    <div class="scroll"><table>
+      <thead><tr><th>Motor</th><th>Ops</th><th class="hide-s">Acierto</th><th>Realizado</th><th>Abierto</th><th>Total</th></tr></thead>
+      <tbody id="tMotor"></tbody><tfoot id="fMotor"></tfoot>
+    </table></div>
+  </section>
+
+  <section class="panel" aria-labelledby="hMind">
+    <h2 id="hMind">Disciplina <small>según la Bitácora</small></h2>
+    <div class="scroll"><table>
+      <thead><tr><th>Grupo</th><th>Ops</th><th>Realizado</th><th>Promedio</th></tr></thead>
+      <tbody id="tMind"></tbody>
+    </table></div>
+  </section>
+
+  <p class="foot">Montos brutos en USD, sin comisiones. Las primas de opciones abiertas son la última captura. Herramienta de seguimiento: no es recomendación de inversión.</p>
+</div>
+<script>
+(function(){
+const TZ="America/New_York", BASE="https://0dte.katapunta.com/";
+const MOT=[["spx0dte","SPX 0DTE"],["swing","Swing"],["scalping","Scalping"],["wheel","Wheel"],["leaps","LEAPS"]];
+const CREDIT=new Set(["Put vendido","Call cubierto","Spread vendido"]);
+const BAD=["Ansioso","FOMO","Avaricia","Exceso de confianza","Revancha","Cansado","Distraído"];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const money=v=>v==null||isNaN(v)?"—":(v<0?"−$":"$")+Math.abs(Math.round(v)).toLocaleString("es-MX");
+const cls=v=>v>0?"pos":v<0?"neg":"";
+const n=v=>(v===null||v===undefined||v===""||isNaN(+v))?null:+v;
+const today=()=>new Date().toLocaleDateString("en-CA",{timeZone:TZ});
+const dayLbl=d=>new Intl.DateTimeFormat("es-MX",{timeZone:"UTC",weekday:"short",day:"numeric",month:"short"}).format(new Date(d+"T12:00:00Z"));
+let periodo="todo", trades=[], openBy={}, stamp=null;
+try{ periodo=localStorage.getItem("kp-res-periodo")||"todo"; }catch(e){}
+
+function desde(){
+  const t=new Date(today()+"T12:00:00Z");
+  if(periodo==="semana"){ const w=(t.getUTCDay()+6)%7; t.setUTCDate(t.getUTCDate()-w); return t.toISOString().slice(0,10); }
+  if(periodo==="mes") return today().slice(0,8)+"01";
+  if(periodo==="anio") return today().slice(0,5)+"01-01";
+  return "0000";
+}
+function openPnl(r,q){
+  const p=q[(r.ticker||"").toUpperCase()]; const px=p?p.p:null;
+  if(r.instrumento==="accion"){ const qy=n(r.cantidad), e=n(r.precioEntrada); return (qy!=null&&e!=null&&px!=null)?(px-e)*qy:null; }
+  const c=n(r.contratos), pe=n(r.primaEntrada), pa=n(r.primaActual);
+  return (c!=null&&pe!=null&&pa!=null)?(pa-pe)*c*100*(CREDIT.has(r.estructura)?-1:1):null;
+}
+function render(){
+  document.querySelectorAll("#periodo .chip").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.p===periodo)));
+  const d0=desde(), tr=trades.filter(t=>t.fecha>=d0);
+  const sum=a=>a.reduce((x,t)=>x+t.pnl,0);
+  const real=sum(tr), openTot=Object.values(openBy).reduce((a,b)=>a+b,0);
+  const wins=tr.filter(t=>t.pnl>0), loss=tr.filter(t=>t.pnl<0);
+  const gw=sum(wins), gl=-sum(loss);
+  $("kReal").textContent=money(real); $("kReal").className="v "+cls(real);
+  $("kRealD").textContent=tr.length+" operaciones · bruto";
+  $("kOpen").textContent=money(openTot); $("kOpen").className="v "+cls(openTot);
+  $("kWin").textContent=tr.length?Math.round(wins.length/tr.length*100)+"%":"—";
+  $("kWinD").textContent=wins.length+" ganadoras · "+loss.length+" perdedoras";
+  $("kPF").textContent=gl>0?(gw/gl).toFixed(2):(gw>0?"∞":"—");
+  $("kPFD").textContent="gana prom. "+money(wins.length?gw/wins.length:0)+" · pierde prom. "+money(loss.length?-gl/loss.length:0);
+  // por motor
+  let rows="", tOps=0, tR=0, tO=0, tW=0;
+  MOT.forEach(([k,l])=>{
+    const m=tr.filter(t=>t.motor===k), r=sum(m), o=openBy[k]||0, w=m.filter(t=>t.pnl>0).length;
+    if(!m.length&&!o) return;
+    tOps+=m.length; tR+=r; tO+=o; tW+=w;
+    rows+='<tr><td>'+esc(l)+'</td><td class="num">'+m.length+'</td><td class="num hide-s">'+(m.length?Math.round(w/m.length*100)+"%":"—")+'</td><td class="num '+cls(r)+'">'+money(r)+'</td><td class="num '+cls(o)+'">'+money(o)+'</td><td class="num '+cls(r+o)+'">'+money(r+o)+'</td></tr>';
+  });
+  $("tMotor").innerHTML=rows||'<tr><td colspan="6"><div class="empty">Sin datos en este periodo.</div></td></tr>';
+  $("fMotor").innerHTML='<tr><td>Total</td><td class="num">'+tOps+'</td><td class="num hide-s">'+(tOps?Math.round(tW/tOps*100)+"%":"—")+'</td><td class="num '+cls(tR)+'">'+money(tR)+'</td><td class="num '+cls(tO)+'">'+money(tO)+'</td><td class="num '+cls(tR+tO)+'">'+money(tR+tO)+'</td></tr>';
+  // disciplina
+  const bit=tr.filter(t=>t.src==="bitacora");
+  const grp=[["Siguiendo el Playbook",bit.filter(t=>t.playbook==="si")],["Parcial",bit.filter(t=>t.playbook==="parcial")],["Sin seguirlo",bit.filter(t=>t.playbook==="no")],["Sin registrar",bit.filter(t=>!t.playbook)],
+    ["Estado positivo",bit.filter(t=>(t.estadoMental||[]).length&&!(t.estadoMental||[]).some(m=>BAD.includes(m)))],["Estado negativo",bit.filter(t=>(t.estadoMental||[]).some(m=>BAD.includes(m)))]];
+  $("tMind").innerHTML=grp.filter(g=>g[1].length).map(([l,a])=>{const s=sum(a);return '<tr><td>'+esc(l)+'</td><td class="num">'+a.length+'</td><td class="num '+cls(s)+'">'+money(s)+'</td><td class="num '+cls(s)+'">'+money(s/a.length)+'</td></tr>';}).join("")||'<tr><td colspan="4"><div class="empty">Aún no hay operaciones con registro de Playbook y estado mental.</div></td></tr>';
+  chart(tr);
+}
+function chart(tr){
+  const by={}; tr.forEach(t=>{by[t.fecha]=(by[t.fecha]||0)+t.pnl;});
+  const days=Object.keys(by).sort();
+  if(!days.length){ $("chartBox").innerHTML='<div class="empty">Sin operaciones cerradas en este periodo.</div>'; $("curveSub").textContent=""; return; }
+  let cum=0; const pts=days.map(d=>{cum+=by[d]; return {d,v:by[d],c:cum};});
+  $("curveSub").textContent=days.length+" días · acumulado "+money(cum);
+  const W=Math.max(300,Math.round($("chartBox").clientWidth||860)),H=W<500?200:240,pl=56,pr=12,pt=14,pb=28, iw=W-pl-pr, ih=H-pt-pb;
+  const lo=Math.min(0,...pts.map(p=>Math.min(p.v,p.c))), hi=Math.max(0,...pts.map(p=>Math.max(p.v,p.c)));
+  const span=(hi-lo)||1, y=v=>pt+(hi-v)/span*ih, bw=Math.min(48,iw/pts.length*0.6), x=i=>pl+(i+0.5)*iw/pts.length;
+  const step=Math.pow(10,Math.floor(Math.log10(span/3))); const tick=[1,2,5,10].map(m=>m*step).find(s=>span/s<=5)||step;
+  let g=""; for(let v=Math.ceil(lo/tick)*tick; v<=hi+1e-9; v+=tick){ g+='<line x1="'+pl+'" x2="'+(W-pr)+'" y1="'+y(v)+'" y2="'+y(v)+'" stroke="var(--grid)" stroke-width="1"/><text x="'+(pl-6)+'" y="'+(y(v)+4)+'" text-anchor="end">'+money(v)+'</text>'; }
+  g+='<line x1="'+pl+'" x2="'+(W-pr)+'" y1="'+y(0)+'" y2="'+y(0)+'" stroke="var(--muted)" stroke-width="1"/>';
+  let bars="", lbl=""; const every=Math.ceil(pts.length/(W<500?4:8));
+  pts.forEach((p,i)=>{ const top=Math.min(y(p.v),y(0)), h=Math.max(2,Math.abs(y(p.v)-y(0)));
+    bars+='<rect class="b" data-i="'+i+'" x="'+(x(i)-bw/2)+'" y="'+top+'" width="'+bw+'" height="'+h+'" rx="3" fill="'+(p.v>=0?"var(--good)":"var(--bad)")+'" tabindex="0" role="img" aria-label="'+esc(dayLbl(p.d))+': '+money(p.v)+'"/>';
+    if(i%every===0) lbl+='<text x="'+x(i)+'" y="'+(H-8)+'" text-anchor="middle">'+esc(dayLbl(p.d))+'</text>'; });
+  const line=pts.map((p,i)=>(i?"L":"M")+x(i).toFixed(1)+" "+y(p.c).toFixed(1)).join(" ");
+  const dots=pts.map((p,i)=>'<circle cx="'+x(i)+'" cy="'+y(p.c)+'" r="3.5" fill="var(--lineC)" stroke="var(--surface)" stroke-width="1.5"/>').join("");
+  $("chartBox").innerHTML='<svg class="chart" viewBox="0 0 '+W+' '+H+'" aria-label="P&L realizado por día y acumulado">'+g+bars+'<path d="'+line+'" fill="none" stroke="var(--lineC)" stroke-width="2"/>'+dots+lbl+'</svg><div class="sub" style="font-size:12px">Barras: P&amp;L del día · línea: acumulado</div>';
+  const show=i=>{const p=pts[i]; $("tip").textContent=dayLbl(p.d)+" · día "+money(p.v)+" · acumulado "+money(p.c);};
+  document.querySelectorAll("#chartBox .b").forEach(b=>{ b.addEventListener("mouseenter",()=>show(+b.dataset.i)); b.addEventListener("click",()=>show(+b.dataset.i)); b.addEventListener("focus",()=>show(+b.dataset.i)); });
+}
+async function load(){
+  try{
+    const [bj,pj]=await Promise.all(["bitacora.json","posiciones.json"].map(f=>fetch(BASE+f+"?t="+Date.now(),{cache:"no-store"}).then(r=>{if(!r.ok) throw new Error(f); return r.json();})));
+    trades=(bj.ops||[]).filter(o=>n(o.pnl)!=null).map(o=>({src:"bitacora",fecha:o.fecha,motor:o.motor,pnl:+o.pnl,playbook:o.playbook,estadoMental:o.estadoMental}));
+    const q=pj.quotes||{}; openBy={};
+    (pj.rows||[]).forEach(r=>{
+      if(r.etapa==="cerrada"&&n(r.pnlRealizado)!=null&&r.fechaCierre){
+        const dup=(bj.ops||[]).some(o=>o.posicionId===r.id);
+        if(!dup) trades.push({src:"posiciones",fecha:r.fechaCierre,motor:r.motor,pnl:+r.pnlRealizado});
+      } else if(r.etapa==="abierta"){ const v=openPnl(r,q); if(v!=null) openBy[r.motor]=(openBy[r.motor]||0)+v; }
+    });
+    const t=[bj.actualizado,pj.actualizado].filter(Boolean).sort().pop();
+    stamp=t?new Date(t).toLocaleString("es-MX",{timeZone:TZ,day:"numeric",month:"short",hour:"2-digit",minute:"2-digit",hour12:false}):"—";
+    $("banner").textContent="Vista pública de solo lectura · datos al "+stamp+" ET · se actualiza cada hora en mercado.";
+    render();
+  }catch(e){ $("banner").textContent="No se pudieron leer los datos. Reintentando…"; }
+}
+$("periodo").addEventListener("click",e=>{const b=e.target.closest(".chip"); if(!b) return; periodo=b.dataset.p; try{localStorage.setItem("kp-res-periodo",periodo);}catch(x){} render();});
+let rz; window.addEventListener("resize",()=>{clearTimeout(rz); rz=setTimeout(()=>{ if(trades.length) render(); },200);});
+load(); setInterval(()=>{ if(!document.hidden) load(); },10*60000);
+})();
+</script>
+</body>
+</html>
