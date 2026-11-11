@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="icon" type="image/png" href="data:image/png;base64,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">
+<style>[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Bitácora Katapunta</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Manrope:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: una columna para el celular. Arriba el estado del día, luego registrar operación, cerrar el día, operaciones de hoy e historial con patrones */
+:root{
+  --bg:#F4F6F9; --surface:#FFFFFF; --sunk:#EAEEF3; --ink:#10254D; --muted:#4A5568; --line:#D9DEE7;
+  --brand:#65B837; --brand-ink:#3D7F1E; --lima:#83DC28; --navy:#10254D;
+  --good:#3D7F1E; --good-bg:#E7F4DF; --warn:#8F5E00; --warn-bg:#FAEFD6; --bad:#B3362D; --bad-bg:#FBE5E2;
+  --f-d:"Montserrat",system-ui,sans-serif; --f-b:"Manrope",system-ui,sans-serif; --f-n:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#08142B; --surface:#10254D; --sunk:#0C1D3D; --ink:#E8EDF5; --muted:#A3B0C6; --line:#22396A;
+  --brand-ink:#83DC28; --good:#83DC28; --good-bg:#17300F; --warn:#E9B24E; --warn-bg:#2E2410; --bad:#F2887E; --bad-bg:#341816; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#08142B; --surface:#10254D; --sunk:#0C1D3D; --ink:#E8EDF5; --muted:#A3B0C6; --line:#22396A;
+  --brand-ink:#83DC28; --good:#83DC28; --good-bg:#17300F; --warn:#E9B24E; --warn-bg:#2E2410; --bad:#F2887E; --bad-bg:#341816; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-b);font-size:15px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px 48px}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+.num{font-family:var(--f-n);font-variant-numeric:tabular-nums}
+header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px}
+.brand{display:flex;align-items:center;gap:10px}
+.brand b{font-family:var(--f-d);font-weight:800;letter-spacing:.06em;font-size:14px}
+.brand b span{color:var(--brand)}
+h1{font-family:var(--f-d);font-size:28px;font-weight:800;margin:2px 0 0;letter-spacing:-.01em;text-wrap:balance}
+.sub{color:var(--muted);font-size:14px;margin:0}
+.pill{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:13px;border-radius:999px;padding:7px 12px}
+.pill.ok{background:var(--good-bg);color:var(--good)} .pill.pend{background:var(--warn-bg);color:var(--warn)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:14px}
+.panel h2{font-family:var(--f-d);font-size:17px;font-weight:700;margin:0;display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.panel h2 small{font-family:var(--f-b);font-weight:500;font-size:13px;color:var(--muted)}
+fieldset{border:0;margin:0;padding:0;min-width:0;display:flex;flex-direction:column;gap:8px}
+legend,.lab{font-size:13px;font-weight:700;color:var(--muted);padding:0;margin-bottom:6px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:inherit;font-size:14px;font-weight:600;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--ink);padding:8px 13px;min-height:40px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+.chip.mind[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:#0F2410}
+.chip.neg[aria-pressed="true"]{background:var(--bad);border-color:var(--bad);color:#fff}
+.chip:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+label.f{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:700;color:var(--muted)}
+label.f input,label.f textarea{font:inherit;font-size:15px;font-weight:500;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-height:44px;width:100%}
+label.f textarea{min-height:76px;resize:vertical}
+.btn{font:inherit;font-weight:700;font-size:15px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:11px 16px;min-height:46px;cursor:pointer}
+.btn.primary{background:var(--navy);border-color:var(--navy);color:#fff}
+.btn.small{font-size:13px;padding:6px 10px;min-height:34px}
+.btn.ghost{background:transparent}
+.btn.danger{color:var(--bad)}
+.btn[disabled]{opacity:.6;cursor:wait}
+.actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.err{color:var(--bad);font-size:13px;font-weight:600;min-height:18px}
+.ok-msg{color:var(--good);font-size:13px;font-weight:700;min-height:18px}
+.list{display:flex;flex-direction:column;gap:8px}
+.entry{border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;background:var(--surface)}
+.e1{display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap}
+.e1 b{font-family:var(--f-d);font-size:16px}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-size:12px;font-weight:700;border-radius:6px;padding:3px 8px;background:var(--sunk);color:var(--muted)}
+.tag.good{background:var(--good-bg);color:var(--good)} .tag.warn{background:var(--warn-bg);color:var(--warn)} .tag.bad{background:var(--bad-bg);color:var(--bad)}
+.why{font-size:14px;color:var(--muted)}
+.pos{color:var(--good)} .neg{color:var(--bad)}
+.pnl{font-family:var(--f-n);font-weight:600;font-size:16px}
+.empty{border:1px dashed var(--line);border-radius:12px;padding:14px;color:var(--muted);font-size:14px}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.stat{background:var(--sunk);border-radius:12px;padding:12px}
+.stat .k{font-size:12px;font-weight:700;color:var(--muted)}
+.stat .v{font-family:var(--f-n);font-size:20px;font-weight:600;margin-top:2px}
+.stat .d{font-size:12px;color:var(--muted);margin-top:2px}
+.day{border-top:1px solid var(--line);padding-top:10px;display:flex;flex-direction:column;gap:6px}
+.day:first-child{border-top:0;padding-top:0}
+.dayh{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.dayh b{font-family:var(--f-d);font-size:15px}
+.banner{border-radius:12px;padding:12px 14px;font-size:14px;background:var(--warn-bg);color:var(--warn)}
+details>summary{cursor:pointer;font-weight:700;color:var(--muted);font-size:14px}
+@media (max-width:560px){.row{grid-template-columns:minmax(0,1fr)}.stats{grid-template-columns:minmax(0,1fr)}h1{font-size:24px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <div class="brand"><b>KATA<span>P</span>UNTA</b><span class="sub">· Bitácora</span></div>
+      <h1 id="hDate">Bitácora</h1>
+      <p class="sub">Registro obligatorio al cierre en todos los motores · horario de Nueva York (ET)</p>
+    </div>
+    <span class="pill pend" id="dayPill">Cargando…</span>
+  </header>
+
+  <div class="banner" id="banner" hidden></div>
+
+  <section class="panel" id="pOp" aria-labelledby="hOp">
+    <h2 id="hOp">Registrar operación <small id="opMode"></small></h2>
+    <fieldset><legend>Motor</legend><div class="chips" id="cMotor"></div></fieldset>
+    <div class="row">
+      <label class="f">Estructura o tipo<input id="fEstr" list="dlEstr" autocomplete="off" placeholder="Iron condor"><datalist id="dlEstr"></datalist></label>
+      <label class="f">Ticker<input id="fTicker" autocomplete="off" placeholder="SPX" style="text-transform:uppercase"></label>
+    </div>
+    <label class="f">¿Por qué entraste?<textarea id="fWhy" placeholder="Gamma positiva, precio dentro del rango esperado, VIX bajando…"></textarea></label>
+    <fieldset><legend>Estado mental al entrar (elige uno o varios)</legend><div class="chips" id="cMind"></div></fieldset>
+    <fieldset><legend>¿Seguiste el Playbook?</legend><div class="chips" id="cPb"></div></fieldset>
+    <div class="row">
+      <label class="f">Resultado en dólares<input id="fPnl" type="number" step="1" inputmode="decimal" placeholder="Ej. 240 o -180"></label>
+      <label class="f">Lección (opcional)<input id="fLesson" autocomplete="off" placeholder="Qué repetiría o evitaría"></label>
+    </div>
+    <div class="err" id="opErr" role="alert"></div>
+    <div class="actions"><button type="button" class="btn ghost" id="opCancel" hidden>Cancelar edición</button><button type="button" class="btn primary" id="opSave">Guardar operación</button></div>
+  </section>
+
+  <section class="panel" aria-labelledby="hToday">
+    <h2 id="hToday">Operaciones de hoy <small class="num" id="todayTot"></small></h2>
+    <div class="list" id="lToday"><div class="empty">Cargando…</div></div>
+  </section>
+
+  <section class="panel" id="pDay" aria-labelledby="hDay">
+    <h2 id="hDay">Cerrar el día</h2>
+    <fieldset><legend>Tu lectura a las 10:30 ET</legend><div class="chips" id="cRead"></div></fieldset>
+    <fieldset><legend>¿Qué fue realmente el día?</legend><div class="chips" id="cReal"></div></fieldset>
+    <fieldset><legend>Estado general del día</legend><div class="chips" id="cDayMind"></div></fieldset>
+    <label class="f">Nota del día (opcional)<textarea id="fDayNote" placeholder="Lo más importante que aprendiste hoy"></textarea></label>
+    <div class="err" id="dayErr" role="alert"></div><div class="ok-msg" id="dayOk"></div>
+    <div class="actions"><button type="button" class="btn ghost" id="noTrade">Hoy no operé</button><button type="button" class="btn primary" id="daySave">Cerrar el día</button></div>
+  </section>
+
+  <section class="panel" aria-labelledby="hHist">
+    <h2 id="hHist">Patrones <small>últimos 30 días</small></h2>
+    <div class="stats">
+      <div class="stat"><div class="k">Acierto de régimen</div><div class="v" id="sReg">—</div><div class="d" id="sRegD">Lectura 10:30 vs. lo que pasó</div></div>
+      <div class="stat"><div class="k">P&amp;L siguiendo el Playbook</div><div class="v" id="sPbY">—</div><div class="d" id="sPbN">Sin seguirlo: —</div></div>
+      <div class="stat"><div class="k">Estado más costoso</div><div class="v" id="sMind" style="font-family:var(--f-d);font-size:17px">—</div><div class="d" id="sMindD">P&amp;L promedio por operación</div></div>
+    </div>
+    <details><summary>Historial por día</summary><div class="list" id="lHist" style="margin-top:12px"></div></details>
+  </section>
+</div>
+
+<script>
+(function(){
+const TZ="America/New_York", OPS="bitacora", DAYS="dias";
+const MOTORS=[["spx0dte","SPX 0DTE"],["swing","Swing"],["scalping","Scalping"],["wheel","Wheel"],["leaps","LEAPS"]];
+const ESTR={spx0dte:["Iron condor","Iron fly","Call spread vendido","Put spread vendido","Call spread comprado","Put spread comprado","Compra de call","Compra de put","Cobertura"],swing:["Acciones","Compra de call","Compra de put","Call spread comprado","Put spread comprado","Call spread vendido","Put spread vendido"],scalping:["Acciones largo","Acciones corto"],wheel:["Put vendido","Call cubierto","Asignación"],leaps:["Compra de call LEAPS","Compra de put LEAPS","Diagonal"]};
+const MIND_GOOD=["Tranquilo","Enfocado","Paciente","Confiado","En alerta"], MIND_BAD=["Ansioso","FOMO","Avaricia","Exceso de confianza","Revancha","Cansado","Distraído"];
+const PB=[["si","Sí"],["parcial","Parcial"],["no","No"]];
+const REG=[["rango","Rango"],["tendencia","Tendencia"],["na","No operé 0DTE"]];
+const REAL=[["rango","Rango"],["tendencia","Tendencia"]];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const today=()=>new Date().toLocaleDateString("en-CA",{timeZone:TZ});
+const money=v=>v==null||isNaN(v)?"—":(v<0?"−$":"$")+Math.abs(Math.round(v)).toLocaleString("es-MX");
+const cls=v=>v>0?"pos":v<0?"neg":"";
+const dayLabel=d=>new Intl.DateTimeFormat("es-MX",{timeZone:"UTC",weekday:"long",day:"numeric",month:"long"}).format(new Date(d+"T12:00:00Z"));
+let PUBLIC=false, db=null, canEdit=false, ops=[], days={}, editId=null, delId=null;
+const st={motor:"spx0dte",mind:new Set(),pb:null,read:null,real:null,dayMind:new Set()};
+
+function chipRow(el,items,key,multi,extraCls){
+  el.innerHTML=items.map(([v,l])=>'<button type="button" class="chip '+(extraCls?extraCls(v):"")+'" data-v="'+esc(v)+'" aria-pressed="false">'+esc(l)+'</button>').join("");
+  el.addEventListener("click",e=>{const b=e.target.closest(".chip"); if(!b) return; const v=b.dataset.v;
+    if(multi){ st[key].has(v)?st[key].delete(v):st[key].add(v); } else { st[key]=v; }
+    if(key==="motor") onMotor(); syncChips(); clearMsgs(); });
+}
+function syncChips(){
+  const set=(id,fn)=>$(id).querySelectorAll(".chip").forEach(b=>b.setAttribute("aria-pressed",String(fn(b.dataset.v))));
+  set("cMotor",v=>st.motor===v); set("cMind",v=>st.mind.has(v)); set("cPb",v=>st.pb===v);
+  set("cRead",v=>st.read===v); set("cReal",v=>st.real===v); set("cDayMind",v=>st.dayMind.has(v));
+}
+function onMotor(){
+  $("dlEstr").innerHTML=(ESTR[st.motor]||[]).map(x=>'<option value="'+esc(x)+'"></option>').join("");
+  if(st.motor==="spx0dte"&&!$("fTicker").value) $("fTicker").value="SPX";
+}
+function clearMsgs(){ $("opErr").textContent=""; $("dayErr").textContent=""; $("dayOk").textContent=""; }
+const mindCls=v=>MIND_BAD.includes(v)?"mind neg":"mind";
+
+chipRow($("cMotor"),MOTORS,"motor",false);
+chipRow($("cMind"),[...MIND_GOOD,...MIND_BAD].map(x=>[x,x]),"mind",true,mindCls);
+chipRow($("cPb"),PB,"pb",false);
+chipRow($("cRead"),REG,"read",false);
+chipRow($("cReal"),REAL,"real",false);
+chipRow($("cDayMind"),[...MIND_GOOD,...MIND_BAD].map(x=>[x,x]),"dayMind",true,mindCls);
+onMotor(); syncChips();
+["fEstr","fTicker","fWhy","fPnl","fLesson","fDayNote"].forEach(id=>$(id).addEventListener("input",clearMsgs));
+
+function resetOp(){
+  editId=null; st.mind=new Set(); st.pb=null; ["fEstr","fWhy","fPnl","fLesson"].forEach(id=>$(id).value="");
+  $("fTicker").value=st.motor==="spx0dte"?"SPX":""; $("opCancel").hidden=true; $("opSave").textContent="Guardar operación"; $("opMode").textContent=""; syncChips();
+}
+async function saveOp(){
+  if(!db||!canEdit) return;
+  const pnl=$("fPnl").value.trim(), why=$("fWhy").value.trim();
+  const err=m=>{$("opErr").textContent=m;};
+  if(!why) return err("Escribe por qué entraste: es lo que permite aprender después.");
+  if(!st.mind.size) return err("Marca tu estado mental al entrar.");
+  if(!st.pb) return err("Indica si seguiste el Playbook.");
+  if(pnl===""||isNaN(+pnl)) return err("Captura el resultado en dólares (0 si quedó en empate).");
+  const d={fecha: editId?(ops.find(o=>o.id===editId)||{}).fecha||today():today(), motor:st.motor, estructura:$("fEstr").value.trim()||null,
+    ticker:($("fTicker").value.trim()||"").toUpperCase()||null, porque:why, estadoMental:[...st.mind], playbook:st.pb, pnl:+pnl, leccion:$("fLesson").value.trim()||null};
+  $("opSave").disabled=true;
+  try{
+    if(editId) await db.doc(OPS+"/"+editId).update(d);
+    else { d.creado=new Date().toISOString(); await db.collection(OPS).add(d); }
+    resetOp(); $("pOp").scrollIntoView({behavior:"smooth",block:"start"});
+  }catch(e){ err("No se pudo guardar ("+(e&&e.code||"error")+"). Intenta de nuevo."); }
+  finally{ $("opSave").disabled=false; }
+}
+function editOp(o){
+  editId=o.id; st.motor=o.motor; onMotor(); st.mind=new Set(o.estadoMental||[]); st.pb=o.playbook;
+  $("fEstr").value=o.estructura||""; $("fTicker").value=o.ticker||""; $("fWhy").value=o.porque||""; $("fPnl").value=o.pnl??""; $("fLesson").value=o.leccion||"";
+  $("opCancel").hidden=false; $("opSave").textContent="Guardar cambios"; $("opMode").textContent="Editando del "+o.fecha; syncChips();
+  $("pOp").scrollIntoView({behavior:"smooth",block:"start"});
+}
+async function saveDay(noTrade){
+  if(!db||!canEdit) return;
+  const err=m=>{$("dayErr").textContent=m;};
+  const t=today(), mine=ops.filter(o=>o.fecha===t);
+  if(noTrade && mine.length) return err("Ya registraste operaciones hoy; usa Cerrar el día.");
+  if(!noTrade){
+    if(!mine.length) return err("No hay operaciones registradas hoy. Si no operaste, usa Hoy no operé.");
+    if(!st.read) return err("Indica tu lectura de las 10:30 ET.");
+    if(st.read!=="na"&&!st.real) return err("Indica qué fue realmente el día.");
+    if(!st.dayMind.size) return err("Marca tu estado general del día.");
+  }
+  const d={fecha:t, cerrado:true, sinOperaciones:!!noTrade, regimenLeido:noTrade?null:st.read, regimenReal:noTrade?(st.real||null):st.real,
+    estadoGeneral:[...st.dayMind], nota:$("fDayNote").value.trim()||null, cerradoEn:new Date().toISOString()};
+  try{ await db.doc(DAYS+"/"+t).set(d); $("dayOk").textContent=noTrade?"Día registrado sin operaciones.":"Día cerrado. Buen trabajo."; }
+  catch(e){ err("No se pudo cerrar el día ("+(e&&e.code||"error")+")."); }
+}
+
+function entryHTML(o,withActions){
+  const pb={si:["good","Playbook: sí"],parcial:["warn","Playbook: parcial"],no:["bad","Playbook: no"]}[o.playbook]||["","—"];
+  let h='<article class="entry"><div class="e1"><b>'+esc(o.ticker||"")+' '+esc(o.estructura||"")+'</b><span class="pnl '+cls(o.pnl)+'">'+money(o.pnl)+'</span></div>'+
+    '<div class="tags"><span class="tag">'+esc((MOTORS.find(m=>m[0]===o.motor)||[0,o.motor])[1])+'</span><span class="tag '+pb[0]+'">'+pb[1]+'</span>'+
+    (o.estadoMental||[]).map(m=>'<span class="tag '+(MIND_BAD.includes(m)?"bad":"")+'">'+esc(m)+'</span>').join("")+'</div>'+
+    '<div class="why">'+esc(o.porque)+'</div>'+(o.leccion?'<div class="why"><b>Lección:</b> '+esc(o.leccion)+'</div>':"");
+  if(withActions&&canEdit){
+    h+='<div class="actions"><button type="button" class="btn small ghost" data-act="edit" data-id="'+o.id+'">Editar</button>'+
+      (delId===o.id?'<button type="button" class="btn small danger" data-act="delok" data-id="'+o.id+'">Confirmar borrado</button>':'<button type="button" class="btn small ghost danger" data-act="del" data-id="'+o.id+'">Borrar</button>')+'</div>';
+  }
+  return h+'</article>';
+}
+function render(){
+  const t=today(), mine=ops.filter(o=>o.fecha===t), day=days[t];
+  if(!PUBLIC) $("hDate").textContent=dayLabel(t).replace(/^./,c=>c.toUpperCase());
+  const done=day&&day.cerrado;
+  $("dayPill").className="pill "+(done?"ok":"pend");
+  $("dayPill").textContent=done?(day.sinOperaciones?"Registrado · sin operaciones":"Día cerrado"):"Pendiente de registrar";
+  const tot=mine.reduce((a,o)=>a+(+o.pnl||0),0);
+  $("todayTot").textContent=mine.length?(mine.length+" · "+money(tot)):""; $("todayTot").className="num "+cls(tot);
+  $("lToday").innerHTML=mine.length?mine.map(o=>entryHTML(o,true)).join(""):'<div class="empty">Aún no registras operaciones hoy. Al cierre, captura cada una arriba: motor, por qué entraste, tu estado mental y el resultado.</div>';
+  if(done&&!st._loadedDay){ st.read=day.regimenLeido||null; st.real=day.regimenReal||null; st.dayMind=new Set(day.estadoGeneral||[]); $("fDayNote").value=day.nota||""; st._loadedDay=true; syncChips(); }
+  $("daySave").textContent=done?"Actualizar cierre":"Cerrar el día";
+  // patrones 30 días
+  const cut=new Date(Date.now()-30*86400000).toLocaleDateString("en-CA",{timeZone:TZ});
+  const rec=ops.filter(o=>o.fecha>=cut), dd=Object.values(days).filter(d=>d.fecha>=cut&&d.regimenLeido&&d.regimenLeido!=="na"&&d.regimenReal);
+  if(dd.length){ const hit=dd.filter(d=>d.regimenLeido===d.regimenReal).length; $("sReg").textContent=Math.round(hit/dd.length*100)+"%"; $("sRegD").textContent=hit+" de "+dd.length+" días"; }
+  else { $("sReg").textContent="—"; $("sRegD").textContent="Se calcula al cerrar días con lectura"; }
+  const sum=a=>a.reduce((x,o)=>x+(+o.pnl||0),0);
+  const pY=rec.filter(o=>o.playbook==="si"), pN=rec.filter(o=>o.playbook!=="si");
+  $("sPbY").textContent=pY.length?money(sum(pY)):"—"; $("sPbY").className="v "+cls(sum(pY));
+  $("sPbN").textContent="Parcial o sin seguirlo: "+(pN.length?money(sum(pN)):"—");
+  const by={}; rec.forEach(o=>(o.estadoMental||[]).forEach(m=>{(by[m]=by[m]||[]).push(+o.pnl||0);}));
+  const worst=Object.entries(by).filter(([,v])=>v.length>=2).map(([k,v])=>[k,v.reduce((a,b)=>a+b,0)/v.length]).sort((a,b)=>a[1]-b[1])[0];
+  if(worst&&worst[1]<0){ $("sMind").textContent=worst[0]; $("sMindD").textContent="Promedio "+money(worst[1])+" por operación"; }
+  else { $("sMind").textContent="—"; $("sMindD").textContent="Necesita al menos 2 operaciones por estado"; }
+  // historial
+  const dates=[...new Set([...ops.map(o=>o.fecha),...Object.keys(days)])].filter(d=>d<t).sort().reverse().slice(0,30);
+  $("lHist").innerHTML=dates.length?dates.map(d=>{const os=ops.filter(o=>o.fecha===d), dy=days[d]||{}, s=sum(os);
+    const reg=dy.regimenLeido&&dy.regimenLeido!=="na"&&dy.regimenReal?(dy.regimenLeido===dy.regimenReal?'<span class="tag good">Régimen acertado</span>':'<span class="tag bad">Régimen errado</span>'):"";
+    const st2=dy.cerrado?"":'<span class="tag warn">Sin cerrar</span>';
+    return '<div class="day"><div class="dayh"><b>'+esc(dayLabel(d))+'</b><span class="pnl '+cls(s)+'">'+(os.length?money(s):"Sin operaciones")+'</span></div><div class="tags">'+reg+st2+(dy.estadoGeneral||[]).map(m=>'<span class="tag">'+esc(m)+'</span>').join("")+'</div>'+(dy.nota?'<div class="why">'+esc(dy.nota)+'</div>':"")+os.map(o=>entryHTML(o,false)).join("")+'</div>';}).join(""):'<div class="empty">Aquí aparecerán tus días anteriores.</div>';
+}
+
+document.addEventListener("click",async e=>{
+  const b=e.target.closest("[data-act]"); if(!b||!canEdit) return;
+  const o=ops.find(x=>x.id===b.dataset.id);
+  if(b.dataset.act==="edit") return editOp(o);
+  if(b.dataset.act==="del"){ delId=o.id; render(); return; }
+  if(b.dataset.act==="delok"){ b.disabled=true; try{ await db.doc(OPS+"/"+o.id).delete(); }catch(x){} delId=null; if(editId===o.id) resetOp(); }
+});
+$("opSave").addEventListener("click",saveOp);
+$("opCancel").addEventListener("click",resetOp);
+$("daySave").addEventListener("click",()=>saveDay(false));
+$("noTrade").addEventListener("click",()=>saveDay(true));
+
+/* vista pública (katapunta.com): lee la foto de la Bitácora, solo lectura */
+const PUBLIC_URL="https://0dte.katapunta.com/bitacora.json";
+async function startPublic(){
+  PUBLIC=true;
+  $("pOp").hidden=true; $("pDay").hidden=true; $("lToday").closest("section").hidden=true; $("dayPill").hidden=true;
+  $("hDate").textContent="Historial y patrones";
+  const load=async()=>{
+    try{
+      const r=await fetch(PUBLIC_URL+"?t="+Date.now(),{cache:"no-store"}); if(!r.ok) throw new Error(r.status);
+      const j=await r.json();
+      ops=j.ops||[]; days={}; Object.entries(j.dias||{}).forEach(([k,v])=>{ days[k]=Object.assign({fecha:k},v); });
+      const at=j.actualizado?new Date(j.actualizado).toLocaleString("es-MX",{timeZone:TZ,day:"numeric",month:"short",hour:"2-digit",minute:"2-digit",hour12:false}):"—";
+      $("banner").hidden=false; $("banner").textContent="Vista pública de solo lectura · actualizada "+at+" ET.";
+      const det=document.querySelector("details"); if(det) det.open=true;
+      render();
+    }catch(e){ $("banner").hidden=false; $("banner").textContent="No se pudo leer la Bitácora. Reintentando…"; }
+  };
+  await load(); setInterval(()=>{ if(!document.hidden) load(); },10*60000);
+}
+async function start(){
+  render();
+  if(!window.claude||!claude.use){ return startPublic(); }
+  const [dbNs,userNs]=await Promise.all([claude.use("db"),claude.use("user")]);
+  db=dbNs; canEdit=userNs?await userNs.canEdit():false;
+  if(!db){ $("banner").hidden=false; $("banner").textContent="La base de la Bitácora no está disponible en esta vista. Recarga desde claude.ai."; return; }
+  if(!canEdit){ $("banner").hidden=false; $("banner").textContent="Vista de solo lectura: ves el registro completo, pero no puedes modificarlo."; $("pOp").hidden=true; $("pDay").hidden=true; }
+  db.collection(OPS).onSnapshot(s=>{ ops=s.docs.map(d=>Object.assign({id:d.id},d.data())); render(); },()=>{ $("banner").hidden=false; $("banner").textContent="Se interrumpió la conexión con la base. Recarga la página."; });
+  db.collection(DAYS).onSnapshot(s=>{ days={}; s.docs.forEach(d=>{ days[d.id]=Object.assign({fecha:d.id},d.data()); }); render(); });
+}
+start();
+setInterval(()=>{ if(!document.hidden) render(); },60000);
+})();
+</script>
+
+</body>
+</html>

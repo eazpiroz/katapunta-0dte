@@ -1,0 +1,249 @@
+{
+ "actualizado": "2026-11-11T08:47:37Z",
+ "ops": [
+  {
+   "creado": "2026-11-09T15:31:03Z",
+   "estadoMental": [
+    "Tranquilo"
+   ],
+   "estructura": "Call spread comprado 7525/7530 ×4",
+   "fecha": "2026-11-09",
+   "leccion": null,
+   "motor": "spx0dte",
+   "playbook": "si",
+   "pnl": 1160,
+   "porque": "Cobertura del call spread vendido 7550/7560 y apuesta direccional a la vez. Cancelé el cierre en 4.40 porque seguía el setup alcista y quise quedarme con el 100%. 10:31 ET → vencimiento · débito 2.10, liquidó en $5.",
+   "ticker": "SPX",
+   "id": "2026-11-09-cs-comprado-7525"
+  },
+  {
+   "creado": "2026-11-09T17:09:30Z",
+   "estadoMental": [
+    "En alerta"
+   ],
+   "estructura": "Call spread comprado 7545/7550 ×4",
+   "fecha": "2026-11-09",
+   "leccion": null,
+   "motor": "spx0dte",
+   "playbook": "si",
+   "pnl": 280,
+   "porque": "Setup alcista. Vi que a 7550 le estaba costando trabajo y decidí cerrar con profit. 12:09 → 13:04 ET · débito 2.10 → 2.80.",
+   "ticker": "SPX",
+   "id": "2026-11-09-cs-comprado-7545"
+  },
+  {
+   "creado": "2026-11-09T18:45:04Z",
+   "estadoMental": [
+    "En alerta"
+   ],
+   "estructura": "Call spread comprado 7550/7555 ×2",
+   "fecha": "2026-11-09",
+   "leccion": null,
+   "motor": "spx0dte",
+   "playbook": "si",
+   "pnl": 110,
+   "porque": "Setup alcista; quería un scalping. 13:45 → 13:57 ET · débito 2.15 → 2.70.",
+   "ticker": "SPX",
+   "id": "2026-11-09-cs-comprado-7550"
+  },
+  {
+   "creado": "2026-11-09T14:30:26Z",
+   "estadoMental": [
+    "Ansioso"
+   ],
+   "estructura": "Call spread vendido 7480/7490 ×2 (abierto vie 6 nov)",
+   "fecha": "2026-11-09",
+   "leccion": null,
+   "motor": "spx0dte",
+   "playbook": "parcial",
+   "pnl": -100,
+   "porque": "Entrada (vie): las Bollinger seguían muy abiertas y esperaba que hoy abriera con gap bajista. Salida: en la apertura vi de inmediato un setup alcista y lo recompré. Crédito 1.90 → recompra 2.40.",
+   "ticker": "SPX",
+   "id": "2026-11-09-cs-vendido-7480"
+  },
+  {
+   "creado": "2026-11-09T14:51:24Z",
+   "estadoMental": [
+    "Ansioso"
+   ],
+   "estructura": "Call spread vendido 7530/7540 ×4",
+   "fecha": "2026-11-09",
+   "leccion": "Fue una apertura prematura.",
+   "motor": "spx0dte",
+   "playbook": "si",
+   "pnl": -280,
+   "porque": "Era el call wall. Vi que seguía subiendo y decidí cerrar. 9:51 → 10:15 ET (primera hora) · crédito 2.25 → recompra 2.95.",
+   "ticker": "SPX",
+   "id": "2026-11-09-cs-vendido-7530"
+  },
+  {
+   "creado": "2026-11-09T15:17:11Z",
+   "estadoMental": [
+    "Revancha"
+   ],
+   "estructura": "Call spread vendido 7550/7560 ×4",
+   "fecha": "2026-11-09",
+   "leccion": null,
+   "motor": "spx0dte",
+   "playbook": "si",
+   "pnl": -760,
+   "porque": "Pensé que el call wall lo detendría y quise recuperar la pérdida de la posición que había cerrado, con la misma tesis de que ya no subiría mucho más, siendo una tendencia alcista. Cierre: vi que seguía subiendo y preferí cerrar con pérdida y volver a abrir más arriba. 10:17 → 12:10 ET · crédito 1.50 → recompra 3.40.",
+   "ticker": "SPX",
+   "id": "2026-11-09-cs-vendido-7550"
+  },
+  {
+   "creado": "2026-11-09T17:14:58Z",
+   "estadoMental": [
+    "En alerta"
+   ],
+   "estructura": "Call spread vendido 7565/7575 ×4",
+   "fecha": "2026-11-09",
+   "leccion": null,
+   "motor": "spx0dte",
+   "playbook": "si",
+   "pnl": 80,
+   "porque": "Vi amenazado el strike corto y decidí salir con profit. 12:14 → 13:57 ET · crédito 1.50 → recompra 1.30.",
+   "ticker": "SPX",
+   "id": "2026-11-09-cs-vendido-7565"
+  },
+  {
+   "creado": "2026-11-09T20:12:44Z",
+   "estadoMental": [
+    "Avaricia"
+   ],
+   "estructura": "Call spread vendido 7580/7585 ×4",
+   "fecha": "2026-11-09",
+   "leccion": null,
+   "motor": "spx0dte",
+   "playbook": "parcial",
+   "pnl": 300,
+   "porque": "Quería más profit; entrada en el límite de horario. Claude me dio PIN 7570, pero no sabía que ese cálculo no había usado GEX. 15:12 ET → vencimiento · crédito 0.75, expiró sin valor (antes intenté 7570/7575 en 0.75 a las 14:03 y lo cancelé).",
+   "ticker": "SPX",
+   "id": "2026-11-09-cs-vendido-7580"
+  },
+  {
+   "creado": "2026-11-09T14:34:18Z",
+   "estadoMental": [
+    "Tranquilo"
+   ],
+   "estructura": "Call spread comprado 175/180 ×2 (venc 11 nov)",
+   "fecha": "2026-11-09",
+   "leccion": null,
+   "motor": "swing",
+   "playbook": "parcial",
+   "pnl": 130,
+   "porque": "Setup alcista. Decidí cerrar con un profit pequeño. 9:34 → 10:10 ET · débito 2.25 → 2.90.",
+   "ticker": "NVDA",
+   "id": "2026-11-09-nvda-cs-comprado-175"
+  },
+  {
+   "creado": "2026-11-09T15:56:35Z",
+   "estadoMental": [
+    "Confiado"
+   ],
+   "estructura": "Put spread vendido 7510/7500 ×4",
+   "fecha": "2026-11-09",
+   "leccion": null,
+   "motor": "spx0dte",
+   "playbook": "si",
+   "pnl": 640,
+   "porque": "Setup alcista. Tenía como hedge la posición anterior por si se veía amenazado. 10:56 ET → vencimiento · crédito 1.60, expiró sin valor (antes intenté 7500/7490 en 1.50 a las 10:52 y lo cancelé).",
+   "ticker": "SPX",
+   "id": "2026-11-09-ps-vendido-7510"
+  },
+  {
+   "creado": "2026-11-09T20:26:29Z",
+   "estadoMental": [
+    "Avaricia"
+   ],
+   "estructura": "Put spread vendido 7565/7560 ×4",
+   "fecha": "2026-11-09",
+   "leccion": "Error garrafal: gestionar desde el celular no es lo mismo que estar frente a la computadora.",
+   "motor": "spx0dte",
+   "playbook": "parcial",
+   "pnl": -1640,
+   "porque": "Vi setup alcista; subí strikes buscando el mínimo aceptable de 0.75 de crédito. Vi la caída final pero andaba en el celular, no frente a la computadora. 15:26 ET → vencimiento · crédito 0.90 (intentos: 7550/7545 a las 15:12, 7555/7550 a las 15:19, 7565/7560 en 1.10 a las 15:25). SPX cerró en 7,549.94: pérdida máxima.",
+   "ticker": "SPX",
+   "id": "2026-11-09-ps-vendido-7565"
+  },
+  {
+   "creado": "2026-11-10T19:11:57Z",
+   "estadoMental": [],
+   "estructura": "Call spread comprado 7510/7515 ×2",
+   "fecha": "2026-11-10",
+   "leccion": null,
+   "motor": "spx0dte",
+   "playbook": null,
+   "pnl": 620,
+   "porque": "POR COMPLETAR. 14:11 ET → vencimiento · débito 1.90; SPX cerró en 7,520.93: liquidó en $5.",
+   "ticker": "SPX",
+   "id": "2026-11-10-cs-comprado-7510"
+  },
+  {
+   "creado": "2026-11-10T15:12:21Z",
+   "estadoMental": [],
+   "estructura": "Call spread comprado 7545/7550 ×4",
+   "fecha": "2026-11-10",
+   "leccion": null,
+   "motor": "spx0dte",
+   "playbook": null,
+   "pnl": -800,
+   "porque": "POR COMPLETAR. 10:12 ET (primera hora) → vencimiento · débito 2.00; SPX cerró en 7,520.93: expiró sin valor.",
+   "ticker": "SPX",
+   "id": "2026-11-10-cs-comprado-7545"
+  },
+  {
+   "creado": "2026-11-10T15:32:13Z",
+   "estadoMental": [],
+   "estructura": "Call spread vendido 7555/7565 ×4",
+   "fecha": "2026-11-10",
+   "leccion": null,
+   "motor": "spx0dte",
+   "playbook": null,
+   "pnl": 720,
+   "porque": "POR COMPLETAR. 10:32 ET → vencimiento · crédito 1.80; expiró sin valor.",
+   "ticker": "SPX",
+   "id": "2026-11-10-cs-vendido-7555"
+  },
+  {
+   "creado": "2026-11-10T16:41:22Z",
+   "estadoMental": [],
+   "estructura": "Put spread comprado 7490/7485 ×2",
+   "fecha": "2026-11-10",
+   "leccion": null,
+   "motor": "spx0dte",
+   "playbook": null,
+   "pnl": -280,
+   "porque": "POR COMPLETAR. 11:41 → 14:10 ET · débito 2.00, cerrado en 0.60.",
+   "ticker": "SPX",
+   "id": "2026-11-10-ps-comprado-7490"
+  },
+  {
+   "creado": "2026-11-10T17:21:27Z",
+   "estadoMental": [],
+   "estructura": "Put spread vendido 7475/7465 ×2",
+   "fecha": "2026-11-10",
+   "leccion": null,
+   "motor": "spx0dte",
+   "playbook": null,
+   "pnl": 380,
+   "porque": "POR COMPLETAR. 12:21 ET → vencimiento · crédito 1.90; expiró sin valor.",
+   "ticker": "SPX",
+   "id": "2026-11-10-ps-vendido-7475"
+  }
+ ],
+ "dias": {
+  "2026-11-09": {
+   "cerrado": true,
+   "cerradoEn": "2026-11-10T02:11:14.103Z",
+   "estadoGeneral": [
+    "En alerta"
+   ],
+   "fecha": "2026-11-09",
+   "nota": null,
+   "regimenLeido": "tendencia",
+   "regimenReal": "tendencia",
+   "sinOperaciones": false
+  }
+ }
+}
