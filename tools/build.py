@@ -57,12 +57,14 @@ runtime = r'''
   function paint() { if (!comp || !window.LIVE_DATA) return; const f = document.createDocumentFragment();
     try { render(tpl.content, comp.renderVals(), f); mount.replaceChildren(f); } catch (e) { console.error(e); } }
   window.__boot = C => { comp = new C({}); paint(); };
-  let lastD = '', lastA = '', DATA = null, AUTO = null;
+  let lastD = '', lastA = '', DATA = null, AUTO = null, TAPE = null;
+  const TAPE_URLS = ['https://api.github.com/repos/eazpiroz/katapunta-0dte/contents/tape.json?ref=live', 'https://raw.githubusercontent.com/eazpiroz/katapunta-0dte/live/tape.json'];
   const AUTO_URLS = ['https://api.github.com/repos/eazpiroz/katapunta-0dte/contents/auto.json?ref=live', 'https://raw.githubusercontent.com/eazpiroz/katapunta-0dte/live/auto.json'];
   const todayMX = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Mexico_City' }).format(new Date());
   function merge() {
     if (!DATA) return null;
     const d = JSON.parse(JSON.stringify(DATA));
+    if (TAPE) d.tape = TAPE;
     const a = AUTO;
     if (!a || a.date !== todayMX()) return d;
     d.on = true;
@@ -95,10 +97,16 @@ runtime = r'''
         if (r.ok) { const t = await r.text(); if (t !== lastA) { lastA = t; AUTO = JSON.parse(t); } break; }
       } catch (e) { console.error(e); }
     }
+    for (const u of TAPE_URLS) {
+      try {
+        const r = await fetch(u, { headers: { Accept: 'application/vnd.github.raw+json' }, cache: 'no-cache' });
+        if (r.ok) { TAPE = JSON.parse(await r.text()); break; }
+      } catch (e) { console.error(e); }
+    }
     const m = merge(); if (m) { window.LIVE_DATA = m; paint(); }
   }
   window.__load = load;
-  setInterval(load, 75000);
+  setInterval(load, 45000);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) load(); });
 })();
 '''

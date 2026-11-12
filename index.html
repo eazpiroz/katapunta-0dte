@@ -355,6 +355,58 @@ a{color:#65B837}a:hover{color:#83DC28}
 </section>
 </template>
 
+<template data-k="if" value="{{tp.on}}" hint-placeholder-val="{{false}}">
+<section aria-label="Tape de opciones" style="background: #10254D; border: 1px solid #22396A; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.01em">Tape +{{tp.min}} · SPX 0DTE</h2>
+<span style="font-size: 11px; color: {{tp.ageC}}">{{tp.age}}</span>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 16px">
+<div style="flex: 1 1 340px; min-width: 0; display: flex; flex-direction: column">
+<div style="display: grid; grid-template-columns: 64px 64px 52px 60px 1fr 70px; gap: 8px; font-size: 11px; font-weight: 500; letter-spacing: 0.08em; color: #A3B0C6; padding: 0 0 6px">
+<span>HORA ET</span><span>STRIKE</span><span>CONTR.</span><span>PRECIO</span><span>LADO</span><span style="text-align: right">PRIMA</span>
+</div>
+<template data-k="for" list="{{tp.prints}}" as="pr" hint-placeholder-count="8">
+<div style="display: grid; grid-template-columns: 64px 64px 52px 60px 1fr 70px; gap: 8px; align-items: center; padding: 5px 0; border-top: 1px solid #22396A; font-size: 13px; font-family: 'IBM Plex Mono', ui-monospace, monospace">
+<span style="color: #A3B0C6">{{pr.h}}</span>
+<span style="font-weight: 600; color: {{pr.kc}}">{{pr.k}}</span>
+<span>{{pr.n}}</span>
+<span>{{pr.px}}</span>
+<span style="font-family: 'Manrope', sans-serif; font-weight: 600; color: {{pr.lc}}">{{pr.lado}}</span>
+<span style="text-align: right">{{pr.prem}}</span>
+</div>
+</template>
+<template data-k="if" value="{{tp.empty}}" hint-placeholder-val="{{false}}">
+<div style="font-size: 13px; color: #A3B0C6; padding: 8px 0">Sin operaciones de +{{tp.min}} contratos todavía.</div>
+</template>
+</div>
+<div style="flex: 1 1 260px; min-width: 0; display: flex; flex-direction: column; gap: 10px">
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px">
+<div style="background: #0B1A38; border: 1px solid #22396A; border-radius: 8px; padding: 10px 12px">
+<div style="font-size: 11px; letter-spacing: 0.08em; color: #A3B0C6">NETO CALLS</div>
+<div style="font-size: 18px; font-weight: 700; font-family: 'IBM Plex Mono', ui-monospace, monospace; color: {{tp.ncC}}">{{tp.nc}}</div>
+</div>
+<div style="background: #0B1A38; border: 1px solid #22396A; border-radius: 8px; padding: 10px 12px">
+<div style="font-size: 11px; letter-spacing: 0.08em; color: #A3B0C6">NETO PUTS</div>
+<div style="font-size: 18px; font-weight: 700; font-family: 'IBM Plex Mono', ui-monospace, monospace; color: {{tp.npC}}">{{tp.np}}</div>
+</div>
+</div>
+<div style="font-size: 11px; font-weight: 500; letter-spacing: 0.08em; color: #A3B0C6">PRIMA POR STRIKE · <span style="color: #4C9AFF">■ compra</span> <span style="color: #FF7A45">■ venta</span> <span style="color: #5B6E91">■ medio</span></div>
+<template data-k="for" list="{{tp.strikes}}" as="st" hint-placeholder-count="6">
+<div style="display: grid; grid-template-columns: 64px 1fr 62px; gap: 8px; align-items: center; font-size: 12px; font-family: 'IBM Plex Mono', ui-monospace, monospace">
+<span style="font-weight: 600; color: {{st.kc}}">{{st.k}}</span>
+<span style="display: flex; height: 10px; border-radius: 3px; overflow: hidden; background: #0B1A38">
+<span style="width: {{st.wB}}; background: #4C9AFF"></span><span style="width: {{st.wV}}; background: #FF7A45"></span><span style="width: {{st.wM}}; background: #5B6E91"></span>
+</span>
+<span style="text-align: right">{{st.tot}}</span>
+</div>
+</template>
+</div>
+</div>
+<div style="font-size: 11px; color: #A3B0C6; line-height: 1.5; border-top: 1px solid #22396A; padding-top: 8px">Tape aproximado desde el streamer de Schwab: cada renglón es un salto de volumen de +{{tp.min}} contratos en un strike 0DTE. Compra = se pagó el ask, venta = se vendió al bid, medio = entre ambos. Se excluyen probables spreads (mismo tamaño en dos strikes en 2 s). Neto = prima comprada − vendida. Sin códigos de condición: dos operaciones juntas pueden verse como una.</div>
+</section>
+</template>
+
 <template data-k="if" value="{{isFull}}" hint-placeholder-val="{{false}}">
 <section style="display: flex; flex-wrap: wrap; gap: 12px; align-items: stretch">
 <div style="flex: 1 1 420px; min-width: 0; background: #10254D; border: 1px solid #22396A; border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 12px">
@@ -449,7 +501,7 @@ a{color:#65B837}a:hover{color:#83DC28}
 </div>
 </div>
 </template>
-<script>window.BUILD='dc6f8eeb';
+<script>window.BUILD='d474cdfd';
 (function(){
   const tpl = document.getElementById('tpl');
   const mount = document.getElementById('app');
@@ -485,12 +537,14 @@ a{color:#65B837}a:hover{color:#83DC28}
   function paint() { if (!comp || !window.LIVE_DATA) return; const f = document.createDocumentFragment();
     try { render(tpl.content, comp.renderVals(), f); mount.replaceChildren(f); } catch (e) { console.error(e); } }
   window.__boot = C => { comp = new C({}); paint(); };
-  let lastD = '', lastA = '', DATA = null, AUTO = null;
+  let lastD = '', lastA = '', DATA = null, AUTO = null, TAPE = null;
+  const TAPE_URLS = ['https://api.github.com/repos/eazpiroz/katapunta-0dte/contents/tape.json?ref=live', 'https://raw.githubusercontent.com/eazpiroz/katapunta-0dte/live/tape.json'];
   const AUTO_URLS = ['https://api.github.com/repos/eazpiroz/katapunta-0dte/contents/auto.json?ref=live', 'https://raw.githubusercontent.com/eazpiroz/katapunta-0dte/live/auto.json'];
   const todayMX = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Mexico_City' }).format(new Date());
   function merge() {
     if (!DATA) return null;
     const d = JSON.parse(JSON.stringify(DATA));
+    if (TAPE) d.tape = TAPE;
     const a = AUTO;
     if (!a || a.date !== todayMX()) return d;
     d.on = true;
@@ -523,10 +577,16 @@ a{color:#65B837}a:hover{color:#83DC28}
         if (r.ok) { const t = await r.text(); if (t !== lastA) { lastA = t; AUTO = JSON.parse(t); } break; }
       } catch (e) { console.error(e); }
     }
+    for (const u of TAPE_URLS) {
+      try {
+        const r = await fetch(u, { headers: { Accept: 'application/vnd.github.raw+json' }, cache: 'no-cache' });
+        if (r.ok) { TAPE = JSON.parse(await r.text()); break; }
+      } catch (e) { console.error(e); }
+    }
     const m = merge(); if (m) { window.LIVE_DATA = m; paint(); }
   }
   window.__load = load;
-  setInterval(load, 75000);
+  setInterval(load, 45000);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) load(); });
 })();
 </script>
@@ -1272,8 +1332,24 @@ class Component extends DCLogic {
       subColor: tk === s ? '#83DC28' : '#A3B0C6',
       pick: () => this.setState({ tk: s })
     }));
+    const TPj = LIVE.tape, tpAge = TPj && TPj.ts ? Date.now() / 1000 - TPj.ts : 1e9;
+    const fK = v => '$' + (Math.abs(v) >= 1e6 ? (v / 1e6).toFixed(2) + 'M' : Math.abs(v) >= 1e3 ? Math.round(v / 1e3) + 'K' : Math.round(v));
+    const etH = h => { const p = String(h).split(':'); return ((+p[0] + 1) % 24) + ':' + p[1] + (p[2] ? ':' + p[2] : ''); };   // CDMX → ET (nov–mar)
+    const tpMx = TPj ? Math.max(1, ...(TPj.strikes || []).map(r => r.B + r.V + r.M)) : 1;
+    const tp = (TPj && tk === 'SPX' && tpAge < 1800) ? {
+      on: true, min: TPj.min || 100,
+      age: tpAge < 90 ? 'en vivo · hace ' + Math.round(tpAge) + ' s' : 'hace ' + Math.round(tpAge / 60) + ' min',
+      ageC: tpAge < 90 ? '#83DC28' : '#F2B544',
+      prints: (TPj.prints || []).slice(0, 12).map(p => ({ h: etH(p.h), k: p.k + (p.t === 'C' ? 'C' : 'P'), kc: p.t === 'C' ? '#4C9AFF' : '#FF7A45', n: p.n, px: (+p.px).toFixed(2),
+        lado: p.lado === 'B' ? 'Compra' : p.lado === 'V' ? 'Venta' : 'Medio', lc: p.lado === 'B' ? '#4C9AFF' : p.lado === 'V' ? '#FF7A45' : '#A3B0C6', prem: fK(p.prem) })),
+      empty: !(TPj.prints || []).length,
+      nc: (TPj.neto.C > 0 ? '+' : TPj.neto.C < 0 ? '−' : '') + fK(Math.abs(TPj.neto.C)), ncC: TPj.neto.C > 0 ? '#4C9AFF' : TPj.neto.C < 0 ? '#FF7A45' : '#E8EDF5',
+      np: (TPj.neto.P > 0 ? '+' : TPj.neto.P < 0 ? '−' : '') + fK(Math.abs(TPj.neto.P)), npC: TPj.neto.P > 0 ? '#4C9AFF' : TPj.neto.P < 0 ? '#FF7A45' : '#E8EDF5',
+      strikes: (TPj.strikes || []).slice(0, 8).map(r => ({ k: r.k + r.t, kc: r.t === 'C' ? '#4C9AFF' : '#FF7A45', tot: fK(r.B + r.V + r.M),
+        wB: (100 * r.B / tpMx).toFixed(1) + '%', wV: (100 * r.V / tpMx).toFixed(1) + '%', wM: (100 * r.M / tpMx).toFixed(1) + '%' }))
+    } : { on: false };
     return {
-      d, rows, tabs,
+      d, rows, tabs, tp,
       tape: d.tickers.map(sem),
       profScale: 'barra mayor = ' + fmtP(pmx), prof, profL: (mode === 'gex' || mode === 'gexv') ? '◀ GEX −' : '◀ Puts', profR: (mode === 'gex' || mode === 'gexv') ? 'GEX + ▶' : 'Calls ▶',
       showGex: () => this.setState({ mode: 'gex' }),
