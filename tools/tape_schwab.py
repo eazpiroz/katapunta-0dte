@@ -20,7 +20,7 @@ from collections import deque
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import flightdeck_recolector as R
 
-MIN = 100            # contratos mínimos por print
+MIN = int(sys.argv[sys.argv.index("--min") + 1]) if "--min" in sys.argv else 100   # contratos mínimos por print
 SPREAD_S = 2.0       # ventana para emparejar patas de un spread
 N_STR = 30           # strikes por lado (5 pts) alrededor del precio
 PUB_S = 30           # segundos entre publicaciones
@@ -209,11 +209,22 @@ def validar():
     print("VALIDACIÓN OK" if con else "Sin datos de contratos: mándame foto de esto.")
 
 
+def vence():
+    """Vencimiento a seguir: hoy hasta las 15:00 CDMX; después, el siguiente día hábil (sesión nocturna de Cboe)."""
+    import datetime as dt
+    t = R.now()
+    d = t.date() + dt.timedelta(days=1 if t.hour * 60 + t.minute >= 901 or t.weekday() >= 5 else 0)
+    while d.weekday() >= 5:
+        d += dt.timedelta(days=1)
+    return d.isoformat(), dt.datetime.fromisoformat(d.isoformat()).replace(hour=15, minute=1, tzinfo=R.MX)
+
+
 def run():
     c = R.jload(R.SCHWAB)
     tok = R.gh_token()
     tape, sha = Tape(), {"v": None}
-    day = R.now().date().isoformat()
+    day, fin = vence()
+    print(f"Tape SPXW vencimiento {day} · prints de +{MIN} contratos · se apaga {fin:%d-%b %H:%M} CDMX")
 
     def publicar(spot):
         path = f"/repos/{R.REPO}/contents/tape.json"
@@ -232,8 +243,7 @@ def run():
             print("GitHub", st, j.get("message"))
 
     while True:
-        t = R.now()
-        if t.hour * 60 + t.minute >= 901:
+        if R.now() >= fin:
             print("15:01 · fin del tape.")
             return
         try:
@@ -269,8 +279,7 @@ def run():
                 if now_ - t_pub >= PUB_S:
                     publicar(spot)
                     t_pub = now_
-                    tm = R.now()
-                    if tm.hour * 60 + tm.minute >= 901:
+                    if R.now() >= fin:
                         return
                 if now_ - t_sub >= RESUB_S:
                     spot, syms = strikes(c, day)
