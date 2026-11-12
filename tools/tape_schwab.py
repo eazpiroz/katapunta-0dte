@@ -12,6 +12,7 @@ Publica tape.json en la rama live cada 30 s. Usa las mismas llaves que flightdec
 
     python tape_schwab.py            # corre hasta las 15:01 CDMX
     python tape_schwab.py --prueba   # prueba local sin Schwab (datos sintéticos)
+    python tape_schwab.py --validar  # login al streamer + suscripción al siguiente vencimiento, imprime y sale
 """
 import base64, json, os, socket, ssl, struct, sys, time, traceback, urllib.parse, urllib.request
 from collections import deque
@@ -169,6 +170,45 @@ def streamer(c):
     return (j.get("streamerInfo") or [j])[0]
 
 
+def validar():
+    import datetime as dt
+    c = R.jload(R.SCHWAB)
+    d = R.now().date() + dt.timedelta(days=1)
+    while d.weekday() >= 5:
+        d += dt.timedelta(days=1)
+    day = d.isoformat()
+    print("1) preferencias del usuario (streamer)…")
+    info = streamer(c)
+    print("   url:", info.get("streamerSocketUrl"))
+    print("2) conectando websocket…")
+    ws = WS(info["streamerSocketUrl"])
+    ids = {"SchwabClientCustomerId": info["schwabClientCustomerId"], "SchwabClientCorrelId": info["schwabClientCorrelId"]}
+    ws.send(json.dumps({"requests": [dict(ids, service="ADMIN", command="LOGIN", requestid="1", parameters={
+        "Authorization": R.access(c), "SchwabClientChannel": info["schwabClientChannel"],
+        "SchwabClientFunctionId": info["schwabClientFunctionId"]})]}))
+    print("3) login:", ws.recv()[:300])
+    spot, syms = strikes(c, day)
+    print(f"4) SPX {spot:.2f} · vencimiento {day} · {len(syms)} contratos, ej. {syms[0]!r}")
+    ws.send(json.dumps({"requests": [dict(ids, service="LEVELONE_OPTIONS", command="SUBS", requestid="2",
+                                          parameters={"keys": ",".join(syms), "fields": CAMPOS})]}))
+    tape, n, t0 = Tape(), 0, time.time()
+    while time.time() - t0 < 20 and n < 6:
+        msg = json.loads(ws.recv())
+        n += 1
+        for r in msg.get("response", []):
+            print("   respuesta:", json.dumps(r)[:300])
+        for d_ in msg.get("data", []):
+            cont = d_.get("content", [])
+            print(f"   datos {d_.get('service')}: {len(cont)} contratos")
+            for x in cont[:3]:
+                print("     ", json.dumps(x)[:250])
+            for x in cont:
+                tape.update(x, time.time())
+    con = sum(1 for q in tape.q.values() if q.get("bid") is not None or q.get("vol") is not None)
+    print(f"\n5) contratos con datos: {con} de {len(syms)}")
+    print("VALIDACIÓN OK" if con else "Sin datos de contratos: mándame foto de esto.")
+
+
 def run():
     c = R.jload(R.SCHWAB)
     tok = R.gh_token()
@@ -263,4 +303,9 @@ def prueba():
 
 
 if __name__ == "__main__":
-    prueba() if "--prueba" in sys.argv else run()
+    if "--prueba" in sys.argv:
+        prueba()
+    elif "--validar" in sys.argv:
+        validar()
+    else:
+        run()
