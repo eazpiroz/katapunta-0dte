@@ -114,6 +114,7 @@ legend{font-size:13px;font-weight:600;color:var(--muted);margin-bottom:6px;paddi
   h1{font-size:26px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.pdate{display:block;font-family:var(--f-body);font-size:11px;color:var(--muted);margin-top:2px}
 </style>
 <style id="kp-tema">
 /* Tema Katapunta · petróleo + turquesa (solo oscuro) */
@@ -264,6 +265,21 @@ const today=()=>new Date().toLocaleDateString("en-CA",{timeZone:TZ});
 function dte(v){ if(!v) return null; const t=today(); return Math.round((Date.parse(v+"T00:00:00Z")-Date.parse(t+"T00:00:00Z"))/86400000); }
 function priceOf(r){ const q=quotes[(r.ticker||"").toUpperCase()]; return q?q.p:null; }
 
+/* valor intrínseco por acción de la opción (o del spread) según el subyacente */
+function intrinseco(r,S){
+  if(S==null||!r.strikes) return null;
+  const m=String(r.strikes).match(/([\d.]+)(?:\s*\/\s*([\d.]+))?\s*([CP])/i); if(!m) return null;
+  const k1=+m[1], k2=m[2]!=null?+m[2]:null, call=m[3].toUpperCase()==="C";
+  if(k2==null) return Math.max(0, call?S-k1:k1-S);
+  const lo=Math.min(k1,k2), hi=Math.max(k1,k2), w=hi-lo;
+  return Math.min(w, Math.max(0, call?S-lo:hi-S));
+}
+function primaEfectiva(r,S){
+  const pa=n(r.primaActual), iv=intrinseco(r,S);
+  if(pa==null) return {v:iv,intr:iv!=null};
+  if(iv!=null&&iv>pa) return {v:iv,intr:true};
+  return {v:pa,intr:false};
+}
 /* ---------- cálculos ---------- */
 function calc(r){
   const tp=n(r.tp), sl=n(r.sl), p=priceOf(r);
@@ -293,7 +309,7 @@ function calc(r){
     const q=n(r.cantidad), px=n(r.precioEntrada);
     if(q!=null&&px!=null){ out.capital=q*px; if(p!=null) out.pnl=(p-px)*q*out.dir; }
   }else{
-    const c=n(r.contratos), pe=n(r.primaEntrada), pa=n(r.primaActual), credit=CREDIT.has(r.estructura);
+    const c=n(r.contratos), pe=n(r.primaEntrada), pef=primaEfectiva(r,p), pa=pef.v, credit=CREDIT.has(r.estructura); out.pa=pa; out.paIntr=pef.intr;
     if(c!=null&&pe!=null){ if(!credit) out.capital=pe*c*100; if(pa!=null) out.pnl=(pa-pe)*c*100*(credit?-1:1); }
     if((tpPct!=null||slPct!=null)&&pe&&pa!=null){
       out.capt = credit ? (pe-pa)/pe*100 : (pa-pe)/pe*100;
@@ -365,7 +381,7 @@ function optCard(r){
     '<div class="figs">'+
     fig("Subyacente",c.p==null?"—":fmt(c.p))+
     fig("Vence",r.vencimiento?(d!=null?d+" días":"—"):"—")+
-    fig("Prima ent. / act.",fmt(n(r.primaEntrada))+" / "+fmt(n(r.primaActual)))+
+    fig("Prima ent. / act.",fmt(n(r.primaEntrada))+" / "+fmt(c.pa)+'<span class="pdate">'+(c.paIntr?"valor intrínseco":(r.primaFecha?"prima al "+new Intl.DateTimeFormat("es-MX",{timeZone:"UTC",day:"numeric",month:"short"}).format(new Date(r.primaFecha+"T12:00:00Z")):"captura manual"))+'</span>')+
     fig("P&L ("+(n(r.contratos)??"—")+" ctr.)",'<span class="'+signed(c.pnl)+'">'+money(c.pnl)+'</span>')+
     '</div>'+barHTML(c)+(r.tesis?'<div class="note">'+esc(r.tesis)+'</div>':"")+actHTML(r)+'</article>';
 }
@@ -524,6 +540,7 @@ async function saveForm(ev){
   if(d.instrumento==="accion"){ d.tpPct=null; d.slPct=null; ["estructura","vencimiento","strikes","contratos","primaEntrada","primaActual","subyacenteEntrada"].forEach(k=>d[k]=null); }
   else { d.cantidad=null; d.precioEntrada=null; }
   if(d.etapa!=="candidato"){ d.nivel=null; }
+  if(d.instrumento!=="accion"&&d.primaActual!=null){ const prev=editingId?rows.find(r=>r.id===editingId):null; if(!prev||n(prev.primaActual)!==d.primaActual) d.primaFecha=today(); }
   $("btnSave").disabled=true;
   try{
     if(editingId){

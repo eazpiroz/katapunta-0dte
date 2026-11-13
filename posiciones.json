@@ -1,5 +1,5 @@
 {
- "actualizado": "2026-11-13T01:45:03Z",
+ "actualizado": "2026-11-13T02:05:20Z",
  "fuente": "TradingView",
  "rows": [
   {
@@ -28,6 +28,7 @@
    "motor": "wheel",
    "primaActual": 34.8,
    "primaEntrada": 9.2932,
+   "primaFecha": "2026-11-10",
    "recordar": [
     {
      "fecha": "2026-11-18",
@@ -59,10 +60,11 @@
    "etapa": "abierta",
    "instrumento": "opcion",
    "mejor": 56.6,
-   "motor": "swing",
+   "motor": "leaps",
    "plan": "Expira sin valor el 20-nov",
    "primaActual": 0.004,
    "primaEntrada": 22.5066,
+   "primaFecha": "2026-11-10",
    "recordar": [
     {
      "fecha": "2026-11-20",
@@ -141,6 +143,7 @@
    "motor": "leaps",
    "primaActual": 0.68,
    "primaEntrada": 0.7966,
+   "primaFecha": "2026-11-10",
    "simbolo": "NASDAQ:GRAB",
    "sinSL": false,
    "sl": 2.9,
@@ -166,7 +169,7 @@
    "etapa": "abierta",
    "instrumento": "accion",
    "mejor": 42.88,
-   "motor": "swing",
+   "motor": "scalping",
    "precioEntrada": 55.8535,
    "simbolo": "NASDAQ:IBIT",
    "sinSL": false,
@@ -189,7 +192,7 @@
    "etapa": "abierta",
    "instrumento": "accion",
    "mejor": 6.18,
-   "motor": "swing",
+   "motor": "scalping",
    "plan": "Largo plazo",
    "precioEntrada": 6.075,
    "simbolo": "NYSE:JOBY",
@@ -205,7 +208,7 @@
    "etapa": "abierta",
    "instrumento": "accion",
    "mejor": 37.75,
-   "motor": "swing",
+   "motor": "scalping",
    "precioEntrada": 47.2567,
    "simbolo": "NYSE:MP",
    "sinSL": false,
@@ -228,7 +231,7 @@
    "etapa": "abierta",
    "instrumento": "accion",
    "mejor": 11.85,
-   "motor": "swing",
+   "motor": "scalping",
    "precioEntrada": 17.3083,
    "simbolo": "NASDAQ:MSTX",
    "sinSL": false,
@@ -260,6 +263,7 @@
    "motor": "swing",
    "primaActual": 8.86,
    "primaEntrada": 5.4865,
+   "primaFecha": "2026-11-10",
    "simbolo": "NYSE:TSM",
    "sinSL": false,
    "sl": 375,
@@ -290,6 +294,7 @@
    "plan": "Reestructurar tras la reacción del 10-nov",
    "primaActual": 0.67,
    "primaEntrada": 2.7665,
+   "primaFecha": "2026-11-10",
    "recordar": [
     {
      "fecha": "2026-11-11",

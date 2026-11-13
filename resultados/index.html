@@ -152,7 +152,11 @@ function desde(){
 function openPnl(r,q){
   const p=q[(r.ticker||"").toUpperCase()]; const px=p?p.p:null;
   if(r.instrumento==="accion"){ const qy=n(r.cantidad), e=n(r.precioEntrada); return (qy!=null&&e!=null&&px!=null)?(px-e)*qy:null; }
-  const c=n(r.contratos), pe=n(r.primaEntrada), pa=n(r.primaActual);
+  const c=n(r.contratos), pe=n(r.primaEntrada); let pa=n(r.primaActual);
+  const m=String(r.strikes||"").match(/([\d.]+)(?:\s*\/\s*([\d.]+))?\s*([CP])/i);
+  if(m&&px!=null){ const k1=+m[1],k2=m[2]!=null?+m[2]:null,call=m[3].toUpperCase()==="C";
+    const iv=k2==null?Math.max(0,call?px-k1:k1-px):Math.min(Math.abs(k2-k1),Math.max(0,call?px-Math.min(k1,k2):Math.max(k1,k2)-px));
+    if(pa==null||iv>pa) pa=iv; }
   return (c!=null&&pe!=null&&pa!=null)?(pa-pe)*c*100*(CREDIT.has(r.estructura)?-1:1):null;
 }
 function render(){
