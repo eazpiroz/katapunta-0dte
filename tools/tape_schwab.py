@@ -247,6 +247,11 @@ def run():
             print("15:01 · fin del tape.")
             return
         try:
+            # auditoría 12-nov: tras una reconexión, el primer TOTAL_VOLUME traía todo el volumen del hueco
+            # y se contaba como un solo print gigante (neto de puts +$40 M). Se reinician las bases.
+            for q in tape.q.values():
+                q["vol"] = None
+            tape.pend.clear()
             info = streamer(c)
             ws = WS(info["streamerSocketUrl"])
             ids = {"SchwabClientCustomerId": info["schwabClientCustomerId"], "SchwabClientCorrelId": info["schwabClientCorrelId"]}
