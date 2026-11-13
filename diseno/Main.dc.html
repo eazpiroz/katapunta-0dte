@@ -10,29 +10,33 @@
 <helmet>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&amp;family=Manrope:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&amp;family=Lora:ital@1&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
 <style>
-html,body{overflow-x:clip}body{margin:0;background:#08142B;font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
+html,body{overflow-x:clip}body{margin:0;background-color:#0B1617;background-image:linear-gradient(rgba(92,193,191,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(92,193,191,.045) 1px,transparent 1px);background-size:56px 56px;background-attachment:fixed;font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
 svg text{font-family:'IBM Plex Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
-h1,h2,h3{font-family:'Montserrat','Manrope',sans-serif}
+h1,h2,h3{font-family:'Poppins',sans-serif}
 .num{font-family:'IBM Plex Mono',ui-monospace,monospace}
-a{color:#65B837}a:hover{color:#83DC28}
+a{color:#5CC1BF}a:hover{color:#8ADBD7}
+.kp-back{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;font:600 12px/1 "Poppins",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#5CC1BF;text-decoration:none;border:1px solid #1E3739;border-radius:999px;padding:9px 14px;min-height:36px;box-sizing:border-box;background:rgba(17,33,35,.7)}
+.kp-back:hover{border-color:#5CC1BF;color:#5CC1BF}
+.kp-back:focus-visible{outline:2px solid #5CC1BF;outline-offset:2px}
 </style>
 </helmet>
-<div style="background: #08142B; color: #E8EDF5; font-family: 'Manrope', system-ui, sans-serif; min-height: 100vh; padding: 16px 20px 40px; box-sizing: border-box">
+<div style="background: transparent; color: #F2EFE8; font-family: 'Poppins', system-ui, sans-serif; min-height: 100vh; padding: 16px 20px 40px; box-sizing: border-box">
 <div style="max-width: 1440px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px">
+<a class="kp-back" href="https://www.katapunta.com/" aria-label="Volver al Centro de mando de Katapunta">← Centro de mando</a>
 
-<header style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px 24px; padding-bottom: 12px; border-bottom: 1px solid #22396A">
+<header style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px 24px; padding-bottom: 12px; border-bottom: 1px solid #1E3739">
 <div style="display: flex; align-items: center; gap: 12px; flex: 1 1 280px; min-width: 0">
-<img src="logo-katapunta.png" alt="Katapunta" width="150" height="44" style="flex: none; height: 44px; width: auto">
-<div style="flex: none; width: 1px; align-self: stretch; background: #22396A"></div>
+<img src="portada/logo-katapunta-turquesa.png" alt="Katapunta" width="150" height="44" style="flex: none; height: 44px; width: auto">
+<div style="flex: none; width: 1px; align-self: stretch; background: #1E3739"></div>
 <div style="display: flex; flex-direction: column; gap: 2px; min-width: 0">
-<div style="font-size: 11px; font-weight: 500; letter-spacing: 0.14em; color: #65B837; font-family: 'Montserrat', sans-serif; font-weight: 600">FLIGHT DECK · 0DTE</div>
+<div style="font-size: 11px; font-weight: 500; letter-spacing: 0.2em; color: #5CC1BF; font-family: 'Poppins', sans-serif; font-weight: 600">FLIGHT DECK · 0DTE</div>
 <h1 style="margin: 0; font-size: 20px; font-weight: 600; letter-spacing: -0.02em">{{dayTitle}}</h1>
-<div style="font-size: 12px; color: #A3B0C6">{{d.subtitle}}</div>
+<div style="font-size: 13px; color: #93A9A9; font-family: 'Lora', Georgia, serif; font-style: italic">{{d.subtitle}}</div>
 </div>
 </div>
-<div role="group" aria-label="Elegir subyacente" style="display: flex; flex-wrap: wrap; background: #10254D; border: 1px solid #22396A; border-radius: 10px; padding: 3px; gap: 3px">
+<div role="group" aria-label="Elegir subyacente" style="display: flex; flex-wrap: wrap; background: #112123; border: 1px solid #1E3739; border-radius: 10px; padding: 3px; gap: 3px">
 <sc-for list="{{tabs}}" as="t" hint-placeholder-count="4">
 <button type="button" onClick="{{t.pick}}" aria-pressed="{{t.pressed}}" style="{{t.style}}">
 <span style="font-size: 14px; font-weight: 600">{{t.sym}}</span>
@@ -42,20 +46,20 @@ a{color:#65B837}a:hover{color:#83DC28}
 </div>
 <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; flex: 1 1 280px">
 <sc-if value="{{showToggle}}" hint-placeholder-val="{{true}}">
-<div role="group" aria-label="Vista" style="display: flex; border: 1px solid #22396A; border-radius: 8px; overflow: hidden">
+<div role="group" aria-label="Vista" style="display: flex; border: 1px solid #1E3739; border-radius: 8px; overflow: hidden">
 <button type="button" onClick="{{showSimple}}" aria-pressed="{{simplePressed}}" style="{{simpleBtnStyle}}">Simple</button>
 <button type="button" onClick="{{showFull}}" aria-pressed="{{fullPressed}}" style="{{fullBtnStyle}}">Completa</button>
 </div>
 </sc-if>
-<div style="display: flex; align-items: center; gap: 8px; border: 1px solid #22396A; background: #10254D; padding: 6px 12px; border-radius: 999px; font-size: 12px">
-<span style="color: #A3B0C6">Próximo evento</span>
-<span style="font-weight: 600; color: #E8EDF5">{{nextEv}}</span>
+<div style="display: flex; align-items: center; gap: 8px; border: 1px solid #1E3739; background: #112123; padding: 6px 12px; border-radius: 999px; font-size: 12px">
+<span style="color: #93A9A9">Próximo evento</span>
+<span style="font-weight: 600; color: #F2EFE8">{{nextEv}}</span>
 </div>
 <div style="{{status.chip}}">
 <span style="{{status.dot}}"></span>
 {{status.txt}}
 </div>
-<span style="font-size: 11px; color: #A3B0C6">{{readTxt}}</span>
+<span style="font-size: 11px; color: #93A9A9">{{readTxt}}</span>
 </div>
 </header>
 
@@ -63,35 +67,35 @@ a{color:#65B837}a:hover{color:#83DC28}
 <section aria-label="Lectura del día" style="display: flex; flex-direction: column; gap: 6px">
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px">
 <sc-for list="{{lect}}" as="lc" hint-placeholder-count="4">
-<div style="background: #10254D; border: 1px solid #22396A; border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px">
+<div style="background: #112123; border: 1px solid #1E3739; border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px">
 <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px">
-<div style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; color: #A3B0C6"><span style="margin-right: 6px; color: #A3B0C6">{{lc.ic}}</span>{{lc.label}}</div>
+<div style="font-size: 11px; font-weight: 500; letter-spacing: 0.2em; color: #5CC1BF"><span style="margin-right: 6px; color: #93A9A9">{{lc.ic}}</span>{{lc.label}}</div>
 <sc-if value="{{lc.hasPill}}" hint-placeholder-val="{{false}}">
 <span style="font-size: 10px; font-weight: 600; letter-spacing: 0.08em; padding: 3px 8px; border-radius: 999px; border: 1px solid {{lc.pillCol}}; color: {{lc.pillCol}}; white-space: nowrap">{{lc.pill}}</span>
 </sc-if>
 </div>
-<div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap"><span style="font-family: {{lc.vff}}; font-size: 28px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.1; color: {{lc.color}}">{{lc.value}}</span><span style="font-size: 13px; color: #A3B0C6">{{lc.sub}}</span></div>
+<div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap"><span style="font-family: {{lc.vff}}; font-size: 28px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.1; color: {{lc.color}}">{{lc.value}}</span><span style="font-size: 13px; color: #93A9A9">{{lc.sub}}</span></div>
 <sc-if value="{{lc.hasDots}}" hint-placeholder-val="{{false}}">
 <div style="display: flex; flex-wrap: wrap; gap: 6px 12px">
 <sc-for list="{{lc.dots}}" as="dt" hint-placeholder-count="3">
-<span style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #C9D3E3"><span style="width: 10px; height: 10px; border-radius: 50%; background: {{dt.col}}"></span>{{dt.tf}}</span>
+<span style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #D3DCDA"><span style="width: 10px; height: 10px; border-radius: 50%; background: {{dt.col}}"></span>{{dt.tf}}</span>
 </sc-for>
 </div>
 </sc-if>
 <sc-if value="{{lc.hasDots2}}" hint-placeholder-val="{{false}}">
 <div style="display: flex; gap: 14px; align-items: center">
-<span style="font-size: 10px; letter-spacing: 0.08em; color: #A3B0C6">REGLA NUEVA</span>
+<span style="font-size: 10px; letter-spacing: 0.2em; color: #5CC1BF">REGLA NUEVA</span>
 <sc-for list="{{lc.dots2}}" as="dt" hint-placeholder-count="3">
-<span style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #C9D3E3"><span style="width: 10px; height: 10px; border-radius: 50%; background: {{dt.col}}"></span>{{dt.tf}}</span>
+<span style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #D3DCDA"><span style="width: 10px; height: 10px; border-radius: 50%; background: {{dt.col}}"></span>{{dt.tf}}</span>
 </sc-for>
 </div>
 </sc-if>
 <sc-if value="{{lc.hasBar}}" hint-placeholder-val="{{false}}">
 <div style="display: flex; flex-direction: column; gap: 4px">
-<div style="position: relative; height: 8px; background: #2A2414; border: 1px solid #4A3D1C; border-radius: 4px">
+<div style="position: relative; height: 8px; background: #2E2711; border: 1px solid #4A3D1C; border-radius: 4px">
 <div style="{{lc.barMark}}"></div>
 </div>
-<div style="display: flex; justify-content: space-between; font-size: 11px; color: #A3B0C6"><span>{{lc.barL}}</span><span>{{lc.barR}}</span></div>
+<div style="display: flex; justify-content: space-between; font-size: 11px; color: #93A9A9"><span>{{lc.barL}}</span><span>{{lc.barR}}</span></div>
 </div>
 </sc-if>
 <sc-if value="{{lc.hasSpark}}" hint-placeholder-val="{{false}}">
@@ -110,27 +114,27 @@ a{color:#65B837}a:hover{color:#83DC28}
 <div style="{{lc.rng_dB}}"></div>
 <div style="{{lc.rng_px}}"></div>
 </div>
-<div style="display: flex; justify-content: space-between; font-size: 11px; color: #A3B0C6"><span>{{lc.rngL}}</span><span>{{lc.rngR}}</span></div>
+<div style="display: flex; justify-content: space-between; font-size: 11px; color: #93A9A9"><span>{{lc.rngL}}</span><span>{{lc.rngR}}</span></div>
 </div>
 </sc-if>
-<div style="font-size: 12px; color: #A3B0C6; line-height: 1.4; white-space: pre-line">{{lc.note}}</div>
+<div style="font-size: 12px; color: #93A9A9; line-height: 1.4; white-space: pre-line">{{lc.note}}</div>
 </div>
 </sc-for>
 </div>
-<div style="font-size: 11px; color: #A3B0C6">{{simple.macro}}</div>
+<div style="font-size: 11px; color: #93A9A9">{{simple.macro}}</div>
 </section>
 </sc-if>
 
 <sc-if value="{{isFull}}" hint-placeholder-val="{{false}}">
 <section aria-label="Cotizaciones con semáforo de dirección" style="display: flex; flex-direction: column; gap: 6px">
-<div style="display: flex; flex-wrap: wrap; background: #10254D; border: 1px solid #22396A; border-radius: 10px; overflow: hidden">
+<div style="display: flex; flex-wrap: wrap; background: #112123; border: 1px solid #1E3739; border-radius: 10px; overflow: hidden">
 <sc-for list="{{tape}}" as="t" hint-placeholder-count="6">
-<div style="flex: 1 1 200px; min-width: 0; padding: 10px 14px; display: flex; flex-direction: column; gap: 5px; border-right: 1px solid #22396A; border-bottom: 1px solid #22396A; margin-bottom: -1px">
+<div style="flex: 1 1 200px; min-width: 0; padding: 10px 14px; display: flex; flex-direction: column; gap: 5px; border-right: 1px solid #1E3739; border-bottom: 1px solid #1E3739; margin-bottom: -1px">
 <div style="display: flex; align-items: center; gap: 8px">
-<span style="font-size: 12px; font-weight: 600; color: #C9D3E3">{{t.sym}}</span>
-<span style="font-size: 11px; color: #A3B0C6; border: 1px solid #22396A; border-radius: 4px; padding: 0 5px; white-space: nowrap">{{t.feed}}</span>
+<span style="font-size: 12px; font-weight: 600; color: #D3DCDA">{{t.sym}}</span>
+<span style="font-size: 11px; color: #93A9A9; border: 1px solid #1E3739; border-radius: 4px; padding: 0 5px; white-space: nowrap">{{t.feed}}</span>
 <span role="img" aria-label="{{t.aria}}" style="margin-left: auto; display: flex; align-items: center; gap: 6px">
-<span style="display: flex; gap: 3px; padding: 3px 4px; background: #08142B; border: 1px solid #22396A; border-radius: 999px">
+<span style="display: flex; gap: 3px; padding: 3px 4px; background: #0B1617; border: 1px solid #1E3739; border-radius: 999px">
 <span style="width: 8px; height: 8px; border-radius: 50%; background: {{t.l1}}"></span>
 <span style="width: 8px; height: 8px; border-radius: 50%; background: {{t.l2}}"></span>
 <span style="width: 8px; height: 8px; border-radius: 50%; background: {{t.l3}}"></span>
@@ -142,38 +146,38 @@ a{color:#65B837}a:hover{color:#83DC28}
 <span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 16px; font-weight: 500">{{t.px}}</span>
 <span style="font-size: 12px; color: {{t.chgColor}}">{{t.chg}}</span>
 </div>
-<div style="font-size: 11px; color: #A3B0C6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{t.why}}</div>
+<div style="font-size: 11px; color: #93A9A9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{t.why}}</div>
 </div>
 </sc-for>
 </div>
-<div style="font-size: 11px; color: #A3B0C6">Semáforo sobre el precio del índice (SPX o NDX): verde = alcista, rojo = bajista, gris = neutral. VIX, VXN, DXY y la tasa a 10 años cuentan al revés: si suben, se pinta rojo. La línea de abajo dice qué hace el propio instrumento. Regla en 15m: precio vs EMA 20 y EMA 20 vs EMA 50. Es lectura, no señal de entrada.</div>
+<div style="font-size: 11px; color: #93A9A9">Semáforo sobre el precio del índice (SPX o NDX): verde = alcista, rojo = bajista, gris = neutral. VIX, VXN, DXY y la tasa a 10 años cuentan al revés: si suben, se pinta rojo. La línea de abajo dice qué hace el propio instrumento. Regla en 15m: precio vs EMA 20 y EMA 20 vs EMA 50. Es lectura, no señal de entrada.</div>
 </section>
 
 <sc-if value="{{d.hasWarn}}" hint-placeholder-val="{{false}}">
-<div role="note" style="display: flex; gap: 10px; align-items: flex-start; background: #24151A; border: 1px solid #6B2E2C; border-radius: 10px; padding: 12px 16px; font-size: 13px; color: #F2C9C6">
-<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F08A84" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 1px"><path d="M12 9v4"></path><path d="M12 17h.01"></path><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path></svg>
+<div role="note" style="display: flex; gap: 10px; align-items: flex-start; background: #351A18; border: 1px solid #5A2A26; border-radius: 10px; padding: 12px 16px; font-size: 13px; color: #F2C9C6">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F07F74" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 1px"><path d="M12 9v4"></path><path d="M12 17h.01"></path><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path></svg>
 <span>{{d.warn}}</span>
 </div>
 </sc-if>
 
 <section aria-label="Niveles clave" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px">
 <sc-for list="{{kpis}}" as="k" hint-placeholder-count="4">
-<div style="background: #10254D; border: 1px solid #22396A; border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px">
-<div style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; color: #A3B0C6">{{k.label}}</div>
-<div style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 26px; font-weight: 500; letter-spacing: -0.03em"><span style="color: {{k.c1}}">{{k.v1}}</span><span style="color: #5E6F91">{{k.sep}}</span><span style="color: {{k.c2}}">{{k.v2}}</span></div>
+<div style="background: #112123; border: 1px solid #1E3739; border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px">
+<div style="font-size: 11px; font-weight: 500; letter-spacing: 0.2em; color: #5CC1BF">{{k.label}}</div>
+<div style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 26px; font-weight: 500; letter-spacing: -0.03em"><span style="color: {{k.c1}}">{{k.v1}}</span><span style="color: #6E8786">{{k.sep}}</span><span style="color: {{k.c2}}">{{k.v2}}</span></div>
 <sc-if value="{{k.hasChip}}" hint-placeholder-val="{{false}}">
 <span style="{{k.chipStyle}}">{{k.chip}}</span>
 </sc-if>
 <sc-if value="{{k.hasBar}}" hint-placeholder-val="{{false}}">
 <div style="display: flex; flex-direction: column; gap: 4px; padding-top: 2px">
-<div style="position: relative; height: 8px; background: #2A2414; border: 1px solid #4A3D1C; border-radius: 4px">
+<div style="position: relative; height: 8px; background: #2E2711; border: 1px solid #4A3D1C; border-radius: 4px">
 <div style="{{k.barMark}}"></div>
 </div>
-<div style="display: flex; justify-content: space-between; gap: 6px; font-size: 11px; color: #A3B0C6"><span>{{k.barL}}</span><span style="color: #C9D3E3">{{k.barMid}}</span><span>{{k.barR}}</span></div>
+<div style="display: flex; justify-content: space-between; gap: 6px; font-size: 11px; color: #93A9A9"><span>{{k.barL}}</span><span style="color: #D3DCDA">{{k.barMid}}</span><span>{{k.barR}}</span></div>
 </div>
 </sc-if>
-<div style="font-size: 13px; color: #A3B0C6; line-height: 1.4">{{k.note}}</div>
-<div style="margin-top: auto; font-size: 11px; color: #A3B0C6; border-top: 1px solid #22396A; padding-top: 8px">{{k.src}}</div>
+<div style="font-size: 13px; color: #93A9A9; line-height: 1.4">{{k.note}}</div>
+<div style="margin-top: auto; font-size: 11px; color: #93A9A9; border-top: 1px solid #1E3739; padding-top: 8px">{{k.src}}</div>
 </div>
 </sc-for>
 </section>
@@ -181,12 +185,12 @@ a{color:#65B837}a:hover{color:#83DC28}
 
 <section style="display: flex; flex-wrap: wrap; gap: 12px; align-items: stretch">
 <div style="flex: 999 1 640px; min-width: 0; display: flex; flex-direction: column; gap: 12px">
-<div style="background: #10254D; border: 1px solid #22396A; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+<div style="background: #112123; border: 1px solid #1E3739; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
 <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; align-items: baseline">
 <h2 style="margin: 0; font-size: 18px; font-weight: 600; letter-spacing: -0.01em">Mapa de niveles · {{d.sym}}</h2>
 <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px">
-<span style="font-size: 12px; color: #A3B0C6">Perfil por strike</span>
-<div role="group" aria-label="Métrica del perfil por strike" style="display: flex; border: 1px solid #22396A; border-radius: 8px; overflow: hidden">
+<span style="font-size: 12px; color: #93A9A9">Perfil por strike</span>
+<div role="group" aria-label="Métrica del perfil por strike" style="display: flex; border: 1px solid #1E3739; border-radius: 8px; overflow: hidden">
 <button type="button" onClick="{{showOI}}" aria-pressed="{{oiPressed}}" style="{{oiBtnStyle}}">Open interest</button>
 <button type="button" onClick="{{showVol}}" aria-pressed="{{volPressed}}" style="{{volBtnStyle}}">Volumen</button>
 <button type="button" onClick="{{showGex}}" aria-pressed="{{gexPressed}}" style="{{gexBtnStyle}}">GEX OI</button>
@@ -196,37 +200,37 @@ a{color:#65B837}a:hover{color:#83DC28}
 </div>
 
 <sc-if value="{{isSimple}}" hint-placeholder-val="{{true}}">
-<div style="display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12px; color: #A3B0C6">
-<span style="display: flex; align-items: center; gap: 6px"><span style="width: 4px; height: 10px; background: #26A69A"></span><span style="width: 4px; height: 10px; background: #EF5350"></span>Velas 5m</span>
-<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px dotted #EF5350"></span>EMA 9</span>
-<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px solid #F5A35C"></span>SMA 20</span>
-<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; height: 9px; background: rgba(232, 237, 245, 0.12); border-top: 2px solid #7CD34B; border-bottom: 2px solid #E5534B"></span>Canal (call wall / put wall)</span>
-<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px dotted #E8EDF5"></span>Zero Gamma</span>
-<span style="display: flex; align-items: center; gap: 6px"><span style="width: 9px; height: 9px; border-radius: 50%; background: #FFFFFF"></span><span style="width: 9px; height: 9px; border-radius: 50%; border: 2px solid #E8EDF5; box-sizing: border-box"></span>PIN (lleno = certeza media+, hueco = baja)</span>
+<div style="display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12px; color: #93A9A9">
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 4px; height: 10px; background: #5FD4A0"></span><span style="width: 4px; height: 10px; background: #F07F74"></span>Velas 5m</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px dotted #F07F74"></span>EMA 9</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px solid #E6B655"></span>SMA 20</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; height: 9px; background: rgba(232, 237, 245, 0.12); border-top: 2px solid #5FD4A0; border-bottom: 2px solid #F07F74"></span>Canal (call wall / put wall)</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px dotted #F2EFE8"></span>Zero Gamma</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 9px; height: 9px; border-radius: 50%; background: #FFFFFF"></span><span style="width: 9px; height: 9px; border-radius: 50%; border: 2px solid #F2EFE8; box-sizing: border-box"></span>PIN (lleno = certeza media+, hueco = baja)</span>
 
 </div>
 </sc-if>
 <sc-if value="{{isFull}}" hint-placeholder-val="{{false}}">
-<div style="display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 11px; color: #A3B0C6">
-<span style="display: flex; align-items: center; gap: 6px"><span style="width: 4px; height: 10px; background: #26A69A"></span><span style="width: 4px; height: 10px; background: #EF5350"></span>Velas 5m vie</span>
+<div style="display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 11px; color: #93A9A9">
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 4px; height: 10px; background: #5FD4A0"></span><span style="width: 4px; height: 10px; background: #F07F74"></span>Velas 5m vie</span>
 <span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px solid #E879A6"></span>EMA 9</span>
-<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px solid #F5A35C"></span>SMA 20</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px solid #E6B655"></span>SMA 20</span>
 <span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px solid #A78BFA"></span>SMA 200</span>
-<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; height: 9px; background: #2A2414; border: 1px dashed #7A6230"></span>EM lun</span>
-<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px dashed #4C9AFF"></span>Gamma +</span>
-<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px dotted #C9D3E3"></span>Zero γ</span>
-<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px dashed #FF7A45"></span><span style="width: 16px; border-top: 2px solid #FF7A45"></span>Gamma − · muro put</span>
-<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px dotted #F2B544"></span>Cierre vie</span>
-<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 1px solid #5E6F91"></span>Máx / mín vie</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; height: 9px; background: #2E2711; border: 1px dashed #7A6230"></span>EM lun</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px dashed #5FD4A0"></span>Gamma +</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px dotted #D3DCDA"></span>Zero γ</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px dashed #F07F74"></span><span style="width: 16px; border-top: 2px solid #F07F74"></span>Gamma − · muro put</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px dotted #E6B655"></span>Cierre vie</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 1px solid #6E8786"></span>Máx / mín vie</span>
 </div>
-<div style="font-size: 11px; color: #A3B0C6">Los puntos sobre el viernes marcan cuándo cambió un major en las lecturas de 15 min (Gexbot, vencimiento 10/30); el detalle va abajo de la gráfica. En la zona del lunes, los niveles del vencimiento 11/02.</div>
+<div style="font-size: 11px; color: #93A9A9">Los puntos sobre el viernes marcan cuándo cambió un major en las lecturas de 15 min (Gexbot, vencimiento 10/30); el detalle va abajo de la gráfica. En la zona del lunes, los niveles del vencimiento 11/02.</div>
 </sc-if>
 
 <div role="img" aria-label="{{chart.aria}}" style="display: grid; grid-template-columns: 52px minmax(0, 1fr) 72px minmax(200px, 22%); height: 480px">
 <div style="position: relative">
 <sc-for list="{{chart.ticks}}" as="tk" hint-placeholder-count="4"><span style="{{tk.style}}">{{tk.label}}</span></sc-for>
 </div>
-<div style="position: relative; overflow: hidden; border-left: 1px solid #22396A; border-bottom: 1px solid #22396A">
+<div style="position: relative; overflow: hidden; border-left: 1px solid #1E3739; border-bottom: 1px solid #1E3739">
 <sc-for list="{{chart.ticks}}" as="tk" hint-placeholder-count="4"><div style="{{tk.grid}}"></div></sc-for>
 <div style="{{chart.emStyle}}"></div>
 <div style="{{chart.pinBand}}"></div>
@@ -235,16 +239,16 @@ a{color:#65B837}a:hover{color:#83DC28}
 <span style="{{chart.emLabel}}">{{emTag}}</span>
 <svg viewBox="0 0 1000 400" preserveAspectRatio="none" aria-hidden="true" style="position: absolute; inset: 0; width: 100%; height: 100%">
 <path d="{{chart.chFill}}" fill="rgba(232, 237, 245, 0.045)"></path>
-<path d="{{chart.cwDyn}}" fill="none" stroke="#7CD34B" stroke-width="1.5" vector-effect="non-scaling-stroke" opacity="0.9"></path>
-<path d="{{chart.pwDyn}}" fill="none" stroke="#E5534B" stroke-width="1.5" vector-effect="non-scaling-stroke" opacity="0.9"></path>
-<path d="{{chart.zgDyn}}" fill="none" stroke="#E8EDF5" stroke-width="1.5" stroke-dasharray="2 3" vector-effect="non-scaling-stroke"></path>
-<path d="{{chart.wickUp}}" fill="none" stroke="#26A69A" stroke-width="1" vector-effect="non-scaling-stroke"></path>
-<path d="{{chart.wickDn}}" fill="none" stroke="#EF5350" stroke-width="1" vector-effect="non-scaling-stroke"></path>
-<path d="{{chart.bodyUp}}" fill="#26A69A"></path>
-<path d="{{chart.bodyDn}}" fill="#EF5350"></path>
+<path d="{{chart.cwDyn}}" fill="none" stroke="#5FD4A0" stroke-width="1.5" vector-effect="non-scaling-stroke" opacity="0.9"></path>
+<path d="{{chart.pwDyn}}" fill="none" stroke="#F07F74" stroke-width="1.5" vector-effect="non-scaling-stroke" opacity="0.9"></path>
+<path d="{{chart.zgDyn}}" fill="none" stroke="#F2EFE8" stroke-width="1.5" stroke-dasharray="2 3" vector-effect="non-scaling-stroke"></path>
+<path d="{{chart.wickUp}}" fill="none" stroke="#5FD4A0" stroke-width="1" vector-effect="non-scaling-stroke"></path>
+<path d="{{chart.wickDn}}" fill="none" stroke="#F07F74" stroke-width="1" vector-effect="non-scaling-stroke"></path>
+<path d="{{chart.bodyUp}}" fill="#5FD4A0"></path>
+<path d="{{chart.bodyDn}}" fill="#F07F74"></path>
 <path d="{{chart.sma200}}" fill="none" stroke="#A78BFA" stroke-width="1.5" vector-effect="non-scaling-stroke"></path>
-<path d="{{chart.ema21}}" fill="none" stroke="#F5A35C" stroke-width="1.5" vector-effect="non-scaling-stroke"></path>
-<path d="{{chart.ema9}}" fill="none" stroke="#EF5350" stroke-width="1.5" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"></path>
+<path d="{{chart.ema21}}" fill="none" stroke="#E6B655" stroke-width="1.5" vector-effect="non-scaling-stroke"></path>
+<path d="{{chart.ema9}}" fill="none" stroke="#F07F74" stroke-width="1.5" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"></path>
 </svg>
 <sc-for list="{{chart.levels}}" as="lv" hint-placeholder-count="7"><div style="{{lv.lineStyle}}"></div></sc-for>
 <sc-for list="{{chart.off}}" as="o" hint-placeholder-count="1"><span style="{{o.style}}">{{o.t}}</span></sc-for>
@@ -255,58 +259,58 @@ a{color:#65B837}a:hover{color:#83DC28}
 <sc-for list="{{chart.levels}}" as="lv" hint-placeholder-count="7"><span style="{{lv.labelStyle}}">{{lv.t}}</span></sc-for>
 <sc-for list="{{chart.pills}}" as="pq" hint-placeholder-count="5"><span style="{{pq.style}}">{{pq.t}}</span></sc-for>
 </div>
-<div style="position: relative; overflow: hidden; background: #0B1A38; border-left: 1px solid #22396A; border-bottom: 1px solid #22396A">
-<div style="position: absolute; top: 0; bottom: 0; left: 50%; border-left: 1px solid #2C4478"></div>
+<div style="position: relative; overflow: hidden; background: #0D1B1D; border-left: 1px solid #1E3739; border-bottom: 1px solid #1E3739">
+<div style="position: absolute; top: 0; bottom: 0; left: 50%; border-left: 1px solid #24474A"></div>
 <sc-for list="{{chart.ticks}}" as="tk" hint-placeholder-count="4"><div style="{{tk.grid}}"></div><span style="{{tk.pstyle}}">{{tk.label}}</span></sc-for>
 <sc-for list="{{chart.levels}}" as="lv" hint-placeholder-count="7"><div style="{{lv.profLine}}"></div></sc-for>
 <sc-for list="{{prof}}" as="pr" hint-placeholder-count="20">
 <div style="{{pr.row}}">
 <div style="display: flex; justify-content: flex-end; align-items: center; gap: 4px; min-width: 0">
-<span style="font-size: 11px; color: #E8EDF5; white-space: nowrap">{{pr.lL}}</span>
+<span style="font-size: 11px; color: #F2EFE8; white-space: nowrap">{{pr.lL}}</span>
 <div style="{{pr.lBar}}"></div>
 </div>
 <div style="display: flex; align-items: center; gap: 4px; min-width: 0">
 <div style="{{pr.rBar}}"></div>
-<span style="font-size: 11px; color: #E8EDF5; white-space: nowrap">{{pr.rL}}</span>
+<span style="font-size: 11px; color: #F2EFE8; white-space: nowrap">{{pr.rL}}</span>
 </div>
 </div>
 </sc-for>
 </div>
 </div>
 <sc-if value="{{chart.hasSem}}" hint-placeholder-val="{{false}}">
-<div style="display: grid; grid-template-columns: 52px minmax(0, 1fr) 72px minmax(200px, 22%); align-items: center; font-size: 11px; color: #A3B0C6">
+<div style="display: grid; grid-template-columns: 52px minmax(0, 1fr) 72px minmax(200px, 22%); align-items: center; font-size: 11px; color: #93A9A9">
 <span style="font-weight: 600; letter-spacing: 0.06em">FILTRO</span>
 <svg viewBox="0 0 1000 10" preserveAspectRatio="none" aria-label="Historial del filtro de entrada por vela de 5 minutos" style="width: 100%; height: 12px; display: block">
-<path d="{{chart.semG}}" fill="#2FB67C"></path>
-<path d="{{chart.semA}}" fill="#F2B544"></path>
-<path d="{{chart.semR}}" fill="#EF5350"></path>
+<path d="{{chart.semG}}" fill="#5FD4A0"></path>
+<path d="{{chart.semA}}" fill="#E6B655"></path>
+<path d="{{chart.semR}}" fill="#F07F74"></path>
 </svg>
-<span style="padding-left: 8px; white-space: nowrap"><span style="color: #2FB67C">●</span> vender prima <span style="color: #F2B544">●</span> reservas <span style="color: #EF5350">●</span> tendencia</span>
+<span style="padding-left: 8px; white-space: nowrap"><span style="color: #5FD4A0">●</span> vender prima <span style="color: #E6B655">●</span> reservas <span style="color: #F07F74">●</span> tendencia</span>
 <span></span>
 </div>
 </sc-if>
-<div style="display: grid; grid-template-columns: 52px minmax(0, 1fr) 72px minmax(200px, 22%); font-size: 11px; color: #A3B0C6">
+<div style="display: grid; grid-template-columns: 52px minmax(0, 1fr) 72px minmax(200px, 22%); font-size: 11px; color: #93A9A9">
 <span></span>
 <div style="position: relative; height: 16px">
 <sc-for list="{{chart.xt}}" as="x" hint-placeholder-count="6"><span style="{{x.style}}">{{x.label}}</span></sc-for>
 </div>
 <span style="padding-left: 8px">hora ET</span>
-<div style="display: flex; justify-content: space-between; padding: 0 8px; font-weight: 600"><span style="color: #FF7A45">{{profL}}</span><span style="color: #A3B0C6; font-weight: 500">{{profScale}}</span><span style="color: #4C9AFF">{{profR}}</span></div>
+<div style="display: flex; justify-content: space-between; padding: 0 8px; font-weight: 600"><span style="color: #F07F74">{{profL}}</span><span style="color: #93A9A9; font-weight: 500">{{profScale}}</span><span style="color: #5FD4A0">{{profR}}</span></div>
 </div>
 
 </div>
 
 <sc-if value="{{isFull}}" hint-placeholder-val="{{false}}">
-<div style="background: #10254D; border: 1px solid #22396A; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 12px; flex: 1 1 auto">
+<div style="background: #112123; border: 1px solid #1E3739; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 12px; flex: 1 1 auto">
 <h2 style="margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.01em">Dónde coinciden las fuentes</h2>
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px">
 <sc-for list="{{d.confluence}}" as="c" hint-placeholder-count="3">
-<div style="display: flex; flex-direction: column; gap: 8px; padding-top: 10px; border-top: 1px solid #22396A">
+<div style="display: flex; flex-direction: column; gap: 8px; padding-top: 10px; border-top: 1px solid #1E3739">
 <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 8px">
 <span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 19px; font-weight: 500; letter-spacing: -0.02em; color: {{c.color}}">{{c.k}}</span>
-<span style="font-size: 11px; color: #A3B0C6">{{c.count}}</span>
+<span style="font-size: 11px; color: #93A9A9">{{c.count}}</span>
 </div>
-<ul style="margin: 0; padding-left: 16px; display: flex; flex-direction: column; gap: 4px; font-size: 13px; line-height: 1.4; color: #C9D3E3">
+<ul style="margin: 0; padding-left: 16px; display: flex; flex-direction: column; gap: 4px; font-size: 13px; line-height: 1.4; color: #D3DCDA">
 <sc-for list="{{c.items}}" as="i" hint-placeholder-count="3"><li>{{i}}</li></sc-for>
 </ul>
 </div>
@@ -319,103 +323,103 @@ a{color:#65B837}a:hover{color:#83DC28}
 </section>
 
 <sc-if value="{{isSimple}}" hint-placeholder-val="{{true}}">
-<section aria-label="Estructuras" style="background: #10254D; border: 1px solid #22396A; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<section aria-label="Estructuras" style="background: #112123; border: 1px solid #1E3739; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
 <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap">
 <h2 style="margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.01em">Estructuras · qué favorece el entorno · {{d.sym}}</h2>
-<span style="font-size: 11px; color: #A3B0C6">●●● encaja bien · ●●○ encaja con reservas · ●○○ encaja poco</span>
+<span style="font-size: 11px; color: #93A9A9">●●● encaja bien · ●●○ encaja con reservas · ●○○ encaja poco</span>
 </div>
 <sc-if value="{{hasFil}}" hint-placeholder-val="{{false}}">
-<div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; background: #0B1A38; border: 1px solid {{filC}}">
+<div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; background: #0D1B1D; border: 1px solid {{filC}}">
 <span style="width: 12px; height: 12px; border-radius: 50%; flex: none; background: {{filC}}"></span>
-<span style="font-size: 14px; font-weight: 600; color: #E8EDF5">{{filT}}</span>
+<span style="font-size: 14px; font-weight: 600; color: #F2EFE8">{{filT}}</span>
 </div>
 </sc-if>
 <div style="overflow-x: auto">
 <div style="min-width: 680px; display: flex; flex-direction: column">
-<div style="display: grid; grid-template-columns: 170px 70px minmax(0, 1fr) minmax(0, 1fr); gap: 12px; font-size: 11px; font-weight: 500; letter-spacing: 0.08em; color: #A3B0C6; padding: 0 0 6px">
+<div style="display: grid; grid-template-columns: 170px 70px minmax(0, 1fr) minmax(0, 1fr); gap: 12px; font-size: 11px; font-weight: 500; letter-spacing: 0.2em; color: #5CC1BF; padding: 0 0 6px">
 <span>ESTRUCTURA</span><span>ENCAJE</span><span>POR QUÉ</span><span>REFERENCIA</span>
 </div>
 <sc-for list="{{est}}" as="es" hint-placeholder-count="5">
-<div style="display: grid; grid-template-columns: 170px 70px minmax(0, 1fr) minmax(0, 1fr); gap: 12px; align-items: center; padding: 10px 0; border-top: 1px solid #22396A; font-size: 13px">
+<div style="display: grid; grid-template-columns: 170px 70px minmax(0, 1fr) minmax(0, 1fr); gap: 12px; align-items: center; padding: 10px 0; border-top: 1px solid #1E3739; font-size: 13px">
 <span style="font-weight: 600">{{es.name}}</span>
 <span role="img" aria-label="{{es.aria}}" style="display: flex; gap: 4px">
 <span style="width: 10px; height: 10px; border-radius: 50%; background: {{es.d1}}"></span>
 <span style="width: 10px; height: 10px; border-radius: 50%; background: {{es.d2}}"></span>
 <span style="width: 10px; height: 10px; border-radius: 50%; background: {{es.d3}}"></span>
 </span>
-<span style="color: #C9D3E3">{{es.why}}</span>
-<span style="color: #E8EDF5; font-weight: 500">{{es.ref}}</span>
+<span style="color: #D3DCDA">{{es.why}}</span>
+<span style="color: #F2EFE8; font-weight: 500">{{es.ref}}</span>
 </div>
 </sc-for>
 </div>
 </div>
-<div style="font-size: 11px; color: #A3B0C6; line-height: 1.5; border-top: 1px solid #22396A; padding-top: 8px">Reglas fijas: iron condor con gamma positiva por volumen, sin momentum y VIX bajando (cortos en delta 15). Verticales vendidos detrás del techo/piso y del delta 15, a favor del momentum. Verticales comprados solo con momentum fuerte alineado en 5m, 15m y 1H, mejor si acelera o hay gamma negativa. Alas de 10; precios a mitad de la cadena. Describe el entorno; no es recomendación de entrada. Detalle técnico, agenda completa y bitácora en la vista Completa.</div>
+<div style="font-size: 11px; color: #93A9A9; line-height: 1.5; border-top: 1px solid #1E3739; padding-top: 8px">Reglas fijas: iron condor con gamma positiva por volumen, sin momentum y VIX bajando (cortos en delta 15). Verticales vendidos detrás del techo/piso y del delta 15, a favor del momentum. Verticales comprados solo con momentum fuerte alineado en 5m, 15m y 1H, mejor si acelera o hay gamma negativa. Alas de 10; precios a mitad de la cadena. Describe el entorno; no es recomendación de entrada. Detalle técnico, agenda completa y bitácora en la vista Completa.</div>
 </section>
 </sc-if>
 
 <sc-if value="{{tp.on}}" hint-placeholder-val="{{false}}">
-<section aria-label="Tape de opciones" style="background: #10254D; border: 1px solid #22396A; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<section aria-label="Tape de opciones" style="background: #112123; border: 1px solid #1E3739; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
 <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap">
 <h2 style="margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.01em">Tape +{{tp.min}} · SPX 0DTE</h2>
 <span style="font-size: 11px; color: {{tp.ageC}}">{{tp.age}}</span>
 </div>
 <div style="display: flex; flex-wrap: wrap; gap: 16px">
 <div style="flex: 1 1 340px; min-width: 0; display: flex; flex-direction: column">
-<div style="display: grid; grid-template-columns: 64px 64px 52px 60px 1fr 70px; gap: 8px; font-size: 11px; font-weight: 500; letter-spacing: 0.08em; color: #A3B0C6; padding: 0 0 6px">
+<div style="display: grid; grid-template-columns: 64px 64px 52px 60px 1fr 70px; gap: 8px; font-size: 11px; font-weight: 500; letter-spacing: 0.2em; color: #5CC1BF; padding: 0 0 6px">
 <span>HORA ET</span><span>STRIKE</span><span>CONTR.</span><span>PRECIO</span><span>LADO</span><span style="text-align: right">PRIMA</span>
 </div>
 <sc-for list="{{tp.prints}}" as="pr" hint-placeholder-count="8">
-<div style="display: grid; grid-template-columns: 64px 64px 52px 60px 1fr 70px; gap: 8px; align-items: center; padding: 5px 0; border-top: 1px solid #22396A; font-size: 13px; font-family: 'IBM Plex Mono', ui-monospace, monospace">
-<span style="color: #A3B0C6">{{pr.h}}</span>
+<div style="display: grid; grid-template-columns: 64px 64px 52px 60px 1fr 70px; gap: 8px; align-items: center; padding: 5px 0; border-top: 1px solid #1E3739; font-size: 13px; font-family: 'IBM Plex Mono', ui-monospace, monospace">
+<span style="color: #93A9A9">{{pr.h}}</span>
 <span style="font-weight: 600; color: {{pr.kc}}">{{pr.k}}</span>
 <span>{{pr.n}}</span>
 <span>{{pr.px}}</span>
-<span style="font-family: 'Manrope', sans-serif; font-weight: 600; color: {{pr.lc}}">{{pr.lado}}</span>
+<span style="font-family: 'Poppins', sans-serif; font-weight: 600; color: {{pr.lc}}">{{pr.lado}}</span>
 <span style="text-align: right">{{pr.prem}}</span>
 </div>
 </sc-for>
 <sc-if value="{{tp.empty}}" hint-placeholder-val="{{false}}">
-<div style="font-size: 13px; color: #A3B0C6; padding: 8px 0">Sin operaciones de +{{tp.min}} contratos todavía.</div>
+<div style="font-size: 13px; color: #93A9A9; padding: 8px 0">Sin operaciones de +{{tp.min}} contratos todavía.</div>
 </sc-if>
 </div>
 <div style="flex: 1 1 260px; min-width: 0; display: flex; flex-direction: column; gap: 10px">
 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px">
-<div style="background: #0B1A38; border: 1px solid #22396A; border-radius: 8px; padding: 10px 12px">
-<div style="font-size: 11px; letter-spacing: 0.08em; color: #A3B0C6">NETO CALLS</div>
+<div style="background: #0D1B1D; border: 1px solid #1E3739; border-radius: 8px; padding: 10px 12px">
+<div style="font-size: 11px; letter-spacing: 0.2em; color: #5CC1BF">NETO CALLS</div>
 <div style="font-size: 18px; font-weight: 700; font-family: 'IBM Plex Mono', ui-monospace, monospace; color: {{tp.ncC}}">{{tp.nc}}</div>
 </div>
-<div style="background: #0B1A38; border: 1px solid #22396A; border-radius: 8px; padding: 10px 12px">
-<div style="font-size: 11px; letter-spacing: 0.08em; color: #A3B0C6">NETO PUTS</div>
+<div style="background: #0D1B1D; border: 1px solid #1E3739; border-radius: 8px; padding: 10px 12px">
+<div style="font-size: 11px; letter-spacing: 0.2em; color: #5CC1BF">NETO PUTS</div>
 <div style="font-size: 18px; font-weight: 700; font-family: 'IBM Plex Mono', ui-monospace, monospace; color: {{tp.npC}}">{{tp.np}}</div>
 </div>
 </div>
-<div style="font-size: 11px; font-weight: 500; letter-spacing: 0.08em; color: #A3B0C6">PRIMA POR STRIKE · <span style="color: #4C9AFF">■ compra</span> <span style="color: #FF7A45">■ venta</span> <span style="color: #5B6E91">■ medio</span></div>
+<div style="font-size: 11px; font-weight: 500; letter-spacing: 0.2em; color: #5CC1BF">PRIMA POR STRIKE · <span style="color: #5FD4A0">■ compra</span> <span style="color: #F07F74">■ venta</span> <span style="color: #6E8786">■ medio</span></div>
 <sc-for list="{{tp.strikes}}" as="st" hint-placeholder-count="6">
 <div style="display: grid; grid-template-columns: 64px 1fr 62px; gap: 8px; align-items: center; font-size: 12px; font-family: 'IBM Plex Mono', ui-monospace, monospace">
 <span style="font-weight: 600; color: {{st.kc}}">{{st.k}}</span>
-<span style="display: flex; height: 10px; border-radius: 3px; overflow: hidden; background: #0B1A38">
-<span style="width: {{st.wB}}; background: #4C9AFF"></span><span style="width: {{st.wV}}; background: #FF7A45"></span><span style="width: {{st.wM}}; background: #5B6E91"></span>
+<span style="display: flex; height: 10px; border-radius: 3px; overflow: hidden; background: #0D1B1D">
+<span style="width: {{st.wB}}; background: #5FD4A0"></span><span style="width: {{st.wV}}; background: #F07F74"></span><span style="width: {{st.wM}}; background: #6E8786"></span>
 </span>
 <span style="text-align: right">{{st.tot}}</span>
 </div>
 </sc-for>
 </div>
 </div>
-<div style="font-size: 11px; color: #A3B0C6; line-height: 1.5; border-top: 1px solid #22396A; padding-top: 8px">Tape aproximado desde el streamer de Schwab: cada renglón es un salto de volumen de +{{tp.min}} contratos en un strike 0DTE. Compra = se pagó el ask, venta = se vendió al bid, medio = entre ambos. Se excluyen probables spreads (mismo tamaño en dos strikes en 2 s). Neto = prima comprada − vendida. Sin códigos de condición: dos operaciones juntas pueden verse como una.</div>
+<div style="font-size: 11px; color: #93A9A9; line-height: 1.5; border-top: 1px solid #1E3739; padding-top: 8px">Tape aproximado desde el streamer de Schwab: cada renglón es un salto de volumen de +{{tp.min}} contratos en un strike 0DTE. Compra = se pagó el ask, venta = se vendió al bid, medio = entre ambos. Se excluyen probables spreads (mismo tamaño en dos strikes en 2 s). Neto = prima comprada − vendida. Sin códigos de condición: dos operaciones juntas pueden verse como una.</div>
 </section>
 </sc-if>
 
 <sc-if value="{{isFull}}" hint-placeholder-val="{{false}}">
 <section style="display: flex; flex-wrap: wrap; gap: 12px; align-items: stretch">
-<div style="flex: 1 1 420px; min-width: 0; background: #10254D; border: 1px solid #22396A; border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 12px">
+<div style="flex: 1 1 420px; min-width: 0; background: #112123; border: 1px solid #1E3739; border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 12px">
 <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap">
 <h2 style="margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.01em">Técnico multi-timeframe</h2>
-<span style="font-size: 12px; color: #A3B0C6">{{d.sym}} al cierre {{d.closeTxt}}</span>
+<span style="font-size: 12px; color: #93A9A9">{{d.sym}} al cierre {{d.closeTxt}}</span>
 </div>
 <div style="overflow-x: auto">
 <table style="width: 100%; border-collapse: collapse; font-size: 13px; min-width: 440px">
 <thead>
-<tr style="color: #A3B0C6; font-size: 12px; text-align: right">
+<tr style="color: #93A9A9; font-size: 12px; text-align: right">
 <th style="text-align: left; font-weight: 500; padding: 6px 4px">TF</th>
 <th style="font-weight: 500; padding: 6px 4px">RSI</th>
 <th style="font-weight: 500; padding: 6px 4px">MACD / señal</th>
@@ -426,7 +430,7 @@ a{color:#65B837}a:hover{color:#83DC28}
 </thead>
 <tbody>
 <sc-for list="{{d.tech}}" as="t" hint-placeholder-count="3">
-<tr style="border-top: 1px solid #22396A; font-family: 'IBM Plex Mono', ui-monospace, monospace; text-align: right">
+<tr style="border-top: 1px solid #1E3739; font-family: 'IBM Plex Mono', ui-monospace, monospace; text-align: right">
 <td style="text-align: left; padding: 10px 4px; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-weight: 600">{{t.tf}}</td>
 <td style="padding: 10px 4px; color: {{t.rsiColor}}">{{t.rsi}}</td>
 <td style="padding: 10px 4px">{{t.macd}}</td>
@@ -438,35 +442,35 @@ a{color:#65B837}a:hover{color:#83DC28}
 </tbody>
 </table>
 </div>
-<div style="font-size: 12px; color: #A3B0C6">Azul: precio arriba de la media · naranja: precio debajo · RSI &lt; 40 naranja, &gt; 60 azul</div>
-<div style="font-size: 11px; color: #A3B0C6; border-top: 1px solid #22396A; padding-top: 8px">Fuente: TradingView · cierre vie 30-oct</div>
+<div style="font-size: 12px; color: #93A9A9">Azul: precio arriba de la media · naranja: precio debajo · RSI &lt; 40 naranja, &gt; 60 azul</div>
+<div style="font-size: 11px; color: #93A9A9; border-top: 1px solid #1E3739; padding-top: 8px">Fuente: TradingView · cierre vie 30-oct</div>
 </div>
 
-<div style="flex: 1 1 300px; min-width: 0; background: #10254D; border: 1px solid #22396A; border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 12px">
+<div style="flex: 1 1 300px; min-width: 0; background: #112123; border: 1px solid #1E3739; border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 12px">
 <h2 style="margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.01em">{{agTitle}}</h2>
-<div style="background: #0B1A38; border: 1px solid #22396A; border-radius: 8px; padding: 10px 12px; font-size: 13px; color: #C9D3E3">Horario de Nueva York: apertura <strong style="color: #E8EDF5">9:30</strong> y cierre <strong style="color: #E8EDF5">16:00</strong> ET.</div>
+<div style="background: #0D1B1D; border: 1px solid #1E3739; border-radius: 8px; padding: 10px 12px; font-size: 13px; color: #D3DCDA">Horario de Nueva York: apertura <strong style="color: #F2EFE8">9:30</strong> y cierre <strong style="color: #F2EFE8">16:00</strong> ET.</div>
 <sc-for list="{{events}}" as="e" hint-placeholder-count="3">
-<div style="display: grid; grid-template-columns: 52px 1fr; gap: 12px; padding: 8px 0; border-top: 1px solid #22396A">
+<div style="display: grid; grid-template-columns: 52px 1fr; gap: 12px; padding: 8px 0; border-top: 1px solid #1E3739">
 <span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 14px; font-weight: 600">{{e.time}}</span>
 <div style="display: flex; flex-direction: column; gap: 3px">
 <span style="font-size: 14px; font-weight: 500">{{e.name}}</span>
-<span style="font-size: 12px; color: #A3B0C6">{{e.detail}}</span>
+<span style="font-size: 12px; color: #93A9A9">{{e.detail}}</span>
 </div>
 </div>
 </sc-for>
-<div style="font-size: 11px; color: #A3B0C6; border-top: 1px solid #22396A; padding-top: 8px">Fuente: TradingView · calendario económico EE.UU.</div>
+<div style="font-size: 11px; color: #93A9A9; border-top: 1px solid #1E3739; padding-top: 8px">Fuente: TradingView · calendario económico EE.UU.</div>
 </div>
 </section>
 
-<section style="background: #10254D; border: 1px solid #22396A; border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 12px">
+<section style="background: #112123; border: 1px solid #1E3739; border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 12px">
 <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px">
 <h2 style="margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.01em">Bitácora de lecturas · {{d.sym}}</h2>
-<span style="font-size: 12px; color: #A3B0C6">Cada corte queda guardado con su resultado al cierre</span>
+<span style="font-size: 12px; color: #93A9A9">Cada corte queda guardado con su resultado al cierre</span>
 </div>
 <div style="overflow-x: auto">
 <table style="width: 100%; border-collapse: collapse; font-size: 13px; min-width: 860px">
 <thead>
-<tr style="color: #A3B0C6; font-size: 12px; text-align: left">
+<tr style="color: #93A9A9; font-size: 12px; text-align: left">
 <th style="font-weight: 500; padding: 6px 8px">Sesión</th>
 <th style="font-weight: 500; padding: 6px 8px">Corte</th>
 <th style="font-weight: 500; padding: 6px 8px">Zero γ</th>
@@ -478,14 +482,14 @@ a{color:#65B837}a:hover{color:#83DC28}
 </thead>
 <tbody>
 <sc-for list="{{d.log}}" as="l" hint-placeholder-count="2">
-<tr style="border-top: 1px solid #22396A; vertical-align: top">
+<tr style="border-top: 1px solid #1E3739; vertical-align: top">
 <td style="padding: 10px 8px; font-weight: 600">{{l.day}}</td>
-<td style="padding: 10px 8px; color: #A3B0C6">{{l.cut}}</td>
+<td style="padding: 10px 8px; color: #93A9A9">{{l.cut}}</td>
 <td style="padding: 10px 8px; font-family: 'IBM Plex Mono', ui-monospace, monospace">{{l.zg}}</td>
 <td style="padding: 10px 8px; font-family: 'IBM Plex Mono', ui-monospace, monospace">{{l.gm}}</td>
 <td style="padding: 10px 8px; font-family: 'IBM Plex Mono', ui-monospace, monospace">{{l.range}}</td>
 <td style="padding: 10px 8px; font-family: 'IBM Plex Mono', ui-monospace, monospace">{{l.close}}</td>
-<td style="padding: 10px 8px; color: #C9D3E3">{{l.result}}</td>
+<td style="padding: 10px 8px; color: #D3DCDA">{{l.result}}</td>
 </tr>
 </sc-for>
 </tbody>
@@ -494,7 +498,7 @@ a{color:#65B837}a:hover{color:#83DC28}
 </section>
 </sc-if>
 
-<footer style="font-size: 12px; color: #A3B0C6; line-height: 1.5">Herramienta de lectura de mercado. No es recomendación de inversión. {{d.footer}}</footer>
+<footer style="font-size: 12px; color: #93A9A9; line-height: 1.5">Herramienta de lectura de mercado. No es recomendación de inversión. {{d.footer}}</footer>
 
 </div>
 </div>
@@ -512,7 +516,7 @@ class Component extends DCLogic {
       SPY: { o: [/*@oSPY*/], h: [/*@hSPY*/], l: [/*@lSPY*/], c: [/*@cSPY*/], v: [/*@vSPY*/], reads: [/*@rSPY*/], rows: [/*@kSPY*/] },
       QQQ: { o: [/*@oQQQ*/], h: [/*@hQQQ*/], l: [/*@lQQQ*/], c: [/*@cQQQ*/], v: [/*@vQQQ*/], reads: [/*@rQQQ*/], rows: [/*@kQQQ*/] }
     };
-    const up = '#4C9AFF', dn = '#FF7A45', neu = '#E8EDF5', cyan = '#F2B544', yel = '#C9D3E3';
+    const up = '#5FD4A0', dn = '#F07F74', neu = '#F2EFE8', cyan = '#E6B655', yel = '#D3DCDA';
     const DAY = LIVE.day || {};
     const view = LIVE.on ? 'simple' : (this.state.view || 'simple');
     const isSimple = view === 'simple';
@@ -533,7 +537,7 @@ class Component extends DCLogic {
       { sym: 'DXY', feed: 'RT', px: '101.96', chg: '+0.11%', chgColor: neu, n: 101.963, e20: 101.912, e50: 101.880, tol: 0.02, inv: true },
       { sym: 'US10Y', feed: 'RT', px: '4.933%', chg: '−0.08%', chgColor: neu, n: 4.933, e20: 4.931, e50: 4.933, tol: 0.002, inv: true }
     ];
-    const SEM = { g: '#26A69A', y: '#A3B0C6', r: '#EF5350', off: '#22396A' };
+    const SEM = { g: '#5FD4A0', y: '#93A9A9', r: '#F07F74', off: '#1E3739' };
     const sem = t => {
       const dx = t.n - t.e20;
       const pos = Math.abs(dx) <= t.tol ? 0 : (dx > 0 ? 1 : -1);
@@ -671,7 +675,7 @@ class Component extends DCLogic {
         footer: 'Fuentes: TradingView (QQQ y VXN en tiempo real; NDX con 15 min y NQ1! con 10 min de retraso), Cboe delayed quotes (15 min), Gexbot (lectura manual).'
       }
     };
-    const LC = { up: '#4C9AFF', dn: '#FF7A45', zg: '#C9D3E3', am: '#F2B544', th: '#5E6F91' };
+    const LC = { up: '#5FD4A0', dn: '#F07F74', zg: '#D3DCDA', am: '#E6B655', th: '#6E8786' };
     const CH = {
       SPX: {
         lo: 7480, hi: 7680, ticks: [7650, 7600, 7550, 7500], em: [7514, 7646], fmt: 0,
@@ -785,7 +789,7 @@ class Component extends DCLogic {
     const LS = {
       SPX: [
         { v: 7650, c: LC.up, s: 'dash', t: 'Techo 7,650 · 2 fuentes' },
-        { v: 7600, c: '#E8EDF5', s: 'solid', t: 'PIN 7,600 · 4 fuentes' },
+        { v: 7600, c: '#F2EFE8', s: 'solid', t: 'PIN 7,600 · 4 fuentes' },
         { v: 7593.39, c: LC.zg, s: 'dot', t: 'Zero γ 7,593' },
         { v: 7580.07, c: LC.am, s: 'dot', t: 'Cierre vie 7,580' },
         { v: 7500, c: LC.dn, s: 'solid', t: 'Piso 7,500 · 3 fuentes' }
@@ -793,12 +797,12 @@ class Component extends DCLogic {
       SPY: [
         { v: 760, c: LC.up, s: 'dash', t: 'Techo 760 · 4 fuentes' },
         { v: 755.72, c: LC.am, s: 'dot', t: 'Cierre vie 755.72' },
-        { v: 755.59, c: '#E8EDF5', s: 'solid', t: 'PIN / zero γ 755.6 · 3 fuentes' },
+        { v: 755.59, c: '#F2EFE8', s: 'solid', t: 'PIN / zero γ 755.6 · 3 fuentes' },
         { v: 750, c: LC.dn, s: 'solid', t: 'Piso 750 · 3 fuentes' }
       ],
       QQQ: [
         { v: 700, c: LC.up, s: 'dash', t: 'Techo 700 · 3 fuentes' },
-        { v: 695, c: '#E8EDF5', s: 'solid', t: 'Zona OI 695 · 3 fuentes' },
+        { v: 695, c: '#F2EFE8', s: 'solid', t: 'Zona OI 695 · 3 fuentes' },
         { v: 690.49, c: LC.am, s: 'dot', t: 'Cierre vie 690.49' },
         { v: 688.39, c: LC.zg, s: 'dot', t: 'Zero γ 688.4' },
         { v: 680, c: LC.dn, s: 'solid', t: 'Piso 680 · 3 fuentes' }
@@ -839,7 +843,7 @@ class Component extends DCLogic {
       let chF = '';
       (dyn.c || []).forEach((cv, i) => { const pv = (dyn.p || [])[i]; if (cv == null || pv == null) return; chF += 'M' + (i * W).toFixed(1) + ' ' + Y(cv).toFixed(1) + 'H' + ((i + 1) * W).toFixed(1) + 'V' + Y(pv).toFixed(1) + 'H' + (i * W).toFixed(1) + 'Z'; });
       // PIN por lectura: punto lleno (certeza media o más) o hueco (baja)
-      const pinDots = (cfg.pinPts || []).filter(q => q.v >= lo && q.v <= hi).map(q => ({ style: 'position: absolute; width: 9px; height: 9px; border-radius: 50%; box-sizing: border-box; left: calc(' + xp(q.i).toFixed(2) + '% - 4.5px); top: calc(' + P(q.v).toFixed(2) + '% - 4.5px); ' + (q.f ? 'background: #FFFFFF; border: 1px solid #08142B' : 'background: transparent; border: 2px solid #E8EDF5'), title: q.title }));
+      const pinDots = (cfg.pinPts || []).filter(q => q.v >= lo && q.v <= hi).map(q => ({ style: 'position: absolute; width: 9px; height: 9px; border-radius: 50%; box-sizing: border-box; left: calc(' + xp(q.i).toFixed(2) + '% - 4.5px); top: calc(' + P(q.v).toFixed(2) + '% - 4.5px); ' + (q.f ? 'background: #FFFFFF; border: 1px solid #0B1617' : 'background: transparent; border: 2px solid #F2EFE8'), title: q.title }));
       // pastillas del eje derecho (como TradingView)
       let pl = -99;
       const pills = (cfg.pills || []).filter(q => q.v >= lo && q.v <= hi).map(q => Object.assign({}, q, { p: P(q.v) })).sort((a, b) => a.p - b.p).map(q => { const pp = Math.max(q.p, pl + 4.6); pl = pp; return { t: q.t, style: 'position: absolute; left: 4px; top: calc(' + Math.min(pp, 97).toFixed(2) + '% - 9px); font-size: 12px; font-weight: 700; padding: 1px 6px; border-radius: 3px; white-space: nowrap; background: ' + q.bg + '; color: ' + q.fg + (q.bd ? '; border: 1px solid ' + q.bd : '') }; });
@@ -875,7 +879,7 @@ class Component extends DCLogic {
       }
       const evMarks = events.map(e => ({
         title: tAt(e.i) + ' · ' + e.text,
-        dot: 'position: absolute; width: 9px; height: 9px; border-radius: 50%; background: ' + e.col + '; border: 2px solid #08142B; left: calc(' + xp(e.i).toFixed(2) + '% - 6px); top: calc(' + Math.max(1, Math.min(99, P(e.v))).toFixed(2) + '% - 6px)'
+        dot: 'position: absolute; width: 9px; height: 9px; border-radius: 50%; background: ' + e.col + '; border: 2px solid #0B1617; left: calc(' + xp(e.i).toFixed(2) + '% - 6px); top: calc(' + Math.max(1, Math.min(99, P(e.v))).toFixed(2) + '% - 6px)'
       }));
       const evList = events.slice().reverse().map(e => ({ time: tAt(e.i), col: e.col, text: e.text }));
       const evSummary = events.length + (cfg.live ? ' cambios hoy' : ' cambios en la sesión del viernes') + ' · filtro: majors ≥ ' + fv(MT[sym] || 10) + ' y zero γ ≥ ' + fv(ZT[sym] || 10) + ', o cruce del precio';
@@ -889,45 +893,45 @@ class Component extends DCLogic {
           t: lv.t,
           lineStyle: 'position: absolute; left: ' + (!simple && lv.c !== LC.am && lv.s !== 'thin' ? '80%' : '0') + '; right: 0; top: ' + lv.p.toFixed(2) + '%; border-top: ' + lineFor(lv.s) + lv.c,
           profLine: 'position: absolute; left: 0; right: 0; top: ' + lv.p.toFixed(2) + '%; opacity: 0.5; border-top: ' + lineFor(lv.s) + lv.c,
-          labelStyle: 'position: absolute; left: 8px; top: calc(' + Math.min(lp, 97).toFixed(2) + '% - 9px); font-size: 13px; font-weight: 600; white-space: nowrap; color: ' + (lv.s === 'thin' ? '#A3B0C6' : lv.c)
+          labelStyle: 'position: absolute; left: 8px; top: calc(' + Math.min(lp, 97).toFixed(2) + '% - 9px); font-size: 13px; font-weight: 600; white-space: nowrap; color: ' + (lv.s === 'thin' ? '#93A9A9' : lv.c)
         };
       });
       const fmtN = x => x.toLocaleString('en-US');
       const ticks = cfg.ticks.map(tv => ({
         label: fmtN(tv),
-        style: 'position: absolute; right: 8px; top: calc(' + P(tv).toFixed(2) + '% - 8px); font-size: 12px; color: #A3B0C6',
-        grid: 'position: absolute; left: 0; right: 0; top: ' + P(tv).toFixed(2) + '%; border-top: 1px solid #17305E',
-        pstyle: 'position: absolute; left: 4px; top: calc(' + P(tv).toFixed(2) + '% - 7px); font-size: 10px; color: #A3B0C6; pointer-events: none'
+        style: 'position: absolute; right: 8px; top: calc(' + P(tv).toFixed(2) + '% - 8px); font-size: 12px; color: #93A9A9',
+        grid: 'position: absolute; left: 0; right: 0; top: ' + P(tv).toFixed(2) + '%; border-top: 1px solid #183032',
+        pstyle: 'position: absolute; left: 4px; top: calc(' + P(tv).toFixed(2) + '% - 7px); font-size: 10px; color: #93A9A9; pointer-events: none'
       }));
       const emTop = P(cfg.em[1]), emBot = P(cfg.em[0]);
       const st0 = cfg.start || 450;
       const xt = [0, 18, 36, 54, 72].map(ix => ({ label: fmtET(st0 + 5 * ix), style: 'position: absolute; top: 2px; left: ' + xp(ix).toFixed(2) + '%; transform: translateX(-50%); white-space: nowrap' }));
-      if (!cfg.live) xt.push({ label: fmtET(510) + ' lun', style: 'position: absolute; top: 2px; left: 80%; transform: translateX(-50%); white-space: nowrap; color: #C9D3E3' });
+      if (!cfg.live) xt.push({ label: fmtET(510) + ' lun', style: 'position: absolute; top: 2px; left: 80%; transform: translateX(-50%); white-space: nowrap; color: #D3DCDA' });
       return {
         wickUp: wu || 'M0 0', wickDn: wd || 'M0 0', bodyUp: bu || 'M0 0', bodyDn: bd || 'M0 0',
         ema9: curve(ema(9)), ema21: curve(sma(20)), sma200: cfg.cabina ? 'M0 0' : curve(s200), chFill: chF || 'M0 0', pinDots: pinDots, pills: pills, cabina: !!cfg.cabina, noCabina: !cfg.cabina, zgDyn: stepN(dyn.z), cwDyn: stepN(dyn.c), pwDyn: stepN(dyn.p), shPos: shP || 'M0 0', shNeg: shN || 'M0 0', semG: semP.g || 'M0 0', semA: semP.a || 'M0 0', semR: semP.r || 'M0 0', hasSem: !!(cfg.sem && cfg.sem.some(Boolean)),
         events: evMarks, evList: evList, evSummary: evSummary,
         emStyle: cfg.cabina ? 'display: none' : 'position: absolute; left: 0; right: 0; top: ' + emTop.toFixed(2) + '%; height: ' + (emBot - emTop).toFixed(2) + '%; background: rgba(242, 181, 68, 0.06); border-top: 1px dashed rgba(242, 181, 68, 0.45); border-bottom: 1px dashed rgba(242, 181, 68, 0.45)',
         pinBand: cfg.pinz ? 'position: absolute; left: 0; right: 0; top: ' + P(cfg.pinz[1]).toFixed(2) + '%; height: ' + (P(cfg.pinz[0]) - P(cfg.pinz[1])).toFixed(2) + '%; background: rgba(232, 210, 122, 0.10); border-top: 1px dashed rgba(232, 210, 122, 0.55); border-bottom: 1px dashed rgba(232, 210, 122, 0.55)' : 'display: none',
-        zoneStyle: cfg.live ? 'display: none' : 'position: absolute; top: 0; bottom: 0; left: 80%; right: 0; background: #0B1A38; border-left: 1px dashed #3A5287',
-        zoneLabelStyle: cfg.live ? 'display: none' : 'position: absolute; top: 6px; left: calc(80% + 8px); font-size: 11px; color: #A3B0C6; white-space: nowrap',
+        zoneStyle: cfg.live ? 'display: none' : 'position: absolute; top: 0; bottom: 0; left: 80%; right: 0; background: #0D1B1D; border-left: 1px dashed #2A5254',
+        zoneLabelStyle: cfg.live ? 'display: none' : 'position: absolute; top: 6px; left: calc(80% + 8px); font-size: 11px; color: #93A9A9; white-space: nowrap',
         zoneLabel: 'Lun 2-nov · abre ' + fmtET(510) + ' ET',
-        emLabel: cfg.cabina ? 'display: none' : 'position: absolute; left: ' + (cfg.live ? '8px' : 'calc(80% + 8px)') + '; top: calc(' + emTop.toFixed(2) + '% + 4px); font-size: 11px; color: #F2B544; white-space: nowrap',
+        emLabel: cfg.cabina ? 'display: none' : 'position: absolute; left: ' + (cfg.live ? '8px' : 'calc(80% + 8px)') + '; top: calc(' + emTop.toFixed(2) + '% + 4px); font-size: 11px; color: #E6B655; white-space: nowrap',
         levels, ticks, xt,
-        off: offList.map(of => ({ t: of.t, style: 'position: absolute; left: 8px; ' + (of.dir === 'up' ? 'top: ' : 'bottom: ') + (6 + 26 * (stackN[of.dir]++)) + 'px; font-size: 11px; font-weight: 500; white-space: nowrap; padding: 2px 6px; border-radius: 4px; background: #10254D; border: 1px solid #22396A; color: ' + of.c })),
+        off: offList.map(of => ({ t: of.t, style: 'position: absolute; left: 8px; ' + (of.dir === 'up' ? 'top: ' : 'bottom: ') + (6 + 26 * (stackN[of.dir]++)) + 'px; font-size: 11px; font-weight: 500; white-space: nowrap; padding: 2px 6px; border-radius: 4px; background: #112123; border: 1px solid #1E3739; color: ' + of.c })),
         aria: 'Velas de 5 minutos de ' + sym + ' del viernes con VWAP, movimiento esperado y niveles de gamma y open interest para el lunes'
       };
     };
     const d = D[tk];
-    const G = '#26A69A', R = '#EF5350', N = '#A3B0C6';
+    const G = '#5FD4A0', R = '#F07F74', N = '#93A9A9';
     const SIMPLE = {
       SPX: {
         macro: 'Sin alertas macro: DXY +0.11% · US10Y −0.08% · ES1! 7,614 en pre-market',
         lect: [
-          { label: 'RÉGIMEN GAMMA', value: 'Gamma negativa', color: '#FF7A45', note: '13 pts bajo el zero γ (7,593): los movimientos tienden a amplificarse.' },
-          { label: 'TENDENCIA', value: 'Lateral · 1H bajista', color: '#C9D3E3', dots: [{ tf: '5m', col: N }, { tf: '15m', col: N }, { tf: '1H', col: R }], note: 'Precio vs EMA 20 y EMA 20 vs EMA 50 en cada temporalidad.' },
+          { label: 'RÉGIMEN GAMMA', value: 'Gamma negativa', color: '#F07F74', note: '13 pts bajo el zero γ (7,593): los movimientos tienden a amplificarse.' },
+          { label: 'TENDENCIA', value: 'Lateral · 1H bajista', color: '#D3DCDA', dots: [{ tf: '5m', col: N }, { tf: '15m', col: N }, { tf: '1H', col: R }], note: 'Precio vs EMA 20 y EMA 20 vs EMA 50 en cada temporalidad.' },
           { label: 'VOLATILIDAD', value: 'VIX 19.42', color: R, note: '+12.9% el viernes; en 15m ya perdió su EMA 20.' },
-          { label: 'RANGO ESPERADO · LUN', value: '7,514 – 7,646', color: '#F2B544', bar: { pos: 50, l: '−66 pts', r: '+66 pts' }, note: '±0.87% · precio al centro antes de abrir.' }
+          { label: 'RANGO ESPERADO · LUN', value: '7,514 – 7,646', color: '#E6B655', bar: { pos: 50, l: '−66 pts', r: '+66 pts' }, note: '±0.87% · precio al centro antes de abrir.' }
         ],
         est: [
           ['Iron condor', 2, 'Muros claros, pero gamma negativa', 'Cortos fuera de 7,500 / 7,650'],
@@ -940,10 +944,10 @@ class Component extends DCLogic {
       SPY: {
         macro: 'Sin alertas macro: DXY +0.11% · US10Y −0.08% · ES1! 7,614 en pre-market',
         lect: [
-          { label: 'RÉGIMEN GAMMA', value: 'Gamma en el límite', color: '#C9D3E3', note: 'Precio $0.13 arriba del zero γ (755.59): cualquier baja lo voltea a negativa.' },
-          { label: 'TENDENCIA', value: 'Lateral · 1H bajista', color: '#C9D3E3', dots: [{ tf: '5m', col: N }, { tf: '15m', col: N }, { tf: '1H', col: R }], note: 'Precio vs EMA 20 y EMA 20 vs EMA 50 en cada temporalidad.' },
+          { label: 'RÉGIMEN GAMMA', value: 'Gamma en el límite', color: '#D3DCDA', note: 'Precio $0.13 arriba del zero γ (755.59): cualquier baja lo voltea a negativa.' },
+          { label: 'TENDENCIA', value: 'Lateral · 1H bajista', color: '#D3DCDA', dots: [{ tf: '5m', col: N }, { tf: '15m', col: N }, { tf: '1H', col: R }], note: 'Precio vs EMA 20 y EMA 20 vs EMA 50 en cada temporalidad.' },
           { label: 'VOLATILIDAD', value: 'VIX 19.42', color: R, note: '+12.9% el viernes; en 15m ya perdió su EMA 20.' },
-          { label: 'RANGO ESPERADO · LUN', value: '748.89 – 762.55', color: '#F2B544', bar: { pos: 50, l: '−$6.83', r: '+$6.83' }, note: '±0.90% · precio al centro antes de abrir.' }
+          { label: 'RANGO ESPERADO · LUN', value: '748.89 – 762.55', color: '#E6B655', bar: { pos: 50, l: '−$6.83', r: '+$6.83' }, note: '±0.90% · precio al centro antes de abrir.' }
         ],
         est: [
           ['Iron condor', 2, 'Rango 750–760 marcado; gamma al límite', 'Cortos fuera de 750 / 760'],
@@ -956,10 +960,10 @@ class Component extends DCLogic {
       QQQ: {
         macro: 'Sin alertas macro: DXY +0.11% · US10Y −0.08% · NQ1! 28,534 en pre-market',
         lect: [
-          { label: 'RÉGIMEN GAMMA', value: 'Gamma positiva', color: '#4C9AFF', note: '$2.10 arriba del zero γ (688.39): los movimientos tienden a amortiguarse.' },
+          { label: 'RÉGIMEN GAMMA', value: 'Gamma positiva', color: '#5FD4A0', note: '$2.10 arriba del zero γ (688.39): los movimientos tienden a amortiguarse.' },
           { label: 'TENDENCIA', value: 'Bajista en 15m y 1H', color: R, dots: [{ tf: '5m', col: N }, { tf: '15m', col: R }, { tf: '1H', col: R }], note: 'Precio vs EMA 20 y EMA 20 vs EMA 50 en cada temporalidad.' },
           { label: 'VOLATILIDAD', value: 'VXN 28.50', color: R, note: '+13.2% el viernes; en 15m debajo de su EMA 20.' },
-          { label: 'RANGO ESPERADO · LUN', value: '680.40 – 700.58', color: '#F2B544', bar: { pos: 50, l: '−$10.09', r: '+$10.09' }, note: '±1.46% · precio al centro antes de abrir.' }
+          { label: 'RANGO ESPERADO · LUN', value: '680.40 – 700.58', color: '#E6B655', bar: { pos: 50, l: '−$10.09', r: '+$10.09' }, note: '±1.46% · precio al centro antes de abrir.' }
         ],
         est: [
           ['Iron condor', 2, 'Gamma positiva; rango 680–700', 'Cortos fuera de 680 / 700'],
@@ -975,6 +979,8 @@ class Component extends DCLogic {
     const toMin = s => { const p = String(s).split(':'); return +p[0] * 60 + +p[1]; };
     const L = LIVE.on && LIVE[tk] && LIVE[tk].reads.length ? LIVE[tk] : null;
     const lr = L ? L.reads[L.reads.length - 1] : null;
+    // 12-nov: una lectura manual sin cadena (recolector caído) no trae em/vix/rows…; se completan con la última lectura que sí los tenga
+    if (lr) for (let i = L.reads.length - 2; i >= 0; i--) { const pr = L.reads[i]; for (const k in pr) if (lr[k] == null) lr[k] = pr[k]; }
     let liveCfg = null, liveRows = null;
     if (lr) {
       const fv2 = x => x.toLocaleString('en-US', { maximumFractionDigits: x > 1000 ? 0 : 2 });
@@ -1004,7 +1010,7 @@ class Component extends DCLogic {
       const vTxt = vt > 0 ? volName + ' subiendo' : vt < 0 ? volName + ' bajando' : volName + ' lateral';
       const cl = s => Math.max(1, Math.min(3, s));
       const vsTxt = (k, alt) => { const v = lr.vs && lr.vs[k]; if (!v || !v[0]) return alt; const sold = k === 'bc' || k === 'bp'; const wd = Math.abs(v[1] - v[0]); const pr = v[2] || 0; return (sold ? 'Vender ' + fv2(v[0]) + ' / comprar ' + fv2(v[1]) + ' · crédito ' + pr.toFixed(2) + ' · riesgo máx $' + Math.round((wd - pr) * 100) : 'Comprar ' + fv2(v[0]) + ' / vender ' + fv2(v[1]) + ' · débito ' + pr.toFixed(2) + ' · ganancia máx $' + Math.round((wd - pr) * 100)) + ' por contrato'; };
-      const vcol = vt > 0 ? R : vt < 0 ? G : '#A3B0C6';
+      const vcol = vt > 0 ? R : vt < 0 ? G : '#93A9A9';
       const c15 = (lr.vix && lr.vix.c15) || [];
       const clo = Math.min(...c15.map(x => Math.min(x[2], x[4]))), chi = Math.max(...c15.map(x => Math.max(x[1], x[4]))), cspan = (chi - clo) || 1;
       const yy = v => ((chi - v) / cspan * 100).toFixed(1);
@@ -1019,7 +1025,7 @@ class Component extends DCLogic {
       const rp = v => ((v - rlo) / ((rhi - rlo) || 1) * 100).toFixed(1);
       const seg = (a, b, bg, h, top) => 'position: absolute; top: ' + top + 'px; height: ' + h + 'px; left: ' + rp(a) + '%; width: calc(' + rp(b) + '% - ' + rp(a) + '%); background: ' + bg + '; border-radius: 3px';
       const tick = (v, c, h, top, w) => 'position: absolute; top: ' + top + 'px; height: ' + h + 'px; left: calc(' + rp(v) + '% - ' + (w / 2) + 'px); width: ' + w + 'px; background: ' + c + '; border-radius: 1px';
-      const rng = { open: seg(lr.em[0], lr.em[1], '#2C4478', 14, 3), rem: seg(rr[0], rr[1], '#6B5420', 8, 6), dA: d15 ? tick(d15[0], '#C9D3E3', 20, 0, 2) : 'display: none', dB: d15 ? tick(d15[1], '#C9D3E3', 20, 0, 2) : 'display: none', px: tick(lr.px, '#F2B544', 24, -2, 4) };
+      const rng = { open: seg(lr.em[0], lr.em[1], '#24474A', 14, 3), rem: seg(rr[0], rr[1], '#6B5420', 8, 6), dA: d15 ? tick(d15[0], '#D3DCDA', 20, 0, 2) : 'display: none', dB: d15 ? tick(d15[1], '#D3DCDA', 20, 0, 2) : 'display: none', px: tick(lr.px, '#E6B655', 24, -2, 4) };
       // PIN
       const pinOn = !!(lr.pinm && lr.pin);
       // PIN: 4 métodos, certeza y 3 bullets
@@ -1056,7 +1062,7 @@ class Component extends DCLogic {
         const alt = gP ? (sp != null && rnd(sp) !== prim ? rnd(sp) : rnd(cn)) : gMid && cp ? rnd(cp) : gR && cp ? rnd((cp + cn) / 2) !== prim ? rnd((cp + cn) / 2) : null : anc && anc[0] !== prim ? anc[0] : ks.filter(k => k !== prim).reduce((b, k) => Math.abs(k - ctr) < Math.abs(b - ctr) ? k : b, null);
         PN = { cert, prim, alt, z0, z1, mpV, anc, gR, gP, gMid, nvG, cn, cp };
       }
-      const certCol = PN ? (PN.cert === 'ALTA' ? '#5BD69A' : PN.cert === 'MEDIA' ? '#F2B544' : '#A3B0C6') : '#A3B0C6';
+      const certCol = PN ? (PN.cert === 'ALTA' ? '#5BD69A' : PN.cert === 'MEDIA' ? '#E6B655' : '#93A9A9') : '#93A9A9';
       // series del perfil γ por vela de 5 min: historia de Gexbot (day.gx) o, si no hay, lecturas manuales
       const nC = L.c.length, gxs = (DAY.gx && DAY.gx[tk]) || null;
       const gzS = [], gcS = [], gpS = [], gnS = [];
@@ -1097,22 +1103,22 @@ class Component extends DCLogic {
       if (cwN && pwN && lr.px <= cwN && lr.px >= pwN) fuera = 0;
       const tendencia = !noG && fuera >= 3 && ((nv != null && nv < 0) || gneg);
       const nvTxt = nv == null ? '' : 'GEX ' + (nv >= 0 ? '+' : '−') + fv2(Math.round(Math.abs(nv)));
-      const fil = noG ? { c: '#A3B0C6', t: 'Sin lectura del perfil γ: no hay filtro de entrada' }
+      const fil = noG ? { c: '#93A9A9', t: 'Sin lectura del perfil γ: no hay filtro de entrada' }
         : tendencia ? { c: R, t: 'Tendencia: precio ' + (lado > 0 ? 'arriba del call wall' : 'abajo del put wall') + ' ' + fuera * 5 + ' min' + (nvTxt ? ', ' + nvTxt : '') + ' · no IC, no vender el lado ' + (lado > 0 ? 'de calls' : 'de puts') }
-        : enLim ? { c: '#F2B544', t: 'Régimen indefinido: precio a ' + fv2(Math.round(Math.abs(dz) * 10) / 10) + ' pts del Zero Gamma · esperar' }
-        : { c: (gneg || intens === 'fuerte −') ? '#F2B544' : G, t: 'Condiciones para vender prima: ' + (gpos ? 'rango' : 'gamma negativa') + (nvTxt ? ' (' + nvTxt + ')' : '') + ', precio a ' + fv2(Math.round(Math.abs(dz))) + ' pts del Zero Gamma · ' + (intens === 'fuerte +' ? 'IC en rango restante' : intens === 'fuerte −' ? (dz < 0 ? 'solo bear call (lado de calls), en Delta 10' : 'solo bull put (lado de puts), en Delta 10') : 'IC en Delta 15') };
+        : enLim ? { c: '#E6B655', t: 'Régimen indefinido: precio a ' + fv2(Math.round(Math.abs(dz) * 10) / 10) + ' pts del Zero Gamma · esperar' }
+        : { c: (gneg || intens === 'fuerte −') ? '#E6B655' : G, t: 'Condiciones para vender prima: ' + (gpos ? 'rango' : 'gamma negativa') + (nvTxt ? ' (' + nvTxt + ')' : '') + ', precio a ' + fv2(Math.round(Math.abs(dz))) + ' pts del Zero Gamma · ' + (intens === 'fuerte +' ? 'IC en rango restante' : intens === 'fuerte −' ? (dz < 0 ? 'solo bear call (lado de calls), en Delta 10' : 'solo bull put (lado de puts), en Delta 10') : 'IC en Delta 15') };
       SIMPLE[tk] = {
         fil: fil,
         macro: lr.macro || '',
         lect: [
-          noG ? { label: 'RÉGIMEN GAMMA', ic: '◐', pill: 'SIN LECTURA', pillCol: '#F2B544', value: 'Sin lectura', color: '#A3B0C6', note: '⚠ Falta la lectura del perfil γ (más de 30 min). Sin ella no hay régimen.' }
-              : { label: 'RÉGIMEN GAMMA', ic: '◐', pill: tendencia ? 'TENDENCIA' : enLim ? 'LÍMITE' : gpos ? (intens === 'fuerte +' ? 'RANGO FUERTE' : 'RANGO') : gneg ? (intens === 'fuerte −' ? 'TENDENCIA FUERTE' : 'AMPLIFICA') : 'LÍMITE', pillCol: gpos ? '#4C9AFF' : gneg ? '#FF7A45' : '#A3B0C6', value: gpos ? 'Gamma +' : gneg ? 'Gamma −' : 'En el límite', color: gpos ? '#4C9AFF' : gneg ? '#FF7A45' : '#C9D3E3', note: '• Zero Gamma ' + fv2(lr.zg) + '\n• Distancia al precio ' + (dz >= 0 ? '+' : '−') + (Math.round(Math.abs(dz) * 10) / 10).toFixed(1) + (intens ? '\n• Intensidad ' + nvTxt + ' (' + intens + ') · rango 15m típico ~' + (intens === 'fuerte +' ? 9 : intens === 'fuerte −' ? 16 : 12) + ' pts' : '') + '\n• Canal (majors por volumen, se mueven con el precio) ' + fv2(lr.pwv || lr.mnv || lr.mn) + ' – ' + fv2(lr.cwv || lr.mpv || lr.mp) + '\n• ' + (gpos ? 'Amortigua → rango' : gneg ? 'Amplifica → tendencia' : 'Cualquier movimiento cambia el régimen') + '\n• ' + (lr.gt ? 'Lectura ' + fmtET(toMin(lr.gt)) + ' ET' : 'Estimado') },
-          { label: 'MOMENTUM', ic: '➚', pill: momA ? (momAcc ? 'ACELERANDO' : 'ALINEADO') : mom.filter(v => v).length + '/3', pillCol: momA > 0 ? G : momA < 0 ? R : '#A3B0C6', value: momA > 0 ? 'Alcista 3/3' : momA < 0 ? 'Bajista 3/3' : 'Sin alinear', color: momA > 0 ? G : momA < 0 ? R : '#C9D3E3', dots: ['5m', '15m', '1H'].map((t, i) => ({ tf: t, col: mom[i] > 0 ? G : mom[i] < 0 ? R : N })), note: (momA ? (momAcc ? 'Acelerando (MACD 5m creciendo). ' : 'Sin aceleración en 5m. ') : '') + 'Fuerte = EMA 9 sobre/bajo EMA 21 con ambas inclinadas, precio vs SMA 20 (media de Bollinger), RSI 14 vs 50, histograma MACD y precio vs VWAP, en 5m, 15m y 1H a la vez. Sirve para compras direccionales.' + (gpos && !momA ? ' Gamma positiva por volumen: día de rango.' : '') + (lr.fz ? ' ' + lr.fz : '') },
+          noG ? { label: 'RÉGIMEN GAMMA', ic: '◐', pill: 'SIN LECTURA', pillCol: '#E6B655', value: 'Sin lectura', color: '#93A9A9', note: '⚠ Falta la lectura del perfil γ (más de 30 min). Sin ella no hay régimen.' }
+              : { label: 'RÉGIMEN GAMMA', ic: '◐', pill: tendencia ? 'TENDENCIA' : enLim ? 'LÍMITE' : gpos ? (intens === 'fuerte +' ? 'RANGO FUERTE' : 'RANGO') : gneg ? (intens === 'fuerte −' ? 'TENDENCIA FUERTE' : 'AMPLIFICA') : 'LÍMITE', pillCol: gpos ? '#5FD4A0' : gneg ? '#F07F74' : '#93A9A9', value: gpos ? 'Gamma +' : gneg ? 'Gamma −' : 'En el límite', color: gpos ? '#5FD4A0' : gneg ? '#F07F74' : '#D3DCDA', note: '• Zero Gamma ' + fv2(lr.zg) + '\n• Distancia al precio ' + (dz >= 0 ? '+' : '−') + (Math.round(Math.abs(dz) * 10) / 10).toFixed(1) + (intens ? '\n• Intensidad ' + nvTxt + ' (' + intens + ') · rango 15m típico ~' + (intens === 'fuerte +' ? 9 : intens === 'fuerte −' ? 16 : 12) + ' pts' : '') + '\n• Canal (majors por volumen, se mueven con el precio) ' + fv2(lr.pwv || lr.mnv || lr.mn) + ' – ' + fv2(lr.cwv || lr.mpv || lr.mp) + '\n• ' + (gpos ? 'Amortigua → rango' : gneg ? 'Amplifica → tendencia' : 'Cualquier movimiento cambia el régimen') + '\n• ' + (lr.gt ? 'Lectura ' + fmtET(toMin(lr.gt)) + ' ET' : 'Estimado') },
+          { label: 'MOMENTUM', ic: '➚', pill: momA ? (momAcc ? 'ACELERANDO' : 'ALINEADO') : mom.filter(v => v).length + '/3', pillCol: momA > 0 ? G : momA < 0 ? R : '#93A9A9', value: momA > 0 ? 'Alcista 3/3' : momA < 0 ? 'Bajista 3/3' : 'Sin alinear', color: momA > 0 ? G : momA < 0 ? R : '#D3DCDA', dots: ['5m', '15m', '1H'].map((t, i) => ({ tf: t, col: mom[i] > 0 ? G : mom[i] < 0 ? R : N })), note: (momA ? (momAcc ? 'Acelerando (MACD 5m creciendo). ' : 'Sin aceleración en 5m. ') : '') + 'Fuerte = EMA 9 sobre/bajo EMA 21 con ambas inclinadas, precio vs SMA 20 (media de Bollinger), RSI 14 vs 50, histograma MACD y precio vs VWAP, en 5m, 15m y 1H a la vez. Sirve para compras direccionales.' + (gpos && !momA ? ' Gamma positiva por volumen: día de rango.' : '') + (lr.fz ? ' ' + lr.fz : '') },
           { label: volName, ic: '∿', pill: lr.vix.nh ? 'MÁX. DEL DÍA' : '', pillCol: R, value: vt > 0 ? '▲ Subiendo' : vt < 0 ? '▼ Bajando' : '► Lateral', color: vcol, spark: spark, note: (lr.vix.nh ? '⚠ Nuevo máximo del día · ' : '') + 'Velas de 15m · amarillo = SMA 20' },
-          { label: 'RANGO RESTANTE', ic: '↔', sub: '±' + fv2(Math.round((rr[1] - rr[0]) / 2)), value: fv2(rr[0]) + ' – ' + fv2(rr[1]), color: '#F2B544', rng: 1, rng_open: rng.open, rng_rem: rng.rem, rng_dA: rng.dA, rng_dB: rng.dB, rng_px: rng.px, rngL: fv2(rlo), rngR: fv2(rhi), note: (d15 ? 'Delta 15: ' + fv2(d15[0]) + ' / ' + fv2(d15[1]) + '\n' : '') + 'Apertura (fijo): ' + fv2(lr.em[0]) + ' – ' + fv2(lr.em[1]) },
-          PN ? { label: pinOn ? 'PIN DE CIERRE' : 'PIN · IMÁN', ic: '◎', pill: 'CERTEZA ' + PN.cert, pillCol: certCol, value: fv2(PN.prim), sub: PN.alt ? 'alterno ' + fv2(PN.alt) : '', color: '#E8D27A', note: ((PN.gR || PN.gP) && PN.cp ? '• Canal por volumen ' + fv2(Math.round(PN.cn)) + ' – ' + fv2(Math.round(PN.cp)) + ' (3–4 nov: precio dentro 96–98% del día)' : '• Zona ' + fv2(Math.round(PN.z0)) + ' – ' + fv2(Math.round(PN.z1)) + (lr.iman ? ' · imán ' + fv2(lr.iman) : '') + ' · max pain ' + fv2(PN.mpV)) + '\n• Ancla: ' + fv2(PN.anc[0]) + ' tiene el mayor OI de la zona (' + fv2(PN.anc[1] + PN.anc[2]) + ')' + '\n• ' + (PN.gP ? 'Gamma + fuerte (' + fv2(Math.round(PN.nvG)) + '): imán = major + por volumen (' + fv2(Math.round(PN.cp * 10) / 10) + ') hasta las ' + fmtET(870) + ' ET; desde ahí PIN = major − (' + fv2(Math.round(PN.cn)) + ')' : PN.gMid ? 'Gamma + débil (' + fv2(Math.round(PN.nvG)) + '): regla major − con certeza baja; alterno = major + (' + fv2(Math.round(PN.cp)) + ')' : PN.gR ? 'Regla: PIN = major − por volumen (' + fv2(Math.round(PN.cn * 10) / 10) + '); se mueve con el precio' : gneg ? 'Gamma negativa: PIN poco confiable' + (lr.mnv ? ' · nodo − ' + fv2(lr.mnv) : '') : 'Se rompe si 15m cierra abajo del Zero Gamma (' + fv2(lr.zg) + ')' + ((lr.pwv || lr.mnv) ? ' → ' + fv2(lr.pwv || lr.mnv) : '')) + (lr.pinmov ? '\n⚠ ' + lr.pinmov : '') }
-             : { label: 'PIN · IMÁN', ic: '◎', value: lr.iman ? 'Imán ' + fv2(lr.iman) : '—', color: '#E8D27A', note: 'Sin cadena para estimar el PIN' },
-          lr.t10 ? { label: 'TOP 10 DEL S&P', ic: '◉', pill: lr.t10.sem > 0 ? 'VERDE' : lr.t10.sem < 0 ? 'ROJO' : 'ÁMBAR', pillCol: lr.t10.sem > 0 ? G : lr.t10.sem < 0 ? R : '#F2B544', value: (lr.t10.sem > 0 ? '● ' : lr.t10.sem < 0 ? '● ' : '● ') + (lr.t10.w >= 0 ? '+' : '−') + Math.abs(lr.t10.w).toFixed(2) + '%', color: lr.t10.sem > 0 ? G : lr.t10.sem < 0 ? R : '#F2B544', dots: lr.t10.s.map(x => ({ tf: x[0], col: x[1] > 0 ? G : x[1] < 0 ? R : N })), note: lr.t10.up + ' de ' + lr.t10.n + ' suben desde la apertura · promedio ponderado por peso en el índice (~40% del S&P)' } : null
+          { label: 'RANGO RESTANTE', ic: '↔', sub: '±' + fv2(Math.round((rr[1] - rr[0]) / 2)), value: fv2(rr[0]) + ' – ' + fv2(rr[1]), color: '#E6B655', rng: 1, rng_open: rng.open, rng_rem: rng.rem, rng_dA: rng.dA, rng_dB: rng.dB, rng_px: rng.px, rngL: fv2(rlo), rngR: fv2(rhi), note: (d15 ? 'Delta 15: ' + fv2(d15[0]) + ' / ' + fv2(d15[1]) + '\n' : '') + 'Apertura (fijo): ' + fv2(lr.em[0]) + ' – ' + fv2(lr.em[1]) },
+          PN ? { label: pinOn ? 'PIN DE CIERRE' : 'PIN · IMÁN', ic: '◎', pill: 'CERTEZA ' + PN.cert, pillCol: certCol, value: fv2(PN.prim), sub: PN.alt ? 'alterno ' + fv2(PN.alt) : '', color: '#E6B655', note: ((PN.gR || PN.gP) && PN.cp ? '• Canal por volumen ' + fv2(Math.round(PN.cn)) + ' – ' + fv2(Math.round(PN.cp)) + ' (3–4 nov: precio dentro 96–98% del día)' : '• Zona ' + fv2(Math.round(PN.z0)) + ' – ' + fv2(Math.round(PN.z1)) + (lr.iman ? ' · imán ' + fv2(lr.iman) : '') + ' · max pain ' + fv2(PN.mpV)) + '\n• Ancla: ' + fv2(PN.anc[0]) + ' tiene el mayor OI de la zona (' + fv2(PN.anc[1] + PN.anc[2]) + ')' + '\n• ' + (PN.gP ? 'Gamma + fuerte (' + fv2(Math.round(PN.nvG)) + '): imán = major + por volumen (' + fv2(Math.round(PN.cp * 10) / 10) + ') hasta las ' + fmtET(870) + ' ET; desde ahí PIN = major − (' + fv2(Math.round(PN.cn)) + ')' : PN.gMid ? 'Gamma + débil (' + fv2(Math.round(PN.nvG)) + '): regla major − con certeza baja; alterno = major + (' + fv2(Math.round(PN.cp)) + ')' : PN.gR ? 'Regla: PIN = major − por volumen (' + fv2(Math.round(PN.cn * 10) / 10) + '); se mueve con el precio' : gneg ? 'Gamma negativa: PIN poco confiable' + (lr.mnv ? ' · nodo − ' + fv2(lr.mnv) : '') : 'Se rompe si 15m cierra abajo del Zero Gamma (' + fv2(lr.zg) + ')' + ((lr.pwv || lr.mnv) ? ' → ' + fv2(lr.pwv || lr.mnv) : '')) + (lr.pinmov ? '\n⚠ ' + lr.pinmov : '') }
+             : { label: 'PIN · IMÁN', ic: '◎', value: lr.iman ? 'Imán ' + fv2(lr.iman) : '—', color: '#E6B655', note: 'Sin cadena para estimar el PIN' },
+          lr.t10 ? { label: 'TOP 10 DEL S&P', ic: '◉', pill: lr.t10.sem > 0 ? 'VERDE' : lr.t10.sem < 0 ? 'ROJO' : 'ÁMBAR', pillCol: lr.t10.sem > 0 ? G : lr.t10.sem < 0 ? R : '#E6B655', value: (lr.t10.sem > 0 ? '● ' : lr.t10.sem < 0 ? '● ' : '● ') + (lr.t10.w >= 0 ? '+' : '−') + Math.abs(lr.t10.w).toFixed(2) + '%', color: lr.t10.sem > 0 ? G : lr.t10.sem < 0 ? R : '#E6B655', dots: lr.t10.s.map(x => ({ tf: x[0], col: x[1] > 0 ? G : x[1] < 0 ? R : N })), note: lr.t10.up + ' de ' + lr.t10.n + ' suben desde la apertura · promedio ponderado por peso en el índice (~40% del S&P)' } : null
         ].filter(Boolean),
         est: [
           ['Iron condor', (tendencia || enLim || intens === 'fuerte −') ? 1 : cl(1 + (gpos ? 1 : 0) + (!momA ? 1 : 0) + (vt < 0 ? 1 : 0) - (gneg ? 1 : 0) + (intens === 'fuerte +' ? 1 : 0)), (tendencia ? 'Tendencia fuera del canal · ' : enLim ? 'Régimen indefinido · ' : '') + gTxt + (intens ? ' · intensidad ' + intens : '') + ' · ' + (momA ? 'con momentum' : 'sin momentum') + ' · ' + vTxt, lr.icd ? 'Delta 15: cortos ' + fv2(lr.icd[0]) + ' / ' + fv2(lr.icd[1]) + (lr.icd[2] ? ' · crédito ' + lr.icd[2].toFixed(2) : '') + ' · alas de ' + lr.icd[3] + (gneg && lr.ic2 ? ' · en γ− alternativa ajustada: ' + fv2(lr.ic2[0]) + ' / ' + fv2(lr.ic2[1]) + (lr.ic2[2] ? ' (' + lr.ic2[2].toFixed(2) + ')' : '') : '') : (lr.ic ? 'Cortos ' + fv2(lr.ic[0]) + ' / ' + fv2(lr.ic[1]) : 'Cortos fuera de ' + fv2(lr.piso[0]) + ' / ' + fv2(lr.techo[0]))],
@@ -1125,13 +1131,13 @@ class Component extends DCLogic {
       const nf = a => a.length > 2 ? '(' + a[1] + '/3)' : a[1] + ' fuentes';
       const prevClose = (DAY.prev && DAY.prev[tk]) || { SPX: 7580.07, SPY: 755.72, QQQ: 690.49 }[tk];
       LS[tk] = [
-        { v: lr.techo[0], c: '#00BCD4', s: gpos ? 'faint' : 'dash', t: 'Techo ' + fv2(lr.techo[0]) + ' ' + nf(lr.techo) + (gpos ? ' frágil' : '') },
-        lr.pin ? { v: lr.pin[0], c: '#E8EDF5', s: 'solid', t: (lr.pinm ? 'PIN cierre ' + fv2(lr.pin[0]) : (toMin(lr.t) < 780 ? 'Imán ' : 'PIN ') + fv2(lr.pin[0]) + ' ' + nf(lr.pin)) } : null,
+        { v: lr.techo[0], c: '#5CC1BF', s: gpos ? 'faint' : 'dash', t: 'Techo ' + fv2(lr.techo[0]) + ' ' + nf(lr.techo) + (gpos ? ' frágil' : '') },
+        lr.pin ? { v: lr.pin[0], c: '#F2EFE8', s: 'solid', t: (lr.pinm ? 'PIN cierre ' + fv2(lr.pin[0]) : (toMin(lr.t) < 780 ? 'Imán ' : 'PIN ') + fv2(lr.pin[0]) + ' ' + nf(lr.pin)) } : null,
         { v: lr.zg, c: LC.zg, s: 'none', t: 'Zero Gamma ' + fv2(lr.zg) },
-        (lr.cwv || lr.mpv) ? { v: lr.cwv || lr.mpv, c: '#7CD34B', s: 'none', t: 'Call wall ' + fv2(lr.cwv || lr.mpv) } : null,
-        (lr.pwv || lr.mnv) ? { v: lr.pwv || lr.mnv, c: '#E5534B', s: 'none', t: 'Put wall ' + fv2(lr.pwv || lr.mnv) } : null,
+        (lr.cwv || lr.mpv) ? { v: lr.cwv || lr.mpv, c: '#5FD4A0', s: 'none', t: 'Call wall ' + fv2(lr.cwv || lr.mpv) } : null,
+        (lr.pwv || lr.mnv) ? { v: lr.pwv || lr.mnv, c: '#F07F74', s: 'none', t: 'Put wall ' + fv2(lr.pwv || lr.mnv) } : null,
         { v: prevClose, c: LC.am, s: 'dot', t: 'Cierre ant. ' + fv2(prevClose) },
-        { v: lr.piso[0], c: '#00BCD4', s: gneg ? 'faint' : 'solid', t: 'Piso ' + fv2(lr.piso[0]) + ' ' + nf(lr.piso) + (gneg ? ' frágil' : '') }
+        { v: lr.piso[0], c: '#5CC1BF', s: gneg ? 'faint' : 'solid', t: 'Piso ' + fv2(lr.piso[0]) + ' ' + nf(lr.piso) + (gneg ? ' frágil' : '') }
       ].filter(Boolean);
       const hasBars = L.c.length > 0;
       // escala: velas, rango restante y precio; los niveles cercanos entran, los lejanos quedan como etiqueta con flecha
@@ -1168,11 +1174,11 @@ class Component extends DCLogic {
       });
       const pinNow = PN ? PN.prim : null;
       const pills = [
-        cwN ? { v: cwN, t: fv2(Math.round(cwN)), bg: '#7CD34B', fg: '#08142B' } : null,
-        pwN ? { v: pwN, t: fv2(Math.round(pwN)), bg: '#E5534B', fg: '#FFFFFF' } : null,
-        lr.zg ? { v: lr.zg, t: fv2(Math.round(lr.zg)), bg: '#08142B', fg: '#E8EDF5', bd: '#E8EDF5' } : null,
-        pinNow && toMin(lr.t) >= 780 ? { v: pinNow, t: '◉ ' + fv2(pinNow), bg: '#FFFFFF', fg: '#08142B' } : null,
-        { v: lr.px, t: fv2(lr.px), bg: '#4C9AFF', fg: '#FFFFFF' }
+        cwN ? { v: cwN, t: fv2(Math.round(cwN)), bg: '#5FD4A0', fg: '#0B1617' } : null,
+        pwN ? { v: pwN, t: fv2(Math.round(pwN)), bg: '#F07F74', fg: '#FFFFFF' } : null,
+        lr.zg ? { v: lr.zg, t: fv2(Math.round(lr.zg)), bg: '#0B1617', fg: '#F2EFE8', bd: '#F2EFE8' } : null,
+        pinNow && toMin(lr.t) >= 780 ? { v: pinNow, t: '◉ ' + fv2(pinNow), bg: '#FFFFFF', fg: '#0B1617' } : null,
+        { v: lr.px, t: fv2(lr.px), bg: '#5FD4A0', fg: '#FFFFFF' }
       ].filter(Boolean);
       liveCfg = { live: true, start: 510, lo, hi, ticks, em: lr.em, ohlc: { o: L.o, h: L.h, l: L.l, c: L.c, v: L.v }, pre: (L.pre && L.pre.length ? L.pre : (PRE[tk] || []).concat(CH[tk].ohlc.c)), off: [], events: [], dyn: { z: gzS, c: gcS, p: gpS }, sem: semS, pinz: null, cabina: true, pinPts: pinPts, pills: pills };
       if (L.rows.length) liveRows = L.rows[L.rows.length - 1];
@@ -1186,8 +1192,8 @@ class Component extends DCLogic {
     const nextEv = nextAg ? agTxt(nextAg) : 'Sin más eventos hoy';
     const agEvents = AG.map(a => ({ time: fmtET(a[0]), name: String(a[1]).replace(/^\s*\d{1,2}:\d{2}\s*·\s*/, ''), detail: a[2] || '' }));
     const status = lr
-      ? { txt: (nowMin < 510 ? 'Pre-market' : (nowMin >= 900 ? 'Cierre' : 'En vivo')) + ' · lectura ' + fmtET(nowMin) + ' ET', chip: 'display: flex; align-items: center; gap: 8px; border: 1px solid #1F4D47; background: #0F2421; color: #5FD4C4; padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 500', dot: 'width: 7px; height: 7px; border-radius: 50%; background: #26A69A' }
-      : { txt: 'Sin datos de hoy · recolector apagado', chip: 'display: flex; align-items: center; gap: 8px; border: 1px solid #6B2E2C; background: #24151A; color: #F08A84; padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 500', dot: 'width: 7px; height: 7px; border-radius: 50%; background: #F08A84' };
+      ? { txt: (nowMin < 510 ? 'Pre-market' : (nowMin >= 900 ? 'Cierre' : 'En vivo')) + ' · lectura ' + fmtET(nowMin) + ' ET', chip: 'display: flex; align-items: center; gap: 8px; border: 1px solid #1F4D47; background: #0F2421; color: #5FD4C4; padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 500', dot: 'width: 7px; height: 7px; border-radius: 50%; background: #5FD4A0' }
+      : { txt: 'Sin datos de hoy · recolector apagado', chip: 'display: flex; align-items: center; gap: 8px; border: 1px solid #5A2A26; background: #351A18; color: #F07F74; padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 500', dot: 'width: 7px; height: 7px; border-radius: 50%; background: #F07F74' };
     const nxt = lr ? nowMin + 15 : 0;
     const readTxt = lr && lr.auto ? 'Cadena Schwab cada minuto' + (lr.gt ? ' · perfil γ ' + fmtET(toMin(lr.gt)) + ' ET' : '') : lr ? (nowMin >= 900 ? 'Sesión cerrada' : 'Próxima lectura ~' + fmtET(nxt) + ' ET') : 'Los paneles de abajo son un ejemplo, no el mercado de hoy';
     const GEXS = {
@@ -1210,8 +1216,8 @@ class Component extends DCLogic {
     const kfmt = k => k.toLocaleString('en-US');
     const prof = pvals.map(v => ({
       row: 'position: absolute; left: 0; right: 0; top: calc(' + Pp(v.k).toFixed(2) + '% - 5px); height: 10px; display: grid; grid-template-columns: 1fr 1fr',
-      lBar: 'height: 10px; flex: none; border-radius: 2px 0 0 2px; background: #FF7A45; opacity: ' + (topL.includes(v.k) ? 1 : 0.5) + '; width: ' + (v.L > 0 ? Math.max(v.L / pmx * 45, 1.5) : 0).toFixed(1) + '%',
-      rBar: 'height: 10px; flex: none; border-radius: 0 2px 2px 0; background: #4C9AFF; opacity: ' + (topR.includes(v.k) ? 1 : 0.5) + '; width: ' + (v.R > 0 ? Math.max(v.R / pmx * 45, 1.5) : 0).toFixed(1) + '%',
+      lBar: 'height: 10px; flex: none; border-radius: 2px 0 0 2px; background: #F07F74; opacity: ' + (topL.includes(v.k) ? 1 : 0.5) + '; width: ' + (v.L > 0 ? Math.max(v.L / pmx * 45, 1.5) : 0).toFixed(1) + '%',
+      rBar: 'height: 10px; flex: none; border-radius: 0 2px 2px 0; background: #5FD4A0; opacity: ' + (topR.includes(v.k) ? 1 : 0.5) + '; width: ' + (v.R > 0 ? Math.max(v.R / pmx * 45, 1.5) : 0).toFixed(1) + '%',
       lL: topL.includes(v.k) ? kfmt(v.k) + ' · ' + fmtP(v.L) : '',
       rL: topR.includes(v.k) ? fmtP(v.R) + ' · ' + kfmt(v.k) : ''
     }));
@@ -1228,21 +1234,21 @@ class Component extends DCLogic {
         k: r[0].toLocaleString('en-US'),
         cLabel: fmt(r[ci]),
         pLabel: fmt(r[pi]),
-        cBar: 'height: 11px; border-radius: 0 3px 3px 0; background: #4C9AFF; width: ' + (cw * 0.8).toFixed(1) + '%',
-        pBar: 'height: 11px; border-radius: 3px 0 0 3px; background: #FF7A45; width: ' + (pw * 0.8).toFixed(1) + '%',
-        rowStyle: 'display: grid; grid-template-columns: 1fr 72px 1fr; align-items: center; height: 17px; border-radius: 4px;' + (spot ? ' background: #13321F; outline: 1px solid #65B837;' : ''),
-        kStyle: "text-align: center; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px;" + (spot ? ' color: #83DC28; font-weight: 600' : ' color: #C9D3E3')
+        cBar: 'height: 11px; border-radius: 0 3px 3px 0; background: #5FD4A0; width: ' + (cw * 0.8).toFixed(1) + '%',
+        pBar: 'height: 11px; border-radius: 3px 0 0 3px; background: #F07F74; width: ' + (pw * 0.8).toFixed(1) + '%',
+        rowStyle: 'display: grid; grid-template-columns: 1fr 72px 1fr; align-items: center; height: 17px; border-radius: 4px;' + (spot ? ' background: #10302A; outline: 1px solid #5CC1BF;' : ''),
+        kStyle: "text-align: center; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px;" + (spot ? ' color: #8ADBD7; font-weight: 600' : ' color: #D3DCDA')
       };
     });
-    const on = 'background: #22396A; color: #E8EDF5; border: 0; padding: 8px 12px; font: 500 12px Manrope, sans-serif; cursor: pointer; min-height: 32px';
-    const off = 'background: transparent; color: #A3B0C6; border: 0; padding: 8px 12px; font: 500 12px Manrope, sans-serif; cursor: pointer; min-height: 32px';
-    const tabOn = 'display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 84px; min-height: 44px; padding: 5px 12px; border-radius: 7px; border: 1px solid #65B837; background: #13321F; color: #E8EDF5; cursor: pointer; text-align: left';
-    const tabOff = 'display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 84px; min-height: 44px; padding: 5px 12px; border-radius: 7px; border: 1px solid transparent; background: transparent; color: #C9D3E3; cursor: pointer; text-align: left';
+    const on = 'background: #1E3739; color: #F2EFE8; border: 0; padding: 8px 12px; font: 500 12px Poppins, sans-serif; cursor: pointer; min-height: 32px';
+    const off = 'background: transparent; color: #93A9A9; border: 0; padding: 8px 12px; font: 500 12px Poppins, sans-serif; cursor: pointer; min-height: 32px';
+    const tabOn = 'display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 84px; min-height: 44px; padding: 5px 12px; border-radius: 7px; border: 1px solid #5CC1BF; background: #10302A; color: #F2EFE8; cursor: pointer; text-align: left';
+    const tabOff = 'display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 84px; min-height: 44px; padding: 5px 12px; border-radius: 7px; border: 1px solid transparent; background: transparent; color: #D3DCDA; cursor: pointer; text-align: left';
     const tabs = [['SPX', 'S&P 500 índice'], ['SPY', 'S&P 500 ETF'], ['NDX', 'Nasdaq 100 índice'], ['QQQ', 'Nasdaq 100 ETF']].filter(([s]) => !(isSimple && s === 'NDX')).map(([s, sub]) => ({
       sym: s, sub,
       pressed: tk === s ? 'true' : 'false',
       style: tk === s ? tabOn : tabOff,
-      subColor: tk === s ? '#83DC28' : '#A3B0C6',
+      subColor: tk === s ? '#8ADBD7' : '#93A9A9',
       pick: () => this.setState({ tk: s })
     }));
     const TPj = LIVE.tape, tpAge = TPj && TPj.ts ? Date.now() / 1000 - TPj.ts : 1e9;
@@ -1252,13 +1258,13 @@ class Component extends DCLogic {
     const tp = (TPj && tk === 'SPX' && tpAge < 1800) ? {
       on: true, min: TPj.min || 100,
       age: tpAge < 90 ? 'en vivo · hace ' + Math.round(tpAge) + ' s' : 'hace ' + Math.round(tpAge / 60) + ' min',
-      ageC: tpAge < 90 ? '#83DC28' : '#F2B544',
-      prints: (TPj.prints || []).slice(0, 12).map(p => ({ h: etH(p.h), k: p.k + (p.t === 'C' ? 'C' : 'P'), kc: p.t === 'C' ? '#4C9AFF' : '#FF7A45', n: p.n, px: (+p.px).toFixed(2),
-        lado: p.lado === 'B' ? 'Compra' : p.lado === 'V' ? 'Venta' : 'Medio', lc: p.lado === 'B' ? '#4C9AFF' : p.lado === 'V' ? '#FF7A45' : '#A3B0C6', prem: fK(p.prem) })),
+      ageC: tpAge < 90 ? '#8ADBD7' : '#E6B655',
+      prints: (TPj.prints || []).slice(0, 12).map(p => ({ h: etH(p.h), k: p.k + (p.t === 'C' ? 'C' : 'P'), kc: p.t === 'C' ? '#5FD4A0' : '#F07F74', n: p.n, px: (+p.px).toFixed(2),
+        lado: p.lado === 'B' ? 'Compra' : p.lado === 'V' ? 'Venta' : 'Medio', lc: p.lado === 'B' ? '#5FD4A0' : p.lado === 'V' ? '#F07F74' : '#93A9A9', prem: fK(p.prem) })),
       empty: !(TPj.prints || []).length,
-      nc: (TPj.neto.C > 0 ? '+' : TPj.neto.C < 0 ? '−' : '') + fK(Math.abs(TPj.neto.C)), ncC: TPj.neto.C > 0 ? '#4C9AFF' : TPj.neto.C < 0 ? '#FF7A45' : '#E8EDF5',
-      np: (TPj.neto.P > 0 ? '+' : TPj.neto.P < 0 ? '−' : '') + fK(Math.abs(TPj.neto.P)), npC: TPj.neto.P > 0 ? '#4C9AFF' : TPj.neto.P < 0 ? '#FF7A45' : '#E8EDF5',
-      strikes: (TPj.strikes || []).slice(0, 8).map(r => ({ k: r.k + r.t, kc: r.t === 'C' ? '#4C9AFF' : '#FF7A45', tot: fK(r.B + r.V + r.M),
+      nc: (TPj.neto.C > 0 ? '+' : TPj.neto.C < 0 ? '−' : '') + fK(Math.abs(TPj.neto.C)), ncC: TPj.neto.C > 0 ? '#5FD4A0' : TPj.neto.C < 0 ? '#F07F74' : '#F2EFE8',
+      np: (TPj.neto.P > 0 ? '+' : TPj.neto.P < 0 ? '−' : '') + fK(Math.abs(TPj.neto.P)), npC: TPj.neto.P > 0 ? '#5FD4A0' : TPj.neto.P < 0 ? '#F07F74' : '#F2EFE8',
+      strikes: (TPj.strikes || []).slice(0, 8).map(r => ({ k: r.k + r.t, kc: r.t === 'C' ? '#5FD4A0' : '#F07F74', tot: fK(r.B + r.V + r.M),
         wB: (100 * r.B / tpMx).toFixed(1) + '%', wV: (100 * r.V / tpMx).toFixed(1) + '%', wM: (100 * r.M / tpMx).toFixed(1) + '%' }))
     } : { on: false };
     return {
@@ -1282,17 +1288,17 @@ class Component extends DCLogic {
       simpleBtnStyle: isSimple ? on : off,
       fullBtnStyle: isSimple ? off : on,
       simple: SIMPLE[tk] || SIMPLE.SPX,
-      lect: (SIMPLE[tk] || SIMPLE.SPX).lect.map(x => Object.assign({ vff: /[A-Za-zÁÉÍÓÚáéíóúñ]{3,}/.test(String(x.value)) ? "'Montserrat', 'Manrope', sans-serif" : "'IBM Plex Mono', ui-monospace, monospace", hasDots: !!x.dots, hasDots2: !!x.dots2, hasBar: !!x.bar, hasSpark: !!x.spark, hasRng: !!x.rng, hasPill: !!x.pill, pill: x.pill || '', pillCol: x.pillCol || '#A3B0C6', ic: x.ic || '', sub: x.sub || '', barMark: x.bar ? 'position: absolute; top: -4px; left: calc(' + x.bar.pos + '% - 1.5px); width: 3px; height: 14px; border-radius: 2px; background: #F2B544' : '', barL: x.bar ? x.bar.l : '', barR: x.bar ? x.bar.r : '' }, x)),
-      filC: ((SIMPLE[tk] || SIMPLE.SPX).fil || {}).c || '#A3B0C6', filT: ((SIMPLE[tk] || SIMPLE.SPX).fil || {}).t || '', hasFil: !!((SIMPLE[tk] || SIMPLE.SPX).fil),
-      est: (SIMPLE[tk] || SIMPLE.SPX).est.map(e => ({ name: e[0], why: e[2], ref: e[3], aria: e[1] + ' de 3', d1: e[1] >= 1 ? '#E8EDF5' : '#2C4478', d2: e[1] >= 2 ? '#E8EDF5' : '#2C4478', d3: e[1] >= 3 ? '#E8EDF5' : '#2C4478' })),
+      lect: (SIMPLE[tk] || SIMPLE.SPX).lect.map(x => Object.assign({ vff: /[A-Za-zÁÉÍÓÚáéíóúñ]{3,}/.test(String(x.value)) ? "'Poppins', sans-serif" : "'IBM Plex Mono', ui-monospace, monospace", hasDots: !!x.dots, hasDots2: !!x.dots2, hasBar: !!x.bar, hasSpark: !!x.spark, hasRng: !!x.rng, hasPill: !!x.pill, pill: x.pill || '', pillCol: x.pillCol || '#93A9A9', ic: x.ic || '', sub: x.sub || '', barMark: x.bar ? 'position: absolute; top: -4px; left: calc(' + x.bar.pos + '% - 1.5px); width: 3px; height: 14px; border-radius: 2px; background: #E6B655' : '', barL: x.bar ? x.bar.l : '', barR: x.bar ? x.bar.r : '' }, x)),
+      filC: ((SIMPLE[tk] || SIMPLE.SPX).fil || {}).c || '#93A9A9', filT: ((SIMPLE[tk] || SIMPLE.SPX).fil || {}).t || '', hasFil: !!((SIMPLE[tk] || SIMPLE.SPX).fil),
+      est: (SIMPLE[tk] || SIMPLE.SPX).est.map(e => ({ name: e[0], why: e[2], ref: e[3], aria: e[1] + ' de 3', d1: e[1] >= 1 ? '#F2EFE8' : '#24474A', d2: e[1] >= 2 ? '#F2EFE8' : '#24474A', d3: e[1] >= 3 ? '#F2EFE8' : '#24474A' })),
       kpis: d.kpis.map(k => {
-        const tones = { neg: ['#FF7A45', '#2A1A12', '#5C3320'], pos: ['#4C9AFF', '#111D2E', '#24406B'], edge: ['#C9D3E3', '#17305E', '#3A5287'] };
+        const tones = { neg: ['#F07F74', '#351A18', '#5A2A26'], pos: ['#5FD4A0', '#10302A', '#1D4A3C'], edge: ['#D3DCDA', '#183032', '#2A5254'] };
         const t = tones[k.tone] || tones.edge;
         return Object.assign({}, k, {
           hasChip: !!k.chip,
           chipStyle: 'align-self: flex-start; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; color: ' + t[0] + '; background: ' + t[1] + '; border: 1px solid ' + t[2],
           hasBar: !!k.bar,
-          barMark: k.bar ? 'position: absolute; top: -4px; left: calc(' + k.bar.pos + '% - 1.5px); width: 3px; height: 14px; border-radius: 2px; background: #F2B544' : '',
+          barMark: k.bar ? 'position: absolute; top: -4px; left: calc(' + k.bar.pos + '% - 1.5px); width: 3px; height: 14px; border-radius: 2px; background: #E6B655' : '',
           barL: k.bar ? k.bar.l : '', barMid: k.bar ? k.bar.mid : '', barR: k.bar ? k.bar.r : ''
         });
       }),

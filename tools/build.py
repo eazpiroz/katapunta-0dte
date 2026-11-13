@@ -119,10 +119,12 @@ html = f'''<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>Flight Deck 0DTE</title>
+<link rel="icon" type="image/png" href="portada/favicon-katapunta.png">
+<meta name="theme-color" content="#0B1617">
 {helmet}
 </head>
 <body>
-<div id="app"><div style="color:#8A94A3;font-family:Inter,system-ui,sans-serif;padding:24px">Cargando lectura…</div></div>
+<div id="app"><div style="color:#93A9A9;background:#0B1617;font-family:Poppins,system-ui,sans-serif;padding:24px;min-height:100vh">Cargando lectura…</div></div>
 <template id="tpl">{body}</template>
 <script>window.BUILD='{build}';{runtime}</script>
 <script>
