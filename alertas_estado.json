@@ -1,9 +1,9 @@
 {
- "actualizado": "2026-11-12T21:09:00Z",
+ "actualizado": "2026-11-13T15:56:08Z",
  "activas": [
-  "amd-acciones|tpcerca",
+  "ibit-acciones|sl",
   "mstx-acciones|sl",
-  "tsm-put-spread|vig0|395.0"
+  "vst-call-spread|vig0|133.0"
  ],
  "recordados": [
   "vst-call-spread|rec|2026-11-11|decidir la reestructura (vence el 20-nov): mariposa, 133/138C o put spread 133/128"
