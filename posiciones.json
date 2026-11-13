@@ -1,5 +1,5 @@
 {
- "actualizado": "2026-11-12T21:09:00Z",
+ "actualizado": "2026-11-13T01:45:03Z",
  "fuente": "TradingView",
  "rows": [
   {
@@ -7,7 +7,7 @@
    "creado": "2026-11-09T03:45:00Z",
    "etapa": "abierta",
    "instrumento": "accion",
-   "mejor": 508.58,
+   "mejor": 585.3,
    "motor": "wheel",
    "precioEntrada": 295.1064,
    "simbolo": "NASDAQ:AMD",
@@ -24,7 +24,7 @@
    "estructura": "Call cubierto",
    "etapa": "abierta",
    "instrumento": "opcion",
-   "mejor": 508.58,
+   "mejor": 585.3,
    "motor": "wheel",
    "primaActual": 34.8,
    "primaEntrada": 9.2932,
@@ -58,7 +58,7 @@
    "estructura": "Compra de call",
    "etapa": "abierta",
    "instrumento": "opcion",
-   "mejor": 48.98,
+   "mejor": 56.6,
    "motor": "swing",
    "plan": "Expira sin valor el 20-nov",
    "primaActual": 0.004,
@@ -98,11 +98,14 @@
    "contratos": 3,
    "creado": "2026-11-09T03:45:00Z",
    "estructura": "Call cubierto",
-   "etapa": "abierta",
+   "etapa": "cerrada",
+   "fechaCierre": "2026-11-12",
    "instrumento": "opcion",
    "mejor": 379.53,
    "motor": "wheel",
-   "primaActual": 1.1,
+   "notaCierre": "Recomprado 12-nov 14:53 ET en 0.17 (94% de la prima capturada). Las 300 acciones quedan sin call.",
+   "pnlRealizado": 877,
+   "primaActual": 0.17,
    "primaEntrada": 3.0933,
    "recordar": [
     {
@@ -253,7 +256,7 @@
    "estructura": "Spread vendido",
    "etapa": "abierta",
    "instrumento": "opcion",
-   "mejor": 388.62,
+   "mejor": 405.49,
    "motor": "swing",
    "primaActual": 8.86,
    "primaEntrada": 5.4865,
@@ -282,7 +285,7 @@
    "estructura": "Call spread comprado",
    "etapa": "abierta",
    "instrumento": "opcion",
-   "mejor": 133.92,
+   "mejor": 134.51,
    "motor": "swing",
    "plan": "Reestructurar tras la reacción del 10-nov",
    "primaActual": 0.67,
@@ -318,52 +321,52 @@
  "quotes": {
   "GLD": {
    "p": 354.89,
-   "chg": -2.8151272010296653,
+   "chg": -2.82,
    "sym": "AMEX:GLD"
   },
   "AMD": {
    "p": 585.3,
-   "chg": 5.8600108518719445,
+   "chg": 5.86,
    "sym": "NASDAQ:AMD"
   },
   "CRWV": {
    "p": 56.6,
-   "chg": -6.8619384564752375,
+   "chg": -6.86,
    "sym": "NASDAQ:CRWV"
   },
   "GRAB": {
    "p": 3.24,
-   "chg": -2.702702702702698,
+   "chg": -2.7,
    "sym": "NASDAQ:GRAB"
   },
   "IBIT": {
    "p": 40.36,
-   "chg": -4.4507575757575815,
+   "chg": -4.45,
    "sym": "NASDAQ:IBIT"
   },
   "MSTX": {
    "p": 9.22,
-   "chg": -13.18267419962334,
+   "chg": -13.18,
    "sym": "NASDAQ:MSTX"
   },
   "JOBY": {
    "p": 5.34,
-   "chg": -9.183673469387756,
+   "chg": -9.18,
    "sym": "NYSE:JOBY"
   },
   "MP": {
    "p": 37.45,
-   "chg": 1.960250476449785,
+   "chg": 1.96,
    "sym": "NYSE:MP"
   },
   "TSM": {
    "p": 405.49,
-   "chg": -1.9015362283778912,
+   "chg": -1.9,
    "sym": "NYSE:TSM"
   },
   "VST": {
    "p": 134.51,
-   "chg": 0.7943049831397545,
+   "chg": 0.79,
    "sym": "NYSE:VST"
   }
  }
