@@ -1,5 +1,5 @@
 {
- "actualizado": "2026-11-13T21:08:33Z",
+ "actualizado": "2026-11-14T22:17:22Z",
  "fuente": "TradingView",
  "rows": [
   {
@@ -20,21 +20,40 @@
   },
   {
    "contratos": 1,
-   "creado": "2026-11-09T03:45:00Z",
+   "creado": "2026-11-14T22:20:00Z",
    "estructura": "Call cubierto",
    "etapa": "abierta",
    "instrumento": "opcion",
+   "motor": "wheel",
+   "primaActual": 21.86,
+   "primaEntrada": 21.86,
+   "primaFecha": "2026-11-13",
+   "simbolo": "NASDAQ:AMD",
+   "sinSL": true,
+   "sl": null,
+   "strikes": "600 C",
+   "tesis": "Rol del 13-nov (10:09 ET): recompra 500 C nov-20 en 48.86 y venta 600 C dic-18 en 21.86 (débito neto 27.00). Coincide con el TP de 600 de las acciones: si asignan en 600, las 100 acciones salen con +$30,489 sobre el costo de 295.11, más la prima.",
+   "ticker": "AMD",
+   "tp": null,
+   "tpPct": 75,
+   "vencimiento": "2026-12-18",
+   "id": "amd-call-600-dic"
+  },
+  {
+   "contratos": 1,
+   "creado": "2026-11-09T03:45:00Z",
+   "estructura": "Call cubierto",
+   "etapa": "cerrada",
+   "fechaCierre": "2026-11-13",
+   "instrumento": "opcion",
    "mejor": 585.3,
    "motor": "wheel",
-   "primaActual": 34.8,
+   "plan": "Rolado el 13-nov a 600 C dic-18 (ver amd-call-600-dic)",
+   "pnlRealizado": -3957,
+   "primaActual": 48.86,
    "primaEntrada": 9.2932,
-   "primaFecha": "2026-11-10",
-   "recordar": [
-    {
-     "fecha": "2026-11-18",
-     "texto": "hoy se decide: rolar a ~555 dic o aceptar asignación en 500 (+$21,418)"
-    }
-   ],
+   "primaFecha": "2026-11-13",
+   "recordar": [],
    "simbolo": "NASDAQ:AMD",
    "sinSL": true,
    "sl": null,
@@ -44,13 +63,7 @@
    "tp": null,
    "tpPct": 75,
    "vencimiento": "2026-11-20",
-   "vigilar": [
-    {
-     "cruce": "abajo",
-     "precio": 490,
-     "texto": "zona de pullback: evaluar rol a ~555 dic-18 (débito máx 10)"
-    }
-   ],
+   "vigilar": [],
    "id": "amd-call-cubierto"
   },
   {
@@ -254,6 +267,26 @@
    "id": "mstx-acciones"
   },
   {
+   "contratos": 5,
+   "creado": "2026-11-14T22:20:00Z",
+   "estructura": "Call spread comprado",
+   "etapa": "abierta",
+   "instrumento": "opcion",
+   "motor": "swing",
+   "plan": "TP/SL por definir",
+   "primaActual": null,
+   "primaEntrada": 2.05,
+   "primaFecha": "2026-11-13",
+   "simbolo": "NASDAQ:NVDA",
+   "sl": null,
+   "strikes": "160/165 C",
+   "tesis": "Abierto 13-nov 11:17 ET: comprado 160 C, vendido 165 C, venc 20-nov; débito 2.05 (riesgo $1,025, ganancia máx $1,475).",
+   "ticker": "NVDA",
+   "tp": null,
+   "vencimiento": "2026-11-20",
+   "id": "nvda-call-spread-160"
+  },
+  {
    "contratos": 1,
    "creado": "2026-11-09T03:45:00Z",
    "estructura": "Spread vendido",
@@ -326,17 +359,17 @@
  "quotes": {
   "GLD": {
    "p": 355.45,
-   "chg": 0.15779537321423603,
+   "chg": 0.16,
    "sym": "AMEX:GLD"
   },
   "AMD": {
    "p": 534.06,
-   "chg": -8.75448487954895,
+   "chg": -8.75,
    "sym": "NASDAQ:AMD"
   },
   "CRWV": {
    "p": 53.13,
-   "chg": -6.130742049469962,
+   "chg": -6.13,
    "sym": "NASDAQ:CRWV"
   },
   "GRAB": {
@@ -346,32 +379,37 @@
   },
   "IBIT": {
    "p": 38.94,
-   "chg": -3.5183349851338,
+   "chg": -3.52,
    "sym": "NASDAQ:IBIT"
   },
   "MSTX": {
    "p": 8.75,
-   "chg": -5.097613882863347,
+   "chg": -5.1,
    "sym": "NASDAQ:MSTX"
+  },
+  "NVDA": {
+   "p": 162.85,
+   "chg": -2.01,
+   "sym": "NASDAQ:NVDA"
   },
   "JOBY": {
    "p": 5.08,
-   "chg": -4.8689138576778985,
+   "chg": -4.87,
    "sym": "NYSE:JOBY"
   },
   "MP": {
    "p": 38.76,
-   "chg": 3.497997329773018,
+   "chg": 3.5,
    "sym": "NYSE:MP"
   },
   "TSM": {
    "p": 398.73,
-   "chg": -1.667118794544869,
+   "chg": -1.67,
    "sym": "NYSE:TSM"
   },
   "VST": {
    "p": 133.01,
-   "chg": -1.1151587242584196,
+   "chg": -1.12,
    "sym": "NYSE:VST"
   }
  }
