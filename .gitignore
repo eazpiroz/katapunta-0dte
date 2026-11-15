@@ -1,1 +1,4 @@
 __pycache__/
+tools/historial/
+tools/papel.json
+tools/papel_estado.json
