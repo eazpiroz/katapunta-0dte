@@ -1,1 +1,1 @@
-{"ts":1794838626,"spot":7561.67,"min":100,"prints":[],"spreads":[],"strikes":[],"neto":{"C":0,"P":0}}
+{"ts":1794838656,"spot":7561.67,"min":100,"prints":[{"h":"08:17:27","k":7600.0,"t":"C","n":654,"px":2.5,"bid":2.45,"ask":2.55,"lado":"M","prem":163500,"bloque":false,"spread":false}],"spreads":[],"strikes":[{"k":7600.0,"t":"C","B":0,"V":0,"M":163500,"n":654}],"neto":{"C":0,"P":0}}
