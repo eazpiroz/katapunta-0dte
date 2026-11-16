@@ -104,6 +104,8 @@ def main():
         c["secret"] = getpass.getpass("Client Secret (no se verá al escribir): ").strip()
         save(c)
         print("Guardado en", CFG)
+    if "--login" in sys.argv:  # renueva el permiso de 7 días sin pedir Client ID ni Secret
+        login(c)
 
     q = get(c, "/quotes", symbols="$SPX,SPY,QQQ,$VIX", fields="quote")
     print("COTIZACIONES")
