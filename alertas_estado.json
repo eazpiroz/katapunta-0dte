@@ -1,9 +1,9 @@
 {
- "actualizado": "2026-11-16T18:08:50Z",
+ "actualizado": "2026-11-16T21:08:05Z",
  "activas": [
   "ibit-acciones|sl",
   "mstx-acciones|sl",
-  "tsm-put-spread|slcerca",
+  "tsm-put-spread|sl",
   "vst-call-spread|vig0|133.0"
  ],
  "recordados": [
