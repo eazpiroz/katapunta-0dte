@@ -161,6 +161,46 @@ class Marcador:
         return m
 
 
+# ------------------------------------------------------------------ alertas al celular (ntfy)
+ALERTAS = HERE / "papel_alertas.json"     # {"ntfy": "tema-secreto"}  → app ntfy suscrita a ese tema
+
+
+def mandar(titulo, texto, tags, prioridad=4):
+    try:
+        cfg = json.loads(ALERTAS.read_text(encoding="utf-8")) if ALERTAS.exists() else {}
+        if not cfg.get("ntfy"):
+            return
+        import urllib.request
+        body = json.dumps({"topic": cfg["ntfy"], "title": titulo, "message": texto, "tags": tags,
+                           "priority": prioridad, "click": "https://0dte.katapunta.com/papel/"}).encode()
+        urllib.request.urlopen(urllib.request.Request(cfg.get("servidor", "https://ntfy.sh"), data=body,
+                               headers={"Content-Type": "application/json"}), timeout=10)
+    except Exception as e:
+        print("alerta:", e)
+
+
+MESES = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]
+
+
+def orden_tos(p, fecha, abrir, precio):
+    """Orden escrita como la muestra thinkorswim, para capturarla igual en paperMoney."""
+    d = dt.date.fromisoformat(fecha)
+    venc = f"{d.day} {MESES[d.month - 1]} {d.year % 100}"
+    n = p["n"]
+    if p["tipo"] == "pin":
+        ks = {(sd, q): K for sd, K, q in p["legs"]}
+        lado, signo = ("SELL", -n) if abrir else ("BUY", n)
+        ks_txt = f"{ks[('c', -1)]:.0f}/{ks[('c', 1)]:.0f}/{ks[('p', -1)]:.0f}/{ks[('p', 1)]:.0f} CALL/PUT"
+        return f"{lado} {signo:+d} IRON CONDOR SPX 100 (Weeklys) {venc} {ks_txt} @{abs(precio):.2f} LMT"
+    sd = p["legs"][0][0]
+    larg = [K for _, K, q in p["legs"] if q > 0][0]
+    cort = [K for _, K, q in p["legs"] if q < 0][0]
+    compra = (p["tipo"] == "tend") == abrir           # abrir débito o cerrar crédito → BUY
+    a, b = (larg, cort) if p["tipo"] == "tend" else (cort, larg)
+    lado, signo = ("BUY", n) if compra else ("SELL", -n)
+    return f"{lado} {signo:+d} VERTICAL SPX 100 (Weeklys) {venc} {a:.0f}/{b:.0f} {'CALL' if sd == 'c' else 'PUT'} @{abs(precio):.2f} LMT"
+
+
 # ------------------------------------------------------------------ el bot
 class Bot:
     def __init__(self, fecha, pb=PB):
@@ -173,6 +213,7 @@ class Bot:
         self.brk = {}                   # id → minutos seguidos con el ancla rota
         self.sig = 0
         self.nota = None
+        self.avisar = False             # solo en vivo
 
     # -- contexto ------------------------------------------------------
     def ctx(self, r):
@@ -216,6 +257,19 @@ class Bot:
         p["m_in"] = mins(ts)
         self.abiertas.append(p)
         self.n_ent += 1
+        if self.avisar:
+            pb = self.pb
+            if tipo == "tend":
+                plan = (f"TP: spread en {precio + pb['deb_tp'] * (ancho - precio):.2f}" + (f" o SPX en {objetivo:.0f}" if objetivo else "")
+                        + f" · SL: spread en {precio * (1 - pb['deb_sl']):.2f} o tendencia volteada")
+            elif tipo == "venta":
+                plan = f"TP: recomprar en {-precio * (1 - pb['ven_tp']):.2f} · Stop: SPX rompe {ancla:.0f} por {pb['nivel_buf']:.0f} pts 2 min"
+            else:
+                plan = "Al vencimiento · Stop: SPX sale de los cortos por 3 pts 2 min"
+            mandar(f"PAPEL · Abrir {self.estructura(p)}",
+                   f"{et(ts)} ET · SPX {c['px']:,.2f}\n{orden_tos(p, self.f, True, precio)}\n"
+                   f"{'Débito' if precio > 0 else 'Crédito'} {abs(precio):.2f} · riesgo ${(ancho + precio if precio < 0 else precio) * 100 * n:,.0f}\n"
+                   f"Por qué: {regla}\n{plan}", ["green_circle"])
 
     def estructura(self, p):
         ks = sorted({K for _, K, _ in p["legs"]})
@@ -320,6 +374,11 @@ class Bot:
                          "entra": et(p["t_in"]), "sale": et(ts), "entrada": p["entrada"], "salida": round(precio, 2),
                          "n": p["n"], "pnl": pnl, "regla": p["regla"], "estimado": p.get("estimado", False), "motivo": motivo, "ctx": p["ctx"],
                          "mejor": round((p["max"]) * 100 * p["n"], 0), "peor": round(p["min"] * 100 * p["n"], 0)})
+        if self.avisar:
+            mandar(f"PAPEL · Cerrar {self.estructura(p)} · {'+' if pnl >= 0 else '−'}${abs(pnl):,.0f}",
+                   f"{et(ts)} ET\n" + (orden_tos(p, self.f, False, precio) if not motivo.startswith("Venc") else "Expira: no hay que mandar orden")
+                   + f"\nMotivo: {motivo}\nDía en papel: {'−' if self.pnl_dia() < 0 else '+'}${abs(self.pnl_dia()):,.0f}",
+                   ["white_check_mark" if pnl >= 0 else "red_circle"], 3)
 
     def gestionar(self, ts, r, c, cad):
         pb, m = self.pb, mins(ts)
@@ -464,16 +523,30 @@ def traer_remoto():
         print("no pude traer papel.json:", e)
 
 
+def tema_alertas():
+    """Primera vez: crea un tema secreto de ntfy y lo guarda en papel_alertas.json (no va al repositorio)."""
+    if not ALERTAS.exists():
+        import secrets
+        ALERTAS.write_text(json.dumps({"ntfy": "katapunta-papel-" + secrets.token_hex(5)}), encoding="utf-8")
+    t = json.loads(ALERTAS.read_text(encoding="utf-8")).get("ntfy")
+    print(f"Alertas al celular: en la app ntfy suscríbete al tema  {t}\n")
+    return t
+
+
 def vivo():
     traer_remoto()
+    t = tema_alertas()
     hoy = dt.datetime.now(dt.timezone(dt.timedelta(hours=-6))).date().isoformat()
     est = json.loads(STATE.read_text()) if STATE.exists() else {}
     b = Bot(hoy)
+    b.avisar = True
     mk = Marcador()
     hecho = 0
     if est.get("fecha") == hoy:          # reinicio a media sesión: re-procesa el historial de hoy sin marcas reales
         print("Reanudando: vuelvo a pasar el historial de hoy.")
     print(f"Bot de papel en marcha ({PB['version']}). Solo papel: no existe código de órdenes. Ctrl+C para salir.\n")
+    mandar("PAPEL · Bot en marcha", f"{PB['version']} · empieza a buscar entradas a las {et('09:00')} ET. "
+           "Las órdenes vienen escritas como en thinkorswim para el espejo en paperMoney.", ["robot"], 2)
     sin_datos = 0
     while True:
         f = HIST / f"{hoy}.jsonl"
@@ -515,6 +588,8 @@ def vivo():
                 b.liquidar(*[(filas[-1][0], filas[-1][1]["px"])][0])
             publicar(armar([b], "vivo"))
             imprimir(b)
+            mandar(f"PAPEL · Cierre del día {'+' if b.pnl_dia() >= 0 else '−'}${abs(b.pnl_dia()):,.0f}",
+                   f"{len(b.ops)} operaciones · {sum(1 for o in b.ops if o['pnl'] > 0)} ganadoras", ["checkered_flag"], 3)
             print("\nFin del día.")
             break
         time.sleep(20)
