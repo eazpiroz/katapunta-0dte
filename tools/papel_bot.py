@@ -168,6 +168,17 @@ ALERTAS = HERE / "papel_alertas.json"     # {"ntfy": "tema-secreto"}  → app nt
 def mandar(titulo, texto, tags, prioridad=4):
     try:
         cfg = json.loads(ALERTAS.read_text(encoding="utf-8")) if ALERTAS.exists() else {}
+    except Exception as e:
+        print("alerta (papel_alertas.json):", e); return
+    wa = cfg.get("whatsapp") or {}
+    if wa.get("telefono") and wa.get("apikey"):      # WhatsApp vía CallMeBot (llave personal, solo en este archivo)
+        try:
+            import urllib.parse, urllib.request
+            q = urllib.parse.urlencode({"phone": wa["telefono"], "text": f"*{titulo}*\n{texto}", "apikey": wa["apikey"]})
+            urllib.request.urlopen("https://api.callmebot.com/whatsapp.php?" + q, timeout=20)
+        except Exception as e:
+            print("alerta WhatsApp:", e)
+    try:
         if not cfg.get("ntfy"):
             return
         import urllib.request
@@ -527,9 +538,13 @@ def tema_alertas():
     """Primera vez: crea un tema secreto de ntfy y lo guarda en papel_alertas.json (no va al repositorio)."""
     if not ALERTAS.exists():
         import secrets
-        ALERTAS.write_text(json.dumps({"ntfy": "katapunta-papel-" + secrets.token_hex(5)}), encoding="utf-8")
+        ALERTAS.write_text(json.dumps({"ntfy": "katapunta-papel-" + secrets.token_hex(5),
+                                       "whatsapp": {"telefono": "", "apikey": ""}}, indent=1), encoding="utf-8")
     t = json.loads(ALERTAS.read_text(encoding="utf-8")).get("ntfy")
-    print(f"Alertas al celular: en la app ntfy suscríbete al tema  {t}\n")
+    print(f"Alertas al celular: en la app ntfy suscríbete al tema  {t}")
+    wa = json.loads(ALERTAS.read_text(encoding="utf-8")).get("whatsapp") or {}
+    print("WhatsApp: " + ("activo" if wa.get("telefono") and wa.get("apikey") else
+          "apagado (pon tu teléfono y la llave de CallMeBot en papel_alertas.json)") + "\n")
     return t
 
 
