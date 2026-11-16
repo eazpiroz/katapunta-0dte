@@ -165,7 +165,25 @@ class Marcador:
 ALERTAS = HERE / "papel_alertas.json"     # {"ntfy": "tema-secreto"}  → app ntfy suscrita a ese tema
 
 
+def sonar(veces=3):
+    """Alarma en la computadora (Windows): suena aunque el celular esté en silencio."""
+    if os.name != "nt":
+        return
+    def _s():
+        try:
+            import winsound
+            for _ in range(veces):
+                winsound.Beep(1200, 350); winsound.Beep(900, 350); time.sleep(0.3)
+        except Exception:
+            pass
+    import threading
+    threading.Thread(target=_s, daemon=True).start()
+
+
 def mandar(titulo, texto, tags, prioridad=4):
+    if prioridad >= 5:
+        sonar()
+        print("\n" + "=" * 70 + f"\n🔔 {titulo}\n{texto}\n" + "=" * 70 + "\n")
     try:
         cfg = json.loads(ALERTAS.read_text(encoding="utf-8")) if ALERTAS.exists() else {}
     except Exception as e:
@@ -280,7 +298,7 @@ class Bot:
             mandar(f"PAPEL · Abrir {self.estructura(p)}",
                    f"{et(ts)} ET · SPX {c['px']:,.2f}\n{orden_tos(p, self.f, True, precio)}\n"
                    f"{'Débito' if precio > 0 else 'Crédito'} {abs(precio):.2f} · riesgo ${(ancho + precio if precio < 0 else precio) * 100 * n:,.0f}\n"
-                   f"Por qué: {regla}\n{plan}", ["green_circle"])
+                   f"Por qué: {regla}\n{plan}", ["green_circle"], 5)
 
     def estructura(self, p):
         ks = sorted({K for _, K, _ in p["legs"]})
@@ -389,7 +407,7 @@ class Bot:
             mandar(f"PAPEL · Cerrar {self.estructura(p)} · {'+' if pnl >= 0 else '−'}${abs(pnl):,.0f}",
                    f"{et(ts)} ET\n" + (orden_tos(p, self.f, False, precio) if not motivo.startswith("Venc") else "Expira: no hay que mandar orden")
                    + f"\nMotivo: {motivo}\nDía en papel: {'−' if self.pnl_dia() < 0 else '+'}${abs(self.pnl_dia()):,.0f}",
-                   ["white_check_mark" if pnl >= 0 else "red_circle"], 3)
+                   ["white_check_mark" if pnl >= 0 else "red_circle"], 5)
 
     def gestionar(self, ts, r, c, cad):
         pb, m = self.pb, mins(ts)
