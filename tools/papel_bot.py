@@ -478,7 +478,7 @@ def correr_dia(fecha):
         b.paso(ts, r)
         if mins(ts) >= PB["cierre"] - 1:
             break
-    liq = json.loads((HERE / "liquidaciones.json").read_text()) if (HERE / "liquidaciones.json").exists() else {}
+    liq = json.loads((HERE / "liquidaciones.json").read_text(encoding="utf-8")) if (HERE / "liquidaciones.json").exists() else {}
     if filas and mins(filas[-1][0]) < PB["cierre"] - 5:
         b.nota = f"El historial termina a las {et(filas[-1][0])} ET (el recolector se detuvo): sin lecturas después de esa hora."
     if b.abiertas and filas:                 # el historial terminó antes de las 14:59
@@ -489,7 +489,10 @@ def correr_dia(fecha):
 
 # ------------------------------------------------------------------ publicación
 def armar(dias_bots, modo):
-    prev = json.loads(OUT.read_text()) if OUT.exists() else {}
+    try:
+        prev = json.loads(OUT.read_text(encoding="utf-8")) if OUT.exists() else {}
+    except ValueError:
+        prev = {}
     dias = prev.get("dias", {})
     for b in dias_bots:
         dias[b.f] = {**b.resumen(), "modo": modo, "operaciones": b.ops}
@@ -552,7 +555,10 @@ def vivo():
     traer_remoto()
     t = tema_alertas()
     hoy = dt.datetime.now(dt.timezone(dt.timedelta(hours=-6))).date().isoformat()
-    est = json.loads(STATE.read_text()) if STATE.exists() else {}
+    try:
+        est = json.loads(STATE.read_text(encoding="utf-8")) if STATE.exists() else {}
+    except ValueError:
+        est = {}
     b = Bot(hoy)
     b.avisar = True
     mk = Marcador()
@@ -563,51 +569,66 @@ def vivo():
     mandar("PAPEL · Bot en marcha", f"{PB['version']} · empieza a buscar entradas a las {et('09:00')} ET. "
            "Las órdenes vienen escritas como en thinkorswim para el espejo en paperMoney.", ["robot"], 2)
     sin_datos = 0
+    primera = True
     while True:
-        f = HIST / f"{hoy}.jsonl"
-        filas = []
-        if f.exists():
-            for ln in f.read_text(encoding="utf-8").splitlines()[hecho:]:
-                try:
-                    j = json.loads(ln)
-                    if j.get("SPX", {}).get("px"):
-                        filas.append((j["ts"], j["SPX"]))
-                except ValueError:
-                    pass
-                hecho += 1
-        if not filas:
-            sin_datos += 1
-            if sin_datos == 6:
-                print("⚠ 3 min sin lecturas nuevas: ¿está corriendo el recolector?")
-        else:
-            sin_datos = 0
-        for i, (ts, r) in enumerate(filas):
-            if mins(ts) < 8 * 60 + 30:
-                continue
-            cad = None
-            if b.abiertas and i == len(filas) - 1:
-                try:
-                    cad = mk.cadena(hoy)
-                except Exception as e:
-                    print("  cadena Schwab:", e, "→ marco con Black-Scholes")
-            antes = len(b.ops) + len(b.abiertas)
-            b.paso(ts, r, cad)
-            if len(b.ops) + len(b.abiertas) != antes or i == len(filas) - 1:
-                print(f"{et(ts)} ET  SPX {r['px']}  abiertas {len(b.abiertas)}  cerradas {len(b.ops)}  P&L ${b.pnl_dia():,.0f}")
-        if filas:
-            STATE.write_text(json.dumps({"fecha": hoy}))
-            publicar(armar([b], "vivo"))
-        t = dt.datetime.now(dt.timezone(dt.timedelta(hours=-6)))
-        if t.hour * 60 + t.minute >= PB["cierre"] + 2:
-            if b.abiertas and filas:
-                b.liquidar(*[(filas[-1][0], filas[-1][1]["px"])][0])
-            publicar(armar([b], "vivo"))
-            imprimir(b)
-            mandar(f"PAPEL · Cierre del día {'+' if b.pnl_dia() >= 0 else '−'}${abs(b.pnl_dia()):,.0f}",
-                   f"{len(b.ops)} operaciones · {sum(1 for o in b.ops if o['pnl'] > 0)} ganadoras", ["checkered_flag"], 3)
-            print("\nFin del día.")
-            break
-        time.sleep(20)
+      try:
+          f = HIST / f"{hoy}.jsonl"
+          filas = []
+          if f.exists():
+              for ln in f.read_text(encoding="utf-8").splitlines()[hecho:]:
+                  try:
+                      j = json.loads(ln)
+                      if j.get("SPX", {}).get("px"):
+                          filas.append((j["ts"], j["SPX"]))
+                  except ValueError:
+                      pass
+                  hecho += 1
+          if not filas:
+              sin_datos += 1
+              if sin_datos == 6:
+                  print("⚠ 3 min sin lecturas nuevas: ¿está corriendo el recolector?")
+          else:
+              sin_datos = 0
+          for i, (ts, r) in enumerate(filas):
+              if mins(ts) < 8 * 60 + 30:
+                  continue
+              cad = None
+              if b.abiertas and i == len(filas) - 1:
+                  try:
+                      cad = mk.cadena(hoy)
+                  except Exception as e:
+                      print("  cadena Schwab:", e, "→ marco con Black-Scholes")
+              ahora = dt.datetime.now(dt.timezone(dt.timedelta(hours=-6)))
+              b.avisar = (ahora.hour * 60 + ahora.minute) - mins(ts) <= 3     # al reanudar, no avisa lo ya pasado
+              antes = len(b.ops) + len(b.abiertas)
+              b.paso(ts, r, cad)
+              if len(b.ops) + len(b.abiertas) != antes or i == len(filas) - 1:
+                  print(f"{et(ts)} ET  SPX {r['px']}  abiertas {len(b.abiertas)}  cerradas {len(b.ops)}  P&L ${b.pnl_dia():,.0f}")
+          if filas and primera:
+              primera = False
+              if b.ops or b.abiertas:
+                  mandar("PAPEL · Reanudado", "Al ponerse al día con el historial de hoy:\n"
+                         + "\n".join(f"Cerrada {o['entra']}→{o['sale']} ET {o['estructura']} {o['pnl']:+,.0f}" for o in b.ops)
+                         + ("\n" if b.ops and b.abiertas else "")
+                         + "\n".join(f"Abierta desde {et(p['t_in'])} ET: {orden_tos(p, hoy, True, p['entrada'])}" for p in b.abiertas),
+                         ["arrows_counterclockwise"], 3)
+          if filas:
+              STATE.write_text(json.dumps({"fecha": hoy}), encoding="utf-8")
+              publicar(armar([b], "vivo"))
+          t = dt.datetime.now(dt.timezone(dt.timedelta(hours=-6)))
+          if t.hour * 60 + t.minute >= PB["cierre"] + 2:
+              if b.abiertas and filas:
+                  b.liquidar(*[(filas[-1][0], filas[-1][1]["px"])][0])
+              publicar(armar([b], "vivo"))
+              imprimir(b)
+              mandar(f"PAPEL · Cierre del día {'+' if b.pnl_dia() >= 0 else '−'}${abs(b.pnl_dia()):,.0f}",
+                     f"{len(b.ops)} operaciones · {sum(1 for o in b.ops if o['pnl'] > 0)} ganadoras", ["checkered_flag"], 3)
+              print("\nFin del día.")
+              break
+      except Exception:
+        traceback.print_exc()
+        print("⚠ Error en la vuelta; el bot sigue corriendo.")
+      time.sleep(20)
 
 
 def main():
