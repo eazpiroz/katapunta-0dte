@@ -267,23 +267,39 @@ def run():
             spot, syms = strikes(c, day)
             cmd("LEVELONE_OPTIONS", "SUBS", {"keys": ",".join(syms), "fields": CAMPOS})
             print(f"suscrito a {len(syms)} contratos alrededor de {spot:.0f}")
-            t_pub = t_sub = time.time()
+            t_pub = t_sub = t_dat = time.time()
+            n_dat = n_pr = 0
             while True:
                 msg = json.loads(ws.recv())
                 for d in msg.get("data", []):
                     if d.get("service") == "LEVELONE_OPTIONS":
+                        t_dat = time.time()
+                        n_dat += len(d.get("content", []))
                         for x in d.get("content", []):
                             p = tape.update(x, d.get("timestamp", time.time() * 1000) / 1000)
+                            if p:
+                                n_pr += 1
                             if p and not p["spread"]:
                                 print(f'{p["h"]} {p["k"]:g}{p["t"]} {p["n"]:>5} @ {p["px"]:<6} {p["lado"]}  ${p["prem"]:,}')
                 for r in msg.get("response", []):
                     code = (r.get("content") or {}).get("code")
                     if code not in (0, None):
                         print("streamer:", r)
+                for r in msg.get("notify", []):
+                    if "heartbeat" not in r:
+                        print("notify:", r)
                 now_ = time.time()
                 if now_ - t_pub >= PUB_S:
                     publicar(spot)
                     t_pub = now_
+                    if R.now().second < 30:   # una línea por minuto: cuántas actualizaciones y prints llegaron
+                        print(f"{R.now():%H:%M} · {n_dat} actualizaciones · {n_pr} prints · spot {spot:.0f} · {len(syms)} contratos")
+                        n_dat = n_pr = 0
+                # vigilante (16-nov: publicó todo el día sin un print nuevo): en horario de mercado,
+                # 3 min sin datos de opciones = la suscripción murió → reconectar
+                hm = R.now().hour * 60 + R.now().minute
+                if 510 <= hm < 900 and now_ - t_dat > 180:
+                    raise ConnectionError("3 min sin datos de LEVELONE_OPTIONS: reconecto y vuelvo a suscribir")
                     if R.now() >= fin:
                         return
                 if now_ - t_sub >= RESUB_S:
@@ -316,7 +332,34 @@ def prueba():
     print("\nOK prueba")
 
 
+class _Tee:
+    """Copia todo lo que se imprime a historial/tape_AAAA-MM-DD.log (auditoría 16-nov: la ventana se cerró y no quedó el error)."""
+    def __init__(self, *s):
+        self.s = s
+    def write(self, x):
+        for f in self.s:
+            try:
+                f.write(x); f.flush()
+            except Exception:
+                pass
+    def flush(self):
+        pass
+
+
+def _log_a_archivo():
+    try:
+        d = R.HIST; d.mkdir(exist_ok=True)
+        f = open(d / f"tape_{R.now():%Y-%m-%d}.log", "a", encoding="utf-8")
+        sys.stdout = _Tee(sys.__stdout__, f)
+        sys.stderr = _Tee(sys.__stderr__, f)
+        print(f"\n==== tape {R.now():%Y-%m-%d %H:%M:%S} ====")
+    except Exception as e:
+        print("sin log a archivo:", e)
+
+
 if __name__ == "__main__":
+    if not ("--prueba" in sys.argv or "--validar" in sys.argv):
+        _log_a_archivo()
     if "--prueba" in sys.argv:
         prueba()
     elif "--validar" in sys.argv:

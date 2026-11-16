@@ -771,7 +771,8 @@ def cycle(c, tok, state):
             out[tk], prev[tk] = build_ticker(c, tk, q, manual, today, state, vi, macro)
             out[tk]["read"]["t10"] = t10
         except Exception as e:
-            print(f"  {tk}: error {e}")
+            import traceback
+            print(f"  {tk}: error {e!r}\n" + "".join(traceback.format_exc().splitlines(True)[-6:]))
     d = t.date()
     out["day"] = {"title": f"Lectura del {DIAS[d.weekday()]} {d.day} de {MESES[d.month - 1]}",
                   "prev": {k: round(v, 2) for k, v in prev.items() if v}}
@@ -821,5 +822,26 @@ def main():
         time.sleep(max(5, 60 - (time.time() - t0)))
 
 
+class _Tee:
+    """Copia la salida a historial/recolector_AAAA-MM-DD.log (16-nov: faltó el bloque SPX y la ventana ya no estaba)."""
+    def __init__(self, *s):
+        self.s = s
+    def write(self, x):
+        for f in self.s:
+            try:
+                f.write(x); f.flush()
+            except Exception:
+                pass
+    def flush(self):
+        pass
+
+
 if __name__ == "__main__":
+    try:
+        HIST.mkdir(exist_ok=True)
+        _f = open(HIST / f"recolector_{now():%Y-%m-%d}.log", "a", encoding="utf-8")
+        sys.stdout, sys.stderr = _Tee(sys.__stdout__, _f), _Tee(sys.__stderr__, _f)
+        print(f"\n==== recolector {now():%Y-%m-%d %H:%M:%S} ====")
+    except Exception as _e:
+        print("sin log a archivo:", _e)
     main()
