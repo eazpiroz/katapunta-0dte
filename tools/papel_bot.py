@@ -230,6 +230,70 @@ def orden_tos(p, fecha, abrir, precio):
     return f"{lado} {signo:+d} VERTICAL SPX 100 (Weeklys) {venc} {a:.0f}/{b:.0f} {'CALL' if sd == 'c' else 'PUT'} @{abs(precio):.2f} LMT"
 
 
+# ------------------------------------------------------------------ registro del tape (para afinar el Playbook)
+class TapeLog:
+    """Cada minuto guarda la foto de tape.json (la publica tape_schwab.py) en historial/tape_min_FECHA.jsonl:
+    neto acumulado, strikes con más prima y los prints NUEVOS de ese minuto. Al cierre la sube a la rama live."""
+
+    def __init__(self, hoy):
+        import collections
+        self.hoy, self.f = hoy, HIST / f"tape_min_{hoy}.jsonl"
+        self.vistos, self.min_ult, self.ult = set(), None, None
+        self.flujo = collections.deque(maxlen=5)       # (dC, dP) de prima neta por minuto, últimos 5 min
+
+    def tick(self):
+        m = dt.datetime.now(dt.timezone(dt.timedelta(hours=-6))).strftime("%H:%M")
+        if m == self.min_ult:
+            return
+        self.min_ult = m
+        try:
+            import flightdeck_recolector as R
+            st, j = R.gh_req(R.gh_token(), "GET", f"/repos/{R.REPO}/contents/tape.json?ref={R.BRANCH}")
+            if st != 200:
+                return
+            snap = json.loads(base64.b64decode(j["content"]))
+        except Exception as e:
+            print("tape:", e)
+            return
+        nuevos = []
+        for p in snap.get("prints", []):
+            k = (p.get("h"), p.get("k"), p.get("t"), p.get("n"))
+            if k not in self.vistos:
+                self.vistos.add(k)
+                nuevos.append(p)
+        if self.ult is None:            # primera foto: los prints ya estaban, no son flujo de este minuto
+            nuevos_flujo = []
+        else:
+            nuevos_flujo = nuevos
+        dC = sum(p["prem"] * (1 if p["lado"] == "B" else -1 if p["lado"] == "V" else 0) for p in nuevos_flujo if p.get("t") == "C")
+        dP = sum(p["prem"] * (1 if p["lado"] == "B" else -1 if p["lado"] == "V" else 0) for p in nuevos_flujo if p.get("t") == "P")
+        self.flujo.append((dC, dP))
+        self.ult = {"neto": snap.get("neto"), "flujo5": {"C": sum(x[0] for x in self.flujo), "P": sum(x[1] for x in self.flujo)},
+                    "spot": snap.get("spot"), "edad": int(time.time()) - int(snap.get("ts") or 0)}
+        linea = {"ts": m, "spot": snap.get("spot"), "neto": snap.get("neto"), "flujo5": self.ult["flujo5"],
+                 "edad": self.ult["edad"], "strikes": snap.get("strikes", [])[:6], "nuevos": nuevos,
+                 "spreads": len(snap.get("spreads", []))}
+        with open(self.f, "a", encoding="utf-8") as fh:
+            fh.write(json.dumps(linea, separators=(",", ":"), ensure_ascii=False) + "\n")
+
+    def subir(self):
+        if not self.f.exists():
+            return
+        try:
+            import flightdeck_recolector as R
+            tok = R.gh_token()
+            path = f"/repos/{R.REPO}/contents/historial/tape_min_{self.hoy}.jsonl.gz"
+            st, j = R.gh_req(tok, "GET", path + f"?ref={R.BRANCH}")
+            body = {"message": "tape_min " + self.hoy, "branch": R.BRANCH,
+                    "content": base64.b64encode(gzip.compress(self.f.read_bytes())).decode()}
+            if st == 200 and j.get("sha"):
+                body["sha"] = j["sha"]
+            st, j = R.gh_req(tok, "PUT", path, body)
+            print(f"tape del día → GitHub: {'ok' if st in (200, 201) else st}")
+        except Exception as e:
+            print("subir tape:", e)
+
+
 # ------------------------------------------------------------------ el bot
 class Bot:
     def __init__(self, fecha, pb=PB):
@@ -243,6 +307,7 @@ class Bot:
         self.sig = 0
         self.nota = None
         self.avisar = False             # solo en vivo
+        self.tape = None                # último resumen del tape (solo en vivo)
 
     # -- contexto ------------------------------------------------------
     def ctx(self, r):
@@ -280,7 +345,7 @@ class Bot:
         n = self.ctr(riesgo)
         p = {"id": f"{self.f}-{len(self.ops) + len(self.abiertas) + 1}", "tipo": tipo, "dir": dire, "legs": legs,
              "entrada": round(precio, 2), "n": n, "ancho": ancho, "regla": regla, "ancla": ancla, "obj": objetivo,
-             "t_in": ts[:5], "estimado": bool(r.get("_bs")), "ctx": {k: c[k] for k in ("px", "zg", "g", "T", "mp", "mn", "tf2")}, "max": 0.0, "min": 0.0}
+             "t_in": ts[:5], "estimado": bool(r.get("_bs")), "ctx": {**{k: c[k] for k in ("px", "zg", "g", "T", "mp", "mn", "tf2")}, "tape": self.tape}, "max": 0.0, "min": 0.0}
         iv = iv_de(r, ts, self.pb["cierre"])
         p["ajuste"] = precio - valor_bs(legs, r["px"], ts, iv, self.pb["cierre"])   # skew/spread real vs BS al entrar
         p["m_in"] = mins(ts)
@@ -487,8 +552,8 @@ def leer_dia(fecha):
     return out
 
 
-def correr_dia(fecha):
-    b = Bot(fecha)
+def correr_dia(fecha, pb=None):
+    b = Bot(fecha, pb or PB)
     filas = leer_dia(fecha)
     for ts, r in filas:
         if mins(ts) < 8 * 60 + 30:
@@ -580,6 +645,7 @@ def vivo():
     b = Bot(hoy)
     b.avisar = True
     mk = Marcador()
+    tl = TapeLog(hoy)
     hecho = 0
     if est.get("fecha") == hoy:          # reinicio a media sesión: re-procesa el historial de hoy sin marcas reales
         print("Reanudando: vuelvo a pasar el historial de hoy.")
@@ -607,6 +673,10 @@ def vivo():
                   print("⚠ 3 min sin lecturas nuevas: ¿está corriendo el recolector?")
           else:
               sin_datos = 0
+          ahora_m = dt.datetime.now(dt.timezone(dt.timedelta(hours=-6)))
+          if 8 * 60 + 30 <= ahora_m.hour * 60 + ahora_m.minute <= PB["cierre"]:
+              tl.tick()
+              b.tape = tl.ult
           for i, (ts, r) in enumerate(filas):
               if mins(ts) < 8 * 60 + 30:
                   continue
@@ -641,6 +711,7 @@ def vivo():
               imprimir(b)
               mandar(f"PAPEL · Cierre del día {'+' if b.pnl_dia() >= 0 else '−'}${abs(b.pnl_dia()):,.0f}",
                      f"{len(b.ops)} operaciones · {sum(1 for o in b.ops if o['pnl'] > 0)} ganadoras", ["checkered_flag"], 3)
+              tl.subir()
               print("\nFin del día.")
               break
       except Exception:
