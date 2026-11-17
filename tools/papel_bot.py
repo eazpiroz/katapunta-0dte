@@ -317,6 +317,31 @@ class Veto:
         return res
 
 
+IA_CLASIF = """Eres el jefe de mesa de Katapunta. Con los rasgos del día de SPX hasta ahora (y el pre-market), clasifica cómo
+probablemente se comportará el RESTO de la sesión: "tendencia" (sigue en una dirección), "rango" (oscila entre niveles)
+o "pin" (se queda pegado a un strike/major positivo hacia el cierre). Responde SOLO un JSON:
+{"tipo":"tendencia"|"rango"|"pin","direccion":"alcista"|"bajista"|"neutral","confianza":0-100,"razon":"una frase, máx 25 palabras"}"""
+
+
+def ia_clasificar(veto, fecha, ts, f):
+    if not veto or not veto.ok:
+        return None
+    import urllib.request
+    datos = {"hora_et": et(ts), "rasgos": f, **veto.contexto_dia(fecha)}
+    body = {"model": veto.cfg.get("modelo", "claude-sonnet-5-5"), "max_tokens": 250, "system": IA_CLASIF,
+            "messages": [{"role": "user", "content": json.dumps(datos, ensure_ascii=False, default=str)}]}
+    try:
+        req = urllib.request.Request("https://api.anthropic.com/v1/messages", data=json.dumps(body).encode(),
+                                     headers={"x-api-key": veto.cfg["anthropic_api_key"], "anthropic-version": "2023-06-01",
+                                              "content-type": "application/json"})
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            j = json.loads(resp.read())
+        txt = "".join(b.get("text", "") for b in j.get("content", []))
+        return json.loads(txt[txt.find("{"): txt.rfind("}") + 1])
+    except Exception as e:
+        return {"error": e.__class__.__name__}
+
+
 def ia_txt(ia):
     if not ia:
         return ""
@@ -389,6 +414,83 @@ class TapeLog:
             print("subir tape:", e)
 
 
+# ------------------------------------------------------------------ clasificador del tipo de día (fase 1: solo observa)
+CLASIF_HORAS = (9 * 60, 10 * 60, 12 * 60)     # CDMX → 10:00, 11:00 y 13:00 ET
+
+
+def rasgos(dia, r):
+    """Rasgos del día hasta ahora. dia = [(ts, lectura)] desde las 8:30 CDMX."""
+    px0 = dia[0][1]["px"]
+    em = r.get("em") or [px0 - 50, px0 + 50]
+    mitad = max(1.0, (em[1] - em[0]) / 2)
+    xs = [x["px"] for _, x in dia]
+    zg = [x.get("zg") or x["px"] for _, x in dia]
+    g = [1 if x > z + PB["gtol"] else -1 if x < z - PB["gtol"] else 0 for x, z in zip(xs, zg)]
+    cruces = sum(1 for a, b in zip(g, g[1:]) if a and b and a != b)
+    tf2, mom = r.get("tf2") or [0, 0, 0], (r.get("mom") or [0, 0, 0])
+    chg0 = dia[0][1].get("chg") or "0"
+    try:
+        gap = float(str(chg0).replace("−", "-").replace("%", "").replace("+", ""))
+    except ValueError:
+        gap = 0.0
+    mp, mn = r.get("mp"), r.get("mn")
+    return {"px": r["px"], "apertura": px0, "mov": round(r["px"] - px0, 1), "mov_em": round((r["px"] - px0) / mitad, 2),
+            "rango_em": round((max(xs) - min(xs)) / mitad, 2), "gap_pct": gap, "gamma": g[-1],
+            "gamma_estable": round(sum(1 for x in g[-30:] if x == g[-1]) / max(1, len(g[-30:])), 2), "cruces_zg": cruces,
+            "tf2": tf2, "mom": mom, "vs_vwap": round(r["px"] - (r.get("vw") or r["px"]), 1),
+            "dist_mp": round(r["px"] - mp, 1) if mp else None, "dist_mn": round(r["px"] - mn, 1) if mn else None,
+            "mp": mp, "mn": mn, "zg": r.get("zg"), "vix": (r.get("vix") or {}).get("chg"), "macro": r.get("macro")}
+
+
+def clasificar_reglas(f):
+    pts = {"tendencia": 0, "rango": 0, "pin": 0}
+    rz = []
+    al = f["tf2"][0] if f["tf2"][0] and f["tf2"][0] == f["tf2"][1] == f["tf2"][2] else 0
+    if abs(f["mov_em"]) >= 0.5:
+        pts["tendencia"] += 2; rz.append(f"ya recorrió {abs(f['mov_em']):.0%} del rango esperado")
+    elif abs(f["mov_em"]) < 0.3:
+        pts["rango"] += 2; pts["pin"] += 1; rz.append(f"solo {abs(f['mov_em']):.0%} del rango esperado")
+    if al:
+        pts["tendencia"] += 2; rz.append(f"tendencia {'alcista' if al > 0 else 'bajista'} alineada en 5/15/60 min")
+        if (f["mov"] > 0) == (al > 0) and f["mom"][0] == al:
+            pts["tendencia"] += 1
+    else:
+        pts["rango"] += 1
+    if f["gamma"] < 0 and f["gamma_estable"] >= 0.8:
+        pts["tendencia"] += 2; rz.append("gamma negativa estable")
+    elif f["gamma"] > 0 and f["gamma_estable"] >= 0.8:
+        pts["rango"] += 1; pts["pin"] += 1; rz.append("gamma positiva estable")
+    if f["cruces_zg"] >= 2:
+        pts["rango"] += 1; rz.append(f"{f['cruces_zg']} cruces del zero γ")
+    if abs(f["gap_pct"]) >= 0.6:
+        pts["tendencia"] += 1; rz.append(f"gap de {f['gap_pct']:+.1f}%")
+    if f["dist_mp"] is not None and abs(f["dist_mp"]) <= 10 and f["gamma"] > 0:
+        pts["pin"] += 2; rz.append(f"a {abs(f['dist_mp']):.0f} pts del major +")
+    tot = sum(pts.values()) or 1
+    tipo = max(pts, key=pts.get)
+    conf = round(100 * pts[tipo] / tot)
+    if conf < 45:
+        tipo = "incierto"
+    return {"tipo": tipo, "conf": conf, "puntos": pts, "razones": rz}
+
+
+def etiquetar_dia(dia, mp_final=None):
+    """La "verdad" al cierre: tendencia / rango / pin."""
+    if len(dia) < 60:
+        return None
+    xs = [x["px"] for _, x in dia]
+    em = dia[0][1].get("em") or [xs[0] - 50, xs[0] + 50]
+    mitad = max(1.0, (em[1] - em[0]) / 2)
+    mov, rng = xs[-1] - xs[0], max(xs) - min(xs)
+    mp = mp_final or dia[-1][1].get("mp")
+    ult = [x["px"] for t, x in dia if mins(t) >= PB["cierre"] - 60]
+    if mp and ult and max(abs(x - mp) for x in ult) <= 10:
+        return {"tipo": "pin", "detalle": f"última hora a ≤10 pts del major + {mp}"}
+    if abs(mov) >= 0.6 * rng and abs(mov) >= 0.5 * mitad:
+        return {"tipo": "tendencia", "detalle": f"{'alcista' if mov > 0 else 'bajista'}: {mov:+.0f} pts de {rng:.0f} de rango ({abs(mov) / mitad:.0%} del esperado)"}
+    return {"tipo": "rango", "detalle": f"movió {mov:+.0f} pts en {rng:.0f} de rango"}
+
+
 # ------------------------------------------------------------------ el bot
 class Bot:
     def __init__(self, fecha, pb=PB):
@@ -407,6 +509,9 @@ class Bot:
         self.vetadas = []
         import collections
         self.ruta = collections.deque(maxlen=60)
+        self.dia = []                   # [(ts, lectura)] desde las 8:30 CDMX, para el clasificador
+        self.clasif = []
+        self.real = None
 
     # -- contexto ------------------------------------------------------
     def ctx(self, r):
@@ -614,12 +719,29 @@ class Bot:
                 if self.brk[p["id"]] >= 2:
                     self.cerrar(p, ts, v - pb["slip"], f"Stop por nivel: el precio rompió {lim} dos minutos seguidos"); continue
 
+    def clasificar(self, ts, r, m):
+        f = rasgos(self.dia, r)
+        cr = clasificar_reglas(f)
+        ci = ia_clasificar(self.veto, self.f, ts, f) if (self.veto and self.avisar) else None
+        self.clasif.append({"m": m, "hora": et(f"{m // 60}:{m % 60:02d}"), "reglas": cr, "ia": ci, "rasgos": f})
+        if self.avisar:
+            linea_ia = (f"\nClaude: {ci.get('tipo')} {ci.get('direccion', '')} ({ci.get('confianza')}%) · {ci.get('razon')}"
+                        if ci and not ci.get("error") else "")
+            mandar(f"PAPEL · Tipo de día ({et(ts)} ET): {cr['tipo']} {cr['conf']}%",
+                   f"Reglas: {cr['tipo']} ({cr['conf']}%) · " + "; ".join(cr["razones"]) + linea_ia
+                   + "\nFase 1: solo observa, no cambia las reglas del bot.", ["bar_chart"], 4)
+
     def liquidar(self, ts, px):
         for p in list(self.abiertas):
             self.cerrar(p, ts, intrinseco(p["legs"], px), f"Vencimiento: SPX liquidó en {px:.2f}")
 
     def paso(self, ts, r, cad=None):
         self.ruta.append((ts, r["px"]))
+        if mins(ts) >= 8 * 60 + 30:
+            self.dia.append((ts, r))
+            h = [x for x in CLASIF_HORAS if mins(ts) >= x and not any(c["m"] == x for c in self.clasif)]
+            if h and len(self.dia) >= 20:
+                self.clasificar(ts, r, h[-1])
         c = self.ctx(r)
         if mins(ts) >= self.pb["cierre"] - 1:
             self.liquidar(ts, c["px"])
@@ -631,6 +753,8 @@ class Bot:
         n = len(self.ops)
         g = sum(1 for o in self.ops if o["pnl"] > 0)
         return {"fecha": self.f, "pnl": self.pnl_dia(), "ops": n, "ganadoras": g, "nota": self.nota, "vetadas": self.vetadas,
+                "clasif": [{k: v for k, v in c.items() if k != "m"} for c in self.clasif],
+                "real": self.real or (etiquetar_dia(self.dia) if self.dia and (not self.avisar or mins(self.dia[-1][0]) >= self.pb["cierre"] - 5) else None),
                 "abiertas": [{"estructura": self.estructura(p), "entra": et(p["t_in"]), "entrada": p["entrada"], "regla": p["regla"]}
                              for p in self.abiertas]}
 

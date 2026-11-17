@@ -87,6 +87,35 @@ if reales:
 else:
     print("\n## Real (Bitácora): aún sin operaciones registradas para este día")
 
+# 4b. clasificador del tipo de día (fase 1: solo observa)
+print("\n## Tipo de día (clasificador, fase 1)")
+cl = dia.get("clasif") or P.correr_dia(fecha).resumen().get("clasif") or []
+real = dia.get("real") or P.correr_dia(fecha).resumen().get("real")
+for c in cl:
+    ia = c.get("ia") or {}
+    print(f"- {c['hora']} ET · reglas: **{c['reglas']['tipo']}** {c['reglas']['conf']}% ({'; '.join(c['reglas']['razones'])})"
+          + (f" · Claude: **{ia.get('tipo')}** {ia.get('direccion', '')} {ia.get('confianza')}% ({ia.get('razon')})" if ia and not ia.get("error") else ""))
+print(f"- **Real al cierre:** {real['tipo']} · {real['detalle']}" if real else "- Real al cierre: sin dato")
+acc = {h: [0, 0] for h in ("10:00", "11:00", "13:00")}
+por_reg = {}
+for f in sorted({x.name[:10] for x in carpeta.glob("20??-??-??.jsonl*")}):
+    try:
+        x = P.correr_dia(f); rs = x.resumen()
+    except Exception:
+        continue
+    rl = (rs.get("real") or {}).get("tipo")
+    if not rl:
+        continue
+    for c in rs.get("clasif", []):
+        if c["hora"] in acc:
+            acc[c["hora"]][1] += 1; acc[c["hora"]][0] += c["reglas"]["tipo"] == rl
+    for o in x.ops:
+        k = (rl, o["regla"][:1]); v = por_reg.setdefault(k, [0, 0]); v[0] += o["pnl"]; v[1] += 1
+print("\nAcierto acumulado del clasificador de reglas (repetición): " + " · ".join(f"{h} {a}/{n}" for h, (a, n) in acc.items()))
+print("\n| Día real | Regla | Ops | P&L |\n|---|---|---|---|")
+for (rl, rg), (pl, n) in sorted(por_reg.items()):
+    print(f"| {rl} | {rg} | {n} | {usd(pl)} |")
+
 # 5. sensibilidad del Playbook en este mismo día (y acumulado de días con historial)
 variantes = {
     "v1 (actual)": {},
