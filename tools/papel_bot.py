@@ -230,6 +230,101 @@ def orden_tos(p, fecha, abrir, precio):
     return f"{lado} {signo:+d} VERTICAL SPX 100 (Weeklys) {venc} {a:.0f}/{b:.0f} {'CALL' if sd == 'c' else 'PUT'} @{abs(precio):.2f} LMT"
 
 
+# ------------------------------------------------------------------ segunda opinión de Claude (capa de veto)
+IA_CFG = HERE / "papel_ia.json"     # {"anthropic_api_key": "...", "modelo": "...", "modo": "registrar"|"activo"}  (no va al repo)
+IA_SISTEMA = """Eres el jefe de mesa de Katapunta y revisas, en segundos, cada entrada que propone un bot de papel de SPX 0DTE.
+El bot sigue reglas fijas (Playbook v1). Tu trabajo: APROBAR o VETAR esta entrada con criterio de trader profesional,
+usando el régimen de gamma (precio vs zero γ), los niveles GEX (major +/−, techo/piso, muros), la tendencia multi-temporalidad,
+el momentum, el tape (flujo de opciones grandes), el pre-market del día y las lecciones de la bitácora.
+Veta solo con una razón concreta y verificable en los datos (p. ej. entrar contra el flujo, nivel GEX demasiado cerca, evento
+de alto impacto inminente, movimiento ya agotado, rango esperado consumido). Si los datos no dan razón clara, aprueba.
+Responde SOLO un JSON: {"decision":"aprobar"|"vetar","confianza":0-100,"razon":"una frase en español, máx 25 palabras"}"""
+
+
+class Veto:
+    def __init__(self):
+        self.cfg, self.extra, self.dia, self.aviso_llave = {}, {}, None, False
+        try:
+            self.cfg = json.loads(IA_CFG.read_text(encoding="utf-8")) if IA_CFG.exists() else {}
+        except ValueError:
+            print("papel_ia.json no es JSON válido")
+        k = self.cfg.get("anthropic_api_key", "")
+        self.ok = bool(k) and "PEGA_AQUI" not in k
+        self.modo = self.cfg.get("modo", "registrar")
+
+    def contexto_dia(self, hoy):
+        """Una vez al día: pre-market y lecciones recientes de la bitácora (públicos)."""
+        if self.dia == hoy:
+            return self.extra
+        import urllib.request
+        ex = {}
+        try:
+            with urllib.request.urlopen(f"https://premarket.katapunta.com/premarket.json?t={int(time.time())}", timeout=15) as r:
+                pm = json.loads(r.read())
+            ex["premarket"] = {k: pm.get(k) for k in ("fecha", "sesgo", "rango_esperado", "niveles", "eventos", "escenarios")}
+        except Exception as e:
+            ex["premarket"] = f"no disponible ({e.__class__.__name__})"
+        try:
+            with urllib.request.urlopen(f"https://0dte.katapunta.com/bitacora.json?t={int(time.time())}", timeout=15) as r:
+                bj = json.loads(r.read())
+            lec = [f"{o['fecha']}: {o['leccion']}" for o in bj.get("ops", []) if o.get("leccion")][-10:]
+            ex["lecciones"] = lec or "sin lecciones registradas"
+        except Exception as e:
+            ex["lecciones"] = f"no disponible ({e.__class__.__name__})"
+        self.dia, self.extra = hoy, ex
+        return ex
+
+    def consultar(self, bot, p, r, c, ts):
+        if not self.ok:
+            return None
+        import urllib.request, urllib.error
+        datos = {
+            "hora_et": et(ts), "propuesta": {"estructura": bot.estructura(p), "regla": p["regla"], "precio": p["entrada"],
+                                             "contratos": p["n"], "ancho": p["ancho"], "objetivo": p.get("obj"), "ancla_stop": p.get("ancla")},
+            "tablero": {k: r.get(k) for k in ("px", "zg", "mp", "mn", "techo", "piso", "cw", "pw", "tf", "tf2", "mom", "em", "rem", "reg", "flips")},
+            "ruta_spx_ultimos_30min": [f"{et(t)} {x:.1f}" for t, x in list(bot.ruta)[-30:][::5]],
+            "tape": bot.tape or "sin tape",
+            "dia_del_bot": {"pnl": bot.pnl_dia(), "cerradas": [f"{o['entra']}-{o['sale']} {o['estructura']} {o['pnl']:+.0f}" for o in bot.ops],
+                            "abiertas": [bot.estructura(x) for x in bot.abiertas]},
+            **self.contexto_dia(bot.f),
+        }
+        body = {"model": self.cfg.get("modelo", "claude-sonnet-5-5"), "max_tokens": 300, "system": IA_SISTEMA,
+                "messages": [{"role": "user", "content": json.dumps(datos, ensure_ascii=False, default=str)}]}
+        t0 = time.time()
+        try:
+            req = urllib.request.Request("https://api.anthropic.com/v1/messages", data=json.dumps(body).encode(),
+                                         headers={"x-api-key": self.cfg["anthropic_api_key"], "anthropic-version": "2023-06-01",
+                                                  "content-type": "application/json"})
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                j = json.loads(resp.read())
+            txt = "".join(b.get("text", "") for b in j.get("content", []))
+            res = json.loads(txt[txt.find("{"): txt.rfind("}") + 1])
+            res = {"decision": res.get("decision"), "confianza": res.get("confianza"), "razon": res.get("razon"),
+                   "seg": round(time.time() - t0, 1), "modo": self.modo}
+        except urllib.error.HTTPError as e:
+            res = {"error": f"HTTP {e.code}"}
+            if e.code in (401, 403) and not self.aviso_llave:
+                self.aviso_llave = True
+                mandar("PAPEL · Llave de IA inválida o vencida", "La segunda opinión de Claude está apagada. "
+                       "Crea una llave nueva en console.anthropic.com y pégala en papel_ia.json.", ["warning"], 4)
+        except Exception as e:
+            res = {"error": e.__class__.__name__}
+        try:
+            with open(HIST / f"ia_{bot.f}.jsonl", "a", encoding="utf-8") as fh:
+                fh.write(json.dumps({"ts": ts, "pregunta": datos, "respuesta": res}, ensure_ascii=False, default=str) + "\n")
+        except Exception:
+            pass
+        return res
+
+
+def ia_txt(ia):
+    if not ia:
+        return ""
+    if ia.get("error"):
+        return f"IA: sin respuesta ({ia['error']})"
+    return f"IA: {'✅ aprueba' if ia.get('decision') == 'aprobar' else '⛔ vetaría'} ({ia.get('confianza')}%) · {ia.get('razon')}"
+
+
 # ------------------------------------------------------------------ registro del tape (para afinar el Playbook)
 class TapeLog:
     """Cada minuto guarda la foto de tape.json (la publica tape_schwab.py) en historial/tape_min_FECHA.jsonl:
@@ -308,6 +403,10 @@ class Bot:
         self.nota = None
         self.avisar = False             # solo en vivo
         self.tape = None                # último resumen del tape (solo en vivo)
+        self.veto = None                # segunda opinión de Claude (solo en vivo)
+        self.vetadas = []
+        import collections
+        self.ruta = collections.deque(maxlen=60)
 
     # -- contexto ------------------------------------------------------
     def ctx(self, r):
@@ -349,6 +448,13 @@ class Bot:
         iv = iv_de(r, ts, self.pb["cierre"])
         p["ajuste"] = precio - valor_bs(legs, r["px"], ts, iv, self.pb["cierre"])   # skew/spread real vs BS al entrar
         p["m_in"] = mins(ts)
+        if self.veto and self.avisar:
+            p["ia"] = self.veto.consultar(self, p, r, c, ts)
+            if self.veto.modo == "activo" and (p["ia"] or {}).get("decision") == "vetar":
+                self.vetadas.append({"t": et(ts), "estructura": self.estructura(p), "regla": regla, "ia": p["ia"]})
+                mandar(f"PAPEL · Entrada vetada por IA: {self.estructura(p)}", f"{et(ts)} ET\n{ia_txt(p['ia'])}\nPor qué la proponía: {regla}",
+                       ["no_entry"], 3)
+                return
         self.abiertas.append(p)
         self.n_ent += 1
         if self.avisar:
@@ -363,7 +469,7 @@ class Bot:
             mandar(f"PAPEL · Abrir {self.estructura(p)}",
                    f"{et(ts)} ET · SPX {c['px']:,.2f}\n{orden_tos(p, self.f, True, precio)}\n"
                    f"{'Débito' if precio > 0 else 'Crédito'} {abs(precio):.2f} · riesgo ${(ancho + precio if precio < 0 else precio) * 100 * n:,.0f}\n"
-                   f"Por qué: {regla}\n{plan}", ["green_circle"], 5)
+                   f"Por qué: {regla}\n{plan}" + (f"\n{ia_txt(p.get('ia'))}" if p.get("ia") else ""), ["green_circle"], 5)
 
     def estructura(self, p):
         ks = sorted({K for _, K, _ in p["legs"]})
@@ -466,7 +572,7 @@ class Bot:
             self.ult_perdida = m
         self.ops.append({"id": p["id"], "fecha": self.f, "estructura": self.estructura(p), "tipo": p["tipo"],
                          "entra": et(p["t_in"]), "sale": et(ts), "entrada": p["entrada"], "salida": round(precio, 2),
-                         "n": p["n"], "pnl": pnl, "regla": p["regla"], "estimado": p.get("estimado", False), "motivo": motivo, "ctx": p["ctx"],
+                         "n": p["n"], "pnl": pnl, "regla": p["regla"], "estimado": p.get("estimado", False), "motivo": motivo, "ctx": p["ctx"], "ia": p.get("ia"),
                          "mejor": round((p["max"]) * 100 * p["n"], 0), "peor": round(p["min"] * 100 * p["n"], 0)})
         if self.avisar:
             mandar(f"PAPEL · Cerrar {self.estructura(p)} · {'+' if pnl >= 0 else '−'}${abs(pnl):,.0f}",
@@ -513,6 +619,7 @@ class Bot:
             self.cerrar(p, ts, intrinseco(p["legs"], px), f"Vencimiento: SPX liquidó en {px:.2f}")
 
     def paso(self, ts, r, cad=None):
+        self.ruta.append((ts, r["px"]))
         c = self.ctx(r)
         if mins(ts) >= self.pb["cierre"] - 1:
             self.liquidar(ts, c["px"])
@@ -523,7 +630,7 @@ class Bot:
     def resumen(self):
         n = len(self.ops)
         g = sum(1 for o in self.ops if o["pnl"] > 0)
-        return {"fecha": self.f, "pnl": self.pnl_dia(), "ops": n, "ganadoras": g, "nota": self.nota,
+        return {"fecha": self.f, "pnl": self.pnl_dia(), "ops": n, "ganadoras": g, "nota": self.nota, "vetadas": self.vetadas,
                 "abiertas": [{"estructura": self.estructura(p), "entra": et(p["t_in"]), "entrada": p["entrada"], "regla": p["regla"]}
                              for p in self.abiertas]}
 
@@ -646,6 +753,8 @@ def vivo():
     b.avisar = True
     mk = Marcador()
     tl = TapeLog(hoy)
+    b.veto = Veto()
+    print("Segunda opinión de Claude: " + (f"activa · modo {b.veto.modo}" if b.veto.ok else "apagada (falta la llave en papel_ia.json)") + "\n")
     hecho = 0
     if est.get("fecha") == hoy:          # reinicio a media sesión: re-procesa el historial de hoy sin marcas reales
         print("Reanudando: vuelvo a pasar el historial de hoy.")
@@ -720,7 +829,32 @@ def vivo():
       time.sleep(20)
 
 
+def probar_ia():
+    """Prueba la llave con la última lectura del historial: una consulta real y su respuesta."""
+    v = Veto()
+    if not v.ok:
+        print("Falta la llave en papel_ia.json"); return
+    fs = sorted(glob.glob(str(HIST / "20??-??-??.jsonl")))
+    if not fs:
+        print("No hay historial para probar"); return
+    f = Path(fs[-1]).name[:10]
+    filas = leer_dia(f)
+    b = Bot(f); b.avisar = True
+    for ts, r in filas[-30:]:
+        b.ruta.append((ts, r["px"]))
+    ts, r = filas[-1]
+    c = b.ctx(r)
+    p = {"tipo": "tend", "dir": -1, "legs": [("p", round(c["px"] / 5) * 5, 1), ("p", round(c["px"] / 5) * 5 - 10, -1)],
+         "entrada": 2.5, "n": 2, "ancho": 10, "regla": "PRUEBA · entrada inventada para probar la conexión", "obj": None, "ancla": None}
+    print(f"Consultando a Claude con la lectura de {f} {et(ts)} ET…")
+    res = v.consultar(b, p, r, c, ts)
+    print(res)
+    print(ia_txt(res))
+
+
 def main():
+    if "--probar-ia" in sys.argv:
+        probar_ia(); return
     if "--replay" in sys.argv:
         q = sys.argv[sys.argv.index("--replay") + 1]
         if q == "todo":

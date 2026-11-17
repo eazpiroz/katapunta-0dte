@@ -197,7 +197,7 @@ function fila(nom,arr,acierto){const p=arr.reduce((s,o)=>s+o.pnl,0),w=arr.filter
       <div class="t">${esc(o.estructura)}<span class="tag ${(o.regla||"")[0].toLowerCase()}">${esc((o.regla||"")[0])}</span>${o.estimado?'<span class="tag">estimado</span>':""}</div>
       <div class="p ${cls(o.pnl)}">${usd(o.pnl)}</div>
       <div class="h">${o.entra} → ${o.sale} ET · ${o.entrada<0?"crédito "+(-o.entrada).toFixed(2):"débito "+o.entrada.toFixed(2)} → ${o.salida.toFixed(2)} · mejor ${usd(o.mejor)} · peor ${usd(o.peor)}</div>
-      <div class="r"><b>Por qué:</b> ${esc((o.regla||"").replace(/^[A-C] · /,""))}<br><b>Salida:</b> ${esc(o.motivo)}</div></div>`).join("");
+      <div class="r"><b>Por qué:</b> ${esc((o.regla||"").replace(/^[A-C] · /,""))}<br><b>Salida:</b> ${esc(o.motivo)}${o.ia&&o.ia.decision?`<br><b>Claude:</b> ${o.ia.decision==="aprobar"?"aprobó":"habría vetado"} (${esc(o.ia.confianza)}%) · ${esc(o.ia.razon)}`:""}</div></div>`).join("");
     return `<details ${i===0?"open":""}><summary>${fdia(f)} · <span class="${cls(x.pnl)}">${usd(x.pnl)}</span> · ${x.ops} ops</summary>${x.nota?'<p class="sub">⚠ '+esc(x.nota)+'</p>':""}<div class="ops">${lst||'<div class="empty">Sin operaciones: ningún setup del Playbook se cumplió.</div>'}</div></details>`;}).join("");
   const P=d.playbook||{}, hm=m=>{m+=60;return Math.floor(m/60)+":"+String(m%60).padStart(2,"0")+" ET";};
   $("pbv").textContent=P.version||"";

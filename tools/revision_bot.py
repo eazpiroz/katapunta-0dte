@@ -48,6 +48,14 @@ for o in dia["operaciones"]:
           f"(mejor {usd(o['mejor'])}, peor {usd(o['peor'])}) · {o['regla'][:1]} · salida: {o['motivo']}")
     print(f"  ctx: SPX {c.get('px')} zg {c.get('zg')} mp {c.get('mp')} mn {c.get('mn')} tf2 {c.get('tf2')}"
           + (f" · tape neto C {tp.get('neto', {}).get('C')} P {tp.get('neto', {}).get('P')} flujo5 {tp.get('flujo5')}" if tp else " · sin tape"))
+    if o.get("ia"):
+        print(f"  {P.ia_txt(o['ia'])}")
+ias = [o for o in dia["operaciones"] if (o.get("ia") or {}).get("decision")]
+if ias or dia.get("vetadas"):
+    ap = [o for o in ias if o["ia"]["decision"] == "aprobar"]; ve = [o for o in ias if o["ia"]["decision"] == "vetar"]
+    print(f"\n**Segunda opinión de Claude:** aprobó {len(ap)} ({usd(sum(o['pnl'] for o in ap))}) · habría vetado {len(ve)} "
+          f"({usd(sum(o['pnl'] for o in ve))}) · si se hubiera hecho caso, el día sería {usd(sum(o['pnl'] for o in ap) + sum(o['pnl'] for o in dia['operaciones'] if not (o.get('ia') or {}).get('decision')))}"
+          + (f" · vetadas en modo activo: {len(dia['vetadas'])}" if dia.get("vetadas") else ""))
 
 # 2. régimen cada 15 min
 print("\n## Régimen del tablero (cada 15 min, ET)\n\n| ET | SPX | zero γ | γ | tend 5/15/1h | mom | major + | major − |\n|---|---|---|---|---|---|---|---|")
