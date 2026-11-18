@@ -211,6 +211,16 @@ def mandar(titulo, texto, tags, prioridad=4):
 MESES = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]
 
 
+def patas(p, abrir):
+    """En palabras: qué strike se compra y cuál se vende (al abrir; al cerrar se invierte)."""
+    n = p["n"]
+    out = []
+    for sd, K, q in sorted(p["legs"], key=lambda x: (x[0], not ((x[2] > 0) == abrir))):   # por lado, primero la compra
+        compra = (q > 0) == abrir
+        out.append(f"{'🟢 COMPRAR' if compra else '🔴 VENDER'} {n} {'CALL' if sd == 'c' else 'PUT'} {K:.0f}")
+    return "\n".join(out)
+
+
 def orden_tos(p, fecha, abrir, precio):
     """Orden escrita como la muestra thinkorswim, para capturarla igual en paperMoney."""
     d = dt.date.fromisoformat(fecha)
@@ -619,7 +629,7 @@ class Bot:
             else:
                 plan = "Al vencimiento · Stop: SPX sale de los cortos por 3 pts 2 min"
             mandar(f"PAPEL · Abrir {self.estructura(p)}",
-                   f"{et(ts)} ET · SPX {c['px']:,.2f}\n{orden_tos(p, self.f, True, precio)}\n"
+                   f"{et(ts)} ET · SPX {c['px']:,.2f}\n{patas(p, True)}\n{orden_tos(p, self.f, True, precio)}\n"
                    f"{'Débito' if precio > 0 else 'Crédito'} {abs(precio):.2f} · riesgo ${(ancho + precio if precio < 0 else precio) * 100 * n:,.0f}\n"
                    f"Por qué: {regla}\n{plan}" + (f"\n{ia_txt(p.get('ia'))}" if p.get("ia") else ""), ["green_circle"], 5)
 
@@ -728,7 +738,7 @@ class Bot:
                          "mejor": round((p["max"]) * 100 * p["n"], 0), "peor": round(p["min"] * 100 * p["n"], 0)})
         if self.avisar:
             mandar(f"PAPEL · Cerrar {self.estructura(p)} · {'+' if pnl >= 0 else '−'}${abs(pnl):,.0f}",
-                   f"{et(ts)} ET\n" + (orden_tos(p, self.f, False, precio) if not motivo.startswith("Venc") else "Expira: no hay que mandar orden")
+                   f"{et(ts)} ET\n" + (patas(p, False) + "\n" + orden_tos(p, self.f, False, precio) if not motivo.startswith("Venc") else "Expira: no hay que mandar orden")
                    + f"\nMotivo: {motivo}\nDía en papel: {'−' if self.pnl_dia() < 0 else '+'}${abs(self.pnl_dia()):,.0f}",
                    ["white_check_mark" if pnl >= 0 else "red_circle"], 5)
 
