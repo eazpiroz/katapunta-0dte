@@ -788,10 +788,50 @@ def cycle(c, tok, state):
           f"zgE {s.get('zge')} γ0 {s.get('gex',{}).get('d0',{}).get('gex')}  IC {s.get('ic2')}  tend {s.get('tf')}/{s.get('tf2')}  velas hoy {len(out.get('SPX', {}).get('c', []))} (última {state.get('_ultima_SPX')})  {'publicado' if ok else 'NO publicado'}")
 
 
+# ---------------------------------------------------------------- posiciones (pendiente #15, solo lectura)
+TRADER = "https://api.schwabapi.com/trader/v1"
+
+
+def posiciones(c):
+    """Lee posiciones y P&L del día de la cuenta autorizada (GET, sin órdenes) y los guarda SOLO en la PC:
+    historial/posiciones.json (última foto) y historial/posiciones_AAAA-MM-DD.jsonl (una línea por minuto).
+    No se publica nada en GitHub. La cuenta se guarda solo con sus últimos 4 dígitos."""
+    req = urllib.request.Request(TRADER + "/accounts?fields=positions",
+                                 headers={"Authorization": "Bearer " + access(c), "Accept": "application/json"})
+    with urllib.request.urlopen(req, timeout=25) as r:
+        accts = json.loads(r.read())
+    t = now()
+    out = {"ts": t.strftime("%H:%M:%S"), "cuentas": []}
+    for a in accts:
+        s = a.get("securitiesAccount", {})
+        b = s.get("currentBalances", {})
+        pos = []
+        for p in s.get("positions", []):
+            ins = p.get("instrument", {})
+            pos.append({"sym": ins.get("symbol"), "tipo": ins.get("assetType"), "sub": ins.get("underlyingSymbol"),
+                        "q": (p.get("longQuantity") or 0) - (p.get("shortQuantity") or 0),
+                        "px": p.get("averagePrice"), "mv": p.get("marketValue"),
+                        "pl_dia": p.get("currentDayProfitLoss"), "pl_dia_pct": p.get("currentDayProfitLossPercentage")})
+        spx = [x for x in pos if (x["sym"] or "").startswith("SPXW") or (x["sub"] or "") in ("$SPX", "SPX")]
+        out["cuentas"].append({"cuenta": "…" + str(s.get("accountNumber", ""))[-4:], "liq": b.get("liquidationValue"),
+                               "pl_spx_dia": round(sum(x["pl_dia"] or 0 for x in spx), 2), "spx": spx, "todas": pos})
+    HIST.mkdir(exist_ok=True)
+    (HIST / "posiciones.json").write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding="utf-8")
+    with open(HIST / f"posiciones_{t:%Y-%m-%d}.jsonl", "a", encoding="utf-8") as f:
+        f.write(json.dumps(out, ensure_ascii=False) + "\n")
+    return out
+
+
 def main():
     c = jload(SCHWAB)
     if not c.get("key"):
         sys.exit("Primero corre schwab_prueba.py para guardar las llaves de Schwab.")
+    if "--posiciones" in sys.argv:  # prueba: python flightdeck_recolector.py --posiciones
+        pz = posiciones(c)
+        for x in pz["cuentas"]:
+            print(f"{pz['ts']} cuenta {x['cuenta']} · liq ${x['liq'] or 0:,.2f} · {len(x['todas'])} posiciones · SPX {len(x['spx'])} patas · P&L SPX día ${x['pl_spx_dia']:,.2f}")
+        print("Guardado en", HIST / "posiciones.json")
+        return
     tok = gh_token()
     if "--subir" in sys.argv:  # python flightdeck_recolector.py --subir AAAA-MM-DD
         gh_put_hist(tok, sys.argv[sys.argv.index("--subir") + 1])
@@ -809,6 +849,13 @@ def main():
             print(now().strftime("%H:%M:%S"), "Schwab", e.code, e.read()[:200])
         except Exception:
             traceback.print_exc()
+        try:  # posiciones: aparte, para que una falla no frene el recolector
+            pz = posiciones(c)
+            spx = sum(len(x["spx"]) for x in pz["cuentas"])
+            if spx:
+                print(f"  posiciones SPX: {spx} patas · P&L día ${sum(x['pl_spx_dia'] for x in pz['cuentas']):,.2f}")
+        except Exception as e:
+            print("  posiciones:", e)
         if "--una" in sys.argv:
             break
         t = now()
