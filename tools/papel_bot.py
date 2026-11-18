@@ -274,11 +274,27 @@ def pedir_json(cfg, sistema, datos, nombre, esquema, max_tokens=1024):
             "tools": [{"name": nombre, "description": "Entrega la respuesta estructurada.", "input_schema": esquema}],
             "tool_choice": {"type": "tool", "name": nombre},
             "messages": [{"role": "user", "content": json.dumps(datos, ensure_ascii=False, default=str)}]}
-    req = urllib.request.Request("https://api.anthropic.com/v1/messages", data=json.dumps(body).encode(),
-                                 headers={"x-api-key": cfg["anthropic_api_key"], "anthropic-version": "2023-06-01",
-                                          "content-type": "application/json"})
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        j = json.loads(resp.read())
+    import urllib.error
+    def enviar(b):
+        req = urllib.request.Request("https://api.anthropic.com/v1/messages", data=json.dumps(b).encode(),
+                                     headers={"x-api-key": cfg["anthropic_api_key"], "anthropic-version": "2023-06-01",
+                                              "content-type": "application/json"})
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            return json.loads(resp.read())
+    try:
+        j = enviar(body)
+    except urllib.error.HTTPError as e:
+        if e.code != 400:
+            raise
+        # 400: el modelo no aceptó la herramienta forzada → misma pregunta en texto (el respaldo tolera prosa y ```json)
+        detalle = e.read()[:300].decode("utf-8", "replace")
+        print("IA 400 con herramienta:", detalle)
+        b2 = {k: v for k, v in body.items() if k not in ("tools", "tool_choice")}
+        b2["system"] = sistema + "\nResponde ÚNICAMENTE con un objeto JSON con estos campos: " + ", ".join(esquema["required"]) + "."
+        try:
+            j = enviar(b2)
+        except urllib.error.HTTPError as e2:
+            raise ValueError(f"HTTP {e2.code}: {e2.read()[:300].decode('utf-8', 'replace')} (con herramienta: {detalle})")
     for b in j.get("content", []):
         if b.get("type") == "tool_use" and isinstance(b.get("input"), dict):
             return b["input"]
