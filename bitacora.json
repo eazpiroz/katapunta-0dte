@@ -1,5 +1,5 @@
 {
- "actualizado": "2026-11-17T21:08:29Z",
+ "actualizado": "2026-11-18T01:11:02Z",
  "ops": [
   {
    "creado": "2026-11-09T15:31:03Z",
@@ -739,6 +739,83 @@
    "porque": "POR COMPLETAR. 9:46 → 9:57 ET · crédito 1.75 → recompra 3.00.",
    "ticker": "SPX",
    "id": "2026-11-13-ps-vendido-7550"
+  },
+  {
+   "creado": "2026-11-17T21:30:00Z",
+   "estadoMental": [],
+   "estructura": "Call spread comprado 7320/7330 ×1",
+   "fecha": "2026-11-17",
+   "leccion": null,
+   "motor": "manual",
+   "playbook": null,
+   "pnl": -110,
+   "porque": "14:19 ET · débito 3.10 → cierre 14:54 ET a crédito 2.00. Cerrado con pérdida.",
+   "ticker": "SPX",
+   "id": "2026-11-17-cs-comprado-7320"
+  },
+  {
+   "creado": "2026-11-17T21:45:00Z",
+   "estadoMental": [],
+   "estructura": "Call spread vendido 7340/7345 ×1",
+   "fecha": "2026-11-17",
+   "leccion": null,
+   "motor": "manual",
+   "playbook": null,
+   "pnl": 47,
+   "porque": "14:44 ET · crédito 1.00. Vencimiento 0DTE con SPX en 7340.53: 7340 vale 0.53. Ganancia +0.47 por contrato.",
+   "id": "2026-11-17-cs-vendido-7340"
+  },
+  {
+   "creado": "2026-11-17T21:45:00Z",
+   "estadoMental": [],
+   "estructura": "Call spread vendido 7355/7360 ×1",
+   "fecha": "2026-11-17",
+   "leccion": null,
+   "motor": "manual",
+   "playbook": null,
+   "pnl": 100,
+   "porque": "13:10 ET · crédito 1.00. Vencimiento 0DTE con SPX en 7340.53: expiró sin valor. Ganancia completa de la prima.",
+   "ticker": "SPX",
+   "id": "2026-11-17-cs-vendido-7355"
+  },
+  {
+   "creado": "2026-11-17T21:30:00Z",
+   "estadoMental": [],
+   "estructura": "Put spread comprado 7380/7375 ×1",
+   "fecha": "2026-11-17",
+   "leccion": null,
+   "motor": "manual",
+   "playbook": null,
+   "pnl": 310,
+   "porque": "09:27 ET · débito 1.90. Vencimiento 0DTE con SPX cerrando en 7340.53: spread a máximo (5.00). Ganancia +3.10 por contrato.",
+   "ticker": "SPX",
+   "id": "2026-11-17-ps-comprado-7380"
+  },
+  {
+   "creado": "2026-11-17T21:30:00Z",
+   "estadoMental": [],
+   "estructura": "Put spread vendido 7305/7300 ×1",
+   "fecha": "2026-11-17",
+   "leccion": null,
+   "motor": "manual",
+   "playbook": null,
+   "pnl": -150,
+   "porque": "13:47 ET · crédito 1.00 → recompra 14:02 ET a débito 2.50. Cerrado con pérdida.",
+   "ticker": "SPX",
+   "id": "2026-11-17-ps-vendido-7305"
+  },
+  {
+   "creado": "2026-11-17T21:30:00Z",
+   "estadoMental": [],
+   "estructura": "Put spread vendido 7325/7320 ×1",
+   "fecha": "2026-11-17",
+   "leccion": null,
+   "motor": "manual",
+   "playbook": null,
+   "pnl": -130,
+   "porque": "09:34 ET · crédito 1.00 → recompra 13:41 ET a débito 2.30. Cerrado con pérdida.",
+   "ticker": "SPX",
+   "id": "2026-11-17-ps-vendido-7325"
   }
  ],
  "dias": {
