@@ -176,7 +176,8 @@ function fila(nom,arr,acierto){const p=arr.reduce((s,o)=>s+o.pnl,0),w=arr.filter
   try{[d,R]=await Promise.all([papel(),real()]);}catch(e){$("banner").textContent="Todavía no hay resultados del bot publicados.";return;}
   const dias=Object.keys(d.dias||{}).sort(), ops=dias.flatMap(f=>d.dias[f].operaciones||[]);
   const act=new Date(d.actualizado);
-  $("banner").textContent=`Actualizado ${act.toLocaleString("es-MX",{timeZone:"America/New_York",dateStyle:"medium",timeStyle:"short"})} ET · ${dias.length} días · último modo: ${d.modo==="vivo"?"en vivo":"repetición del historial"}`;
+  const abHoy=(d.dias[dias[dias.length-1]]||{}).abiertas||[];
+  $("banner").textContent=(abHoy.length?`${abHoy.length} posición${abHoy.length>1?"es":""} abierta${abHoy.length>1?"s":""} ahora · `:"")+`Actualizado ${act.toLocaleString("es-MX",{timeZone:"America/New_York",dateStyle:"medium",timeStyle:"short"})} ET · ${dias.length} días · último modo: ${d.modo==="vivo"?"en vivo":"repetición del historial"}`;
   const tot=ops.reduce((s,o)=>s+o.pnl,0), win=ops.filter(o=>o.pnl>0), gan=win.reduce((s,o)=>s+o.pnl,0), per=-ops.filter(o=>o.pnl<0).reduce((s,o)=>s+o.pnl,0);
   $("kPnl").textContent=usd(tot); $("kPnl").className="v "+cls(tot); $("kPnlD").textContent=ops.length+" operaciones";
   $("kWin").textContent=ops.length?Math.round(100*win.length/ops.length)+"%":"—"; $("kWinD").textContent=win.length+" ganadoras";
@@ -200,7 +201,13 @@ function fila(nom,arr,acierto){const p=arr.reduce((s,o)=>s+o.pnl,0),w=arr.filter
       <div class="r"><b>Por qué:</b> ${esc((o.regla||"").replace(/^[A-C] · /,""))}<br><b>Salida:</b> ${esc(o.motivo)}${o.ia&&o.ia.decision?`<br><b>Claude:</b> ${o.ia.decision==="aprobar"?"aprobó":"habría vetado"} (${esc(o.ia.confianza)}%) · ${esc(o.ia.razon)}`:""}</div></div>`).join("");
     const cl=(x.clasif||[]).map(c=>`${c.hora}: ${esc(c.reglas.tipo)} ${c.reglas.conf}%${c.ia&&c.ia.tipo?" · Claude "+esc(c.ia.tipo)+" "+esc(c.ia.confianza)+"%":""}`).join(" → ");
     const tipo=(cl||x.real)?`<p class="sub"><b>Tipo de día</b> · ${cl||"sin clasificar"}${x.real?" · <b>real: "+esc(x.real.tipo)+"</b> ("+esc(x.real.detalle)+")":""}</p>`:"";
-    return `<details ${i===0?"open":""}><summary>${fdia(f)} · <span class="${cls(x.pnl)}">${usd(x.pnl)}</span> · ${x.ops} ops${x.real?" · "+esc(x.real.tipo):""}</summary>${x.nota?'<p class="sub">⚠ '+esc(x.nota)+'</p>':""}${tipo}<div class="ops">${lst||'<div class="empty">Sin operaciones: ningún setup del Playbook se cumplió.</div>'}</div></details>`;}).join("");
+    const ab=(x.abiertas||[]).map(a=>`<div class="op">
+      <div class="t">${esc(a.estructura)}<span class="tag ${(a.regla||"")[0].toLowerCase()}">${esc((a.regla||"")[0])}</span><span class="tag a">abierta</span></div>
+      <div class="p">en curso</div>
+      <div class="h">desde ${esc(a.entra)} ET · ${a.entrada<0?"crédito "+(-a.entrada).toFixed(2):"débito "+Number(a.entrada).toFixed(2)}</div>
+      <div class="r"><b>Por qué:</b> ${esc((a.regla||"").replace(/^[A-C] · /,""))}</div></div>`).join("");
+    const nab=(x.abiertas||[]).length;
+    return `<details ${i===0?"open":""}><summary>${fdia(f)} · <span class="${cls(x.pnl)}">${usd(x.pnl)}</span> · ${x.ops} cerradas${nab?" · "+nab+" abierta"+(nab>1?"s":""):""}${x.real?" · "+esc(x.real.tipo):""}</summary>${x.nota?'<p class="sub">⚠ '+esc(x.nota)+'</p>':""}${tipo}<div class="ops">${ab}${lst||(nab?"":'<div class="empty">Sin operaciones: ningún setup del Playbook se cumplió.</div>')}</div></details>`;}).join("");
   const P=d.playbook||{}, hm=m=>{m+=60;return Math.floor(m/60)+":"+String(m%60).padStart(2,"0")+" ET";};
   $("pbv").textContent=P.version||"";
   const items=[["Abre desde",hm(P.abre)],["Último débito de tendencia",hm(P.ultima_tend)],["Última venta",hm(P.ultima_venta)],
