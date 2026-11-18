@@ -128,17 +128,103 @@ variantes = {
     "sin regla C": {"pin": (0, 0)},
 }
 fechas = sorted({f.name[:10] for f in carpeta.glob("20??-??-??.jsonl*")})
-print(f"\n## Sensibilidad del Playbook (repetición) · hoy y acumulado de {len(fechas)} días\n\n| Variante | Hoy | Ops hoy | Acumulado | Acierto acum. |\n|---|---|---|---|---|")
+por_dia = {}                                   # variante → {fecha: (pnl, ops, ganadoras)}
 for nom, cambio in variantes.items():
     pb = {**P.PB, **cambio}
-    hoy = P.correr_dia(fecha, pb)
-    acum, n, g = 0, 0, 0
     for f in fechas:
         try:
             x = P.correr_dia(f, pb)
         except Exception:
             continue
-        acum += x.pnl_dia(); n += len(x.ops); g += sum(1 for o in x.ops if o["pnl"] > 0)
-    print(f"| {nom} | {usd(hoy.pnl_dia())} | {len(hoy.ops)} | {usd(acum)} | {round(100 * g / n) if n else 0}% ({n}) |")
+        por_dia.setdefault(nom, {})[f] = (x.pnl_dia(), len(x.ops), sum(1 for o in x.ops if o["pnl"] > 0))
+print(f"\n## Sensibilidad del Playbook (repetición) · hoy y acumulado de {len(fechas)} días\n\n| Variante | Hoy | Ops hoy | Acumulado | Acierto acum. | Días mejor / peor vs v1 |\n|---|---|---|---|---|---|")
+base = por_dia.get("v1 (actual)", {})
+seguimiento = {}
+for nom in variantes:
+    d = por_dia.get(nom, {})
+    hoy = d.get(fecha, (0, 0, 0))
+    acum, n, g = (sum(v[i] for v in d.values()) for i in range(3))
+    mejor = sum(1 for f, v in d.items() if f in base and v[0] > base[f][0] + 0.5)
+    peor = sum(1 for f, v in d.items() if f in base and v[0] < base[f][0] - 0.5)
+    seguimiento[nom] = (mejor, peor, len(d))
+    mp = "—" if nom == "v1 (actual)" else f"{mejor} / {peor}"
+    print(f"| {nom} | {usd(hoy[0])} | {hoy[1]} | {usd(acum)} | {round(100 * g / n) if n else 0}% ({n}) | {mp} |")
+
+# desglose por día (para ver si una mejora depende de un solo día)
+cols = list(variantes)
+print("\n### Desglose por día (repetición, P&L)\n\n| Día | " + " | ".join(cols) + " |\n|---|" + "---|" * len(cols))
+for f in fechas:
+    print(f"| {f[5:]} | " + " | ".join(usd(por_dia.get(c, {}).get(f, (0,))[0]) for c in cols) + " |")
+
+# seguimiento: criterio para proponer adoptar una variante
+MIN_DIAS, MIN_MEJOR = 15, 4
+print(f"\n### Seguimiento de candidatas (criterio: ≥{MIN_DIAS} días, 0 días peor, ≥{MIN_MEJOR} días mejor)\n")
+for nom, (mejor, peor, nd) in seguimiento.items():
+    if nom == "v1 (actual)" or mejor == 0:
+        continue
+    if peor:
+        est = "descartada por ahora (empeora algún día)"
+    elif nd >= MIN_DIAS and mejor >= MIN_MEJOR:
+        est = "**cumple el criterio: lista para proponer**"
+    else:
+        est = f"en observación (faltan {max(0, MIN_DIAS - nd)} días y {max(0, MIN_MEJOR - mejor)} días mejores)"
+    print(f"- {nom}: {mejor} mejor / {peor} peor en {nd} días → {est}")
+
+# 6. filtro de tape: no abrir si el flujo direccional de 5 min va en contra (solo días con tape registrado)
+def tape_dia(f):
+    for t in (carpeta / f"tape_min_{f}.jsonl", carpeta / f"tape_min_{f}.jsonl.gz"):
+        if t.exists():
+            txt = gzip.decompress(t.read_bytes()).decode() if t.suffix == ".gz" else t.read_text(encoding="utf-8")
+            return {j["ts"][:5]: j for j in (json.loads(x) for x in txt.splitlines() if x.strip())}
+    return {}
+
+
+class BotTape(P.Bot):
+    """Igual que el bot, pero con el tape del minuto y (si filtra) sin entradas contra el flujo direccional:
+    (flujo5 calls − flujo5 puts) × dirección < 0. Sin foto de tape ese minuto → no filtra."""
+    filtrar, cinta, bloqueadas = False, {}, 0
+
+    def paso(self, ts, r):
+        self.tape = self.cinta.get(ts[:5]) or self.tape
+        return super().paso(ts, r)
+
+    def abrir(self, ts, r, c, tipo, dire, *a, **k):
+        fl = (self.tape or {}).get("flujo5") or {}
+        if self.filtrar and dire and fl and (fl.get("C", 0) - fl.get("P", 0)) * dire < 0:
+            self.bloqueadas += 1
+            return
+        return super().abrir(ts, r, c, tipo, dire, *a, **k)
+
+
+def correr_tape(f, filtrar):
+    b = BotTape(f, P.PB); b.filtrar, b.cinta, b.bloqueadas = filtrar, tape_dia(f), 0
+    filas = P.leer_dia(f)
+    for ts, r in filas:
+        if P.mins(ts) < 8 * 60 + 30:
+            continue
+        b.paso(ts, r)
+        if P.mins(ts) >= P.PB["cierre"] - 1:
+            break
+    if b.abiertas and filas:
+        b.liquidar("14:59", filas[-1][1]["px"])
+    return b
+
+
+con_tape = [f for f in fechas if tape_dia(f)]
+print(f"\n## Filtro de tape (repetición) · {len(con_tape)} días con tape\n")
+if con_tape:
+    print("| Día | v1 con tape | Con filtro | Diferencia | Intentos bloqueados (min) |\n|---|---|---|---|---|")
+    tv = tf = 0
+    for f in con_tape:
+        try:
+            a, z = correr_tape(f, False), correr_tape(f, True)
+        except Exception as e:
+            print(f"| {f[5:]} | error {e.__class__.__name__} | | | |"); continue
+        tv += a.pnl_dia(); tf += z.pnl_dia()
+        print(f"| {f[5:]} | {usd(a.pnl_dia())} | {usd(z.pnl_dia())} | {usd(z.pnl_dia() - a.pnl_dia())} | {z.bloqueadas} |")
+    print(f"| **Total** | {usd(tv)} | {usd(tf)} | {usd(tf - tv)} | |")
+    print(f"\nCriterio: adoptar solo si mejora el acumulado con ≥10 días de tape (hoy: {len(con_tape)}).")
+else:
+    print("Sin días con tape registrado todavía.")
 print("\nNota: la repetición marca con Black-Scholes; en vivo el bot marca con la cadena real de Schwab. "
       "Muestra chica: una variante solo es candidata si mejora el acumulado sin depender de un solo día.")

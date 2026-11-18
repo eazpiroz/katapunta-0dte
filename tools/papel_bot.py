@@ -240,6 +240,54 @@ Veta solo con una razón concreta y verificable en los datos (p. ej. entrar cont
 de alto impacto inminente, movimiento ya agotado, rango esperado consumido). Si los datos no dan razón clara, aprueba.
 Responde SOLO un JSON: {"decision":"aprobar"|"vetar","confianza":0-100,"razon":"una frase en español, máx 25 palabras"}"""
 
+# Herramienta forzada: la API devuelve el JSON ya estructurado (adiós JSONDecodeError por prosa o respuesta cortada).
+ESQ_VETO = {"type": "object", "required": ["decision", "confianza", "razon"], "properties": {
+    "decision": {"type": "string", "enum": ["aprobar", "vetar"]},
+    "confianza": {"type": "integer", "minimum": 0, "maximum": 100},
+    "razon": {"type": "string", "description": "una frase en español, máx 25 palabras"}}}
+ESQ_CLASIF = {"type": "object", "required": ["tipo", "direccion", "confianza", "razon"], "properties": {
+    "tipo": {"type": "string", "enum": ["tendencia", "rango", "pin"]},
+    "direccion": {"type": "string", "enum": ["alcista", "bajista", "neutral"]},
+    "confianza": {"type": "integer", "minimum": 0, "maximum": 100},
+    "razon": {"type": "string", "description": "una frase en español, máx 25 palabras"}}}
+
+
+def json_de_texto(txt):
+    """Respaldo si la respuesta llega como texto: toma el primer objeto JSON válido (ignora prosa y ```json)."""
+    dec = json.JSONDecoder()
+    i = txt.find("{")
+    while i != -1:
+        try:
+            obj, _ = dec.raw_decode(txt, i)
+            if isinstance(obj, dict):
+                return obj
+        except ValueError:
+            pass
+        i = txt.find("{", i + 1)
+    raise ValueError("sin JSON en la respuesta")
+
+
+def pedir_json(cfg, sistema, datos, nombre, esquema, max_tokens=1024):
+    """Una consulta a Claude que regresa un dict. Si falla, el error trae stop_reason y el inicio del texto para diagnosticar."""
+    import urllib.request
+    body = {"model": cfg.get("modelo", "claude-sonnet-5-5"), "max_tokens": max_tokens, "system": sistema,
+            "tools": [{"name": nombre, "description": "Entrega la respuesta estructurada.", "input_schema": esquema}],
+            "tool_choice": {"type": "tool", "name": nombre},
+            "messages": [{"role": "user", "content": json.dumps(datos, ensure_ascii=False, default=str)}]}
+    req = urllib.request.Request("https://api.anthropic.com/v1/messages", data=json.dumps(body).encode(),
+                                 headers={"x-api-key": cfg["anthropic_api_key"], "anthropic-version": "2023-06-01",
+                                          "content-type": "application/json"})
+    with urllib.request.urlopen(req, timeout=30) as resp:
+        j = json.loads(resp.read())
+    for b in j.get("content", []):
+        if b.get("type") == "tool_use" and isinstance(b.get("input"), dict):
+            return b["input"]
+    txt = "".join(b.get("text", "") for b in j.get("content", []))
+    try:
+        return json_de_texto(txt)
+    except ValueError:
+        raise ValueError(f"stop={j.get('stop_reason')} texto={txt[:200]!r}")
+
 
 class Veto:
     def __init__(self):
@@ -288,17 +336,9 @@ class Veto:
                             "abiertas": [bot.estructura(x) for x in bot.abiertas]},
             **self.contexto_dia(bot.f),
         }
-        body = {"model": self.cfg.get("modelo", "claude-sonnet-5-5"), "max_tokens": 300, "system": IA_SISTEMA,
-                "messages": [{"role": "user", "content": json.dumps(datos, ensure_ascii=False, default=str)}]}
         t0 = time.time()
         try:
-            req = urllib.request.Request("https://api.anthropic.com/v1/messages", data=json.dumps(body).encode(),
-                                         headers={"x-api-key": self.cfg["anthropic_api_key"], "anthropic-version": "2023-06-01",
-                                                  "content-type": "application/json"})
-            with urllib.request.urlopen(req, timeout=30) as resp:
-                j = json.loads(resp.read())
-            txt = "".join(b.get("text", "") for b in j.get("content", []))
-            res = json.loads(txt[txt.find("{"): txt.rfind("}") + 1])
+            res = pedir_json(self.cfg, IA_SISTEMA, datos, "veredicto", ESQ_VETO)
             res = {"decision": res.get("decision"), "confianza": res.get("confianza"), "razon": res.get("razon"),
                    "seg": round(time.time() - t0, 1), "modo": self.modo}
         except urllib.error.HTTPError as e:
@@ -308,7 +348,7 @@ class Veto:
                 mandar("PAPEL · Llave de IA inválida o vencida", "La segunda opinión de Claude está apagada. "
                        "Crea una llave nueva en console.anthropic.com y pégala en papel_ia.json.", ["warning"], 4)
         except Exception as e:
-            res = {"error": e.__class__.__name__}
+            res = {"error": e.__class__.__name__, "detalle": str(e)[:300]}
         try:
             with open(HIST / f"ia_{bot.f}.jsonl", "a", encoding="utf-8") as fh:
                 fh.write(json.dumps({"ts": ts, "pregunta": datos, "respuesta": res}, ensure_ascii=False, default=str) + "\n")
@@ -326,20 +366,11 @@ o "pin" (se queda pegado a un strike/major positivo hacia el cierre). Responde S
 def ia_clasificar(veto, fecha, ts, f):
     if not veto or not veto.ok:
         return None
-    import urllib.request
     datos = {"hora_et": et(ts), "rasgos": f, **veto.contexto_dia(fecha)}
-    body = {"model": veto.cfg.get("modelo", "claude-sonnet-5-5"), "max_tokens": 250, "system": IA_CLASIF,
-            "messages": [{"role": "user", "content": json.dumps(datos, ensure_ascii=False, default=str)}]}
     try:
-        req = urllib.request.Request("https://api.anthropic.com/v1/messages", data=json.dumps(body).encode(),
-                                     headers={"x-api-key": veto.cfg["anthropic_api_key"], "anthropic-version": "2023-06-01",
-                                              "content-type": "application/json"})
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            j = json.loads(resp.read())
-        txt = "".join(b.get("text", "") for b in j.get("content", []))
-        return json.loads(txt[txt.find("{"): txt.rfind("}") + 1])
+        return pedir_json(veto.cfg, IA_CLASIF, datos, "clasificacion", ESQ_CLASIF)
     except Exception as e:
-        return {"error": e.__class__.__name__}
+        return {"error": e.__class__.__name__, "detalle": str(e)[:300]}
 
 
 def ia_txt(ia):
