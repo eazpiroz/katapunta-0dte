@@ -51,6 +51,7 @@ PB = {
     "ven_cat": 2.5,            # stop de catástrofe: el spread vale 2.5× el crédito
     "nivel_buf": 3.0,          # stop por nivel: cierra si el precio pasa el ancla por 3 pts dos minutos seguidos
     "pin_dist": 10.0,          # IC de pin: precio a ≤10 pts del major +
+    "gamma_edad": 30,          # min: con la lectura γ (perfil manual) más vieja que esto, no abre B ni C (A sí, va por tendencia)
 }
 
 
@@ -63,6 +64,24 @@ def et(ts):
     """CDMX → ET (+1 h en noviembre-marzo)."""
     m = mins(ts) + 60
     return f"{m // 60}:{m % 60:02d}"
+
+
+# ------------------------------------------------------------------ frescura de la lectura γ
+def zg_valido(r):
+    """zero γ real: None si el tablero no tiene lectura (el recolector pone zg = precio cuando no sabe)."""
+    z = r.get("zg")
+    return None if z is None or abs(z - r["px"]) < 1e-6 else z
+
+
+def edad_gamma(ts, r):
+    """Minutos desde la última lectura manual del perfil γ (r["gt"], hora CDMX); None si es estimación propia."""
+    gt = r.get("gt")
+    if not gt:
+        return None
+    try:
+        return mins(ts) - mins(gt)
+    except (ValueError, AttributeError):
+        return None
 
 
 # ------------------------------------------------------------------ valuación
@@ -246,6 +265,8 @@ IA_SISTEMA = """Eres el jefe de mesa de Katapunta y revisas, en segundos, cada e
 El bot sigue reglas fijas (Playbook v1). Tu trabajo: APROBAR o VETAR esta entrada con criterio de trader profesional,
 usando el régimen de gamma (precio vs zero γ), los niveles GEX (major +/−, techo/piso, muros), la tendencia multi-temporalidad,
 el momentum, el tape (flujo de opciones grandes), el pre-market del día y las lecciones de la bitácora.
+Para juzgar la salida usa "valor_estimado": la salida por nivel ocurre a media sesión, así que lo que cuenta es el valor
+del spread AHORA con SPX en ese nivel (valor_spread_ahora_en_nivel), no su valor intrínseco a vencimiento.
 Veta solo con una razón concreta y verificable en los datos (p. ej. entrar contra el flujo, nivel GEX demasiado cerca, evento
 de alto impacto inminente, movimiento ya agotado, rango esperado consumido). Si los datos no dan razón clara, aprueba.
 Responde SOLO un JSON: {"decision":"aprobar"|"vetar","confianza":0-100,"razon":"una frase en español, máx 25 palabras"}"""
@@ -357,7 +378,8 @@ class Veto:
                                              "contratos": p["n"], "ancho": p["ancho"], "objetivo": p.get("obj"), "ancla_stop": p.get("ancla")},
             "tablero": {k: r.get(k) for k in ("px", "zg", "mp", "mn", "techo", "piso", "cw", "pw", "tf", "tf2", "mom", "em", "rem", "reg", "flips")},
             "ruta_spx_ultimos_30min": [f"{et(t)} {x:.1f}" for t, x in list(bot.ruta)[-30:][::5]],
-            "tape": bot.tape or "sin tape",
+            "tape": (p.get("ctx") or {}).get("tape") or bot.tape or "sin tape",
+            "valor_estimado": valor_en_nivel(bot, p, r, ts),
             "dia_del_bot": {"pnl": bot.pnl_dia(), "cerradas": [f"{o['entra']}-{o['sale']} {o['estructura']} {o['pnl']:+.0f}" for o in bot.ops],
                             "abiertas": [bot.estructura(x) for x in bot.abiertas]},
             **self.contexto_dia(bot.f),
@@ -397,6 +419,23 @@ def ia_clasificar(veto, fecha, ts, f):
         return pedir_json(veto.cfg, IA_CLASIF, datos, "clasificacion", ESQ_CLASIF)
     except Exception as e:
         return {"error": e.__class__.__name__, "detalle": str(e)[:300]}
+
+
+def valor_en_nivel(bot, p, r, ts):
+    """Lo que valdría el spread AHORA si SPX estuviera ya en el objetivo (débito) o en el ancla del stop (venta).
+    Es valor de salida intradía (no a vencimiento): así se evalúa la salida por nivel."""
+    try:
+        iv = iv_de(r, ts, bot.pb["cierre"])
+        nivel = p.get("obj") if p["tipo"] == "tend" else p.get("ancla")
+        if not nivel:
+            return None
+        v = valor_bs(p["legs"], nivel, ts, iv, bot.pb["cierre"]) + p.get("ajuste", 0)
+        venc = intrinseco(p["legs"], nivel)
+        return {"nivel_spx": nivel, "valor_spread_ahora_en_nivel": round(v, 2), "valor_spread_a_vencimiento_en_nivel": round(venc, 2),
+                "pnl_si_sale_en_nivel": round((v - p["entrada"]) * 100 * p["n"]), "precio_entrada": p["entrada"],
+                "nota": "salida por nivel = intradía, antes del vencimiento"}
+    except Exception:
+        return None
 
 
 def ia_txt(ia):
@@ -481,8 +520,8 @@ def rasgos(dia, r):
     em = r.get("em") or [px0 - 50, px0 + 50]
     mitad = max(1.0, (em[1] - em[0]) / 2)
     xs = [x["px"] for _, x in dia]
-    zg = [x.get("zg") or x["px"] for _, x in dia]
-    g = [1 if x > z + PB["gtol"] else -1 if x < z - PB["gtol"] else 0 for x, z in zip(xs, zg)]
+    zg = [zg_valido(x) for _, x in dia]
+    g = [0 if z is None else 1 if x > z + PB["gtol"] else -1 if x < z - PB["gtol"] else 0 for x, z in zip(xs, zg)]
     cruces = sum(1 for a, b in zip(g, g[1:]) if a and b and a != b)
     tf2, mom = r.get("tf2") or [0, 0, 0], (r.get("mom") or [0, 0, 0])
     chg0 = dia[0][1].get("chg") or "0"
@@ -496,7 +535,8 @@ def rasgos(dia, r):
             "gamma_estable": round(sum(1 for x in g[-30:] if x == g[-1]) / max(1, len(g[-30:])), 2), "cruces_zg": cruces,
             "tf2": tf2, "mom": mom, "vs_vwap": round(r["px"] - (r.get("vw") or r["px"]), 1),
             "dist_mp": round(r["px"] - mp, 1) if mp else None, "dist_mn": round(r["px"] - mn, 1) if mn else None,
-            "mp": mp, "mn": mn, "zg": r.get("zg"), "vix": (r.get("vix") or {}).get("chg"), "macro": r.get("macro")}
+            "mp": mp, "mn": mn, "zg": zg_valido(r), "con_gamma": zg_valido(r) is not None,
+            "vix": (r.get("vix") or {}).get("chg"), "macro": r.get("macro")}
 
 
 def clasificar_reglas(f):
@@ -512,7 +552,7 @@ def clasificar_reglas(f):
         if (f["mov"] > 0) == (al > 0) and f["mom"][0] == al:
             pts["tendencia"] += 1
     else:
-        pts["rango"] += 1
+        pts["rango"] += 1; rz.append("sin tendencia alineada en 5/15/60 min")
     if f["gamma"] < 0 and f["gamma_estable"] >= 0.8:
         pts["tendencia"] += 2; rz.append("gamma negativa estable")
     elif f["gamma"] > 0 and f["gamma_estable"] >= 0.8:
@@ -528,6 +568,10 @@ def clasificar_reglas(f):
     conf = round(100 * pts[tipo] / tot)
     if conf < 45:
         tipo = "incierto"
+    elif tot < 3:
+        tipo = "incierto"; rz.append(f"evidencia mínima ({tot} pts)")
+    elif not f.get("con_gamma", True):
+        tipo = "incierto"; rz.append("sin lectura γ")
     return {"tipo": tipo, "conf": conf, "puntos": pts, "razones": rz}
 
 
@@ -569,17 +613,22 @@ class Bot:
         self.dia = []                   # [(ts, lectura)] desde las 8:30 CDMX, para el clasificador
         self.clasif = []
         self.real = None
+        self.previo = {}                # clave → {ia, ctx} de operaciones ya publicadas hoy (para reanudar)
+        self.tape_hist = {}             # "HH:MM" → resumen del tape guardado ese minuto
+        self.ult_min = None             # último minuto procesado (ignora lecturas repetidas)
 
     # -- contexto ------------------------------------------------------
     def ctx(self, r):
-        px, zg = r["px"], r.get("zg") or r["px"]
-        g = 1 if px > zg + self.pb["gtol"] else -1 if px < zg - self.pb["gtol"] else 0
+        px, zgv = r["px"], zg_valido(r)
+        zg = zgv if zgv is not None else px
+        g = 0 if zgv is None else 1 if px > zg + self.pb["gtol"] else -1 if px < zg - self.pb["gtol"] else 0
         tf2 = r.get("tf2") or [0, 0, 0]
         T = tf2[0] if tf2[0] == tf2[1] else 0
         mom = (r["mom"] or [0])[0] if "mom" in r else (tf2[0] if tf2[0] == tf2[1] else 0)   # días sin momentum: usa la tendencia
         return {"px": px, "zg": round(zg, 1), "g": g, "T": T, "mom": mom, "mp": r.get("mp"), "mn": r.get("mn"),
                 "techo": (r.get("techo") or [None])[0], "piso": (r.get("piso") or [None])[0], "tf2": tf2,
-                "cw": (r.get("cw") or [None])[0], "pw": (r.get("pw") or [None])[0]}
+                "cw": (r.get("cw") or [None])[0], "pw": (r.get("pw") or [None])[0],
+                "con_gamma": zgv is not None, "edad_g": None}
 
     def pnl_dia(self):
         return sum(o["pnl"] for o in self.ops)
@@ -606,10 +655,17 @@ class Bot:
         n = self.ctr(riesgo)
         p = {"id": f"{self.f}-{len(self.ops) + len(self.abiertas) + 1}", "tipo": tipo, "dir": dire, "legs": legs,
              "entrada": round(precio, 2), "n": n, "ancho": ancho, "regla": regla, "ancla": ancla, "obj": objetivo,
-             "t_in": ts[:5], "estimado": bool(r.get("_bs")), "ctx": {**{k: c[k] for k in ("px", "zg", "g", "T", "mp", "mn", "tf2")}, "tape": self.tape}, "max": 0.0, "min": 0.0}
+             "t_in": ts[:5], "estimado": bool(r.get("_bs")), "ctx": {**{k: c[k] for k in ("px", "zg", "g", "T", "mp", "mn", "tf2", "edad_g")},
+                     "tape": self.tape if self.avisar else self.tape_hist.get(ts[:5].zfill(5), self.tape)}, "max": 0.0, "min": 0.0}
         iv = iv_de(r, ts, self.pb["cierre"])
         p["ajuste"] = precio - valor_bs(legs, r["px"], ts, iv, self.pb["cierre"])   # skew/spread real vs BS al entrar
         p["m_in"] = mins(ts)
+        prev = self.previo.get(self.clave(p))          # al reanudar: conserva la opinión de Claude y el tape originales
+        if prev and not self.avisar:
+            if prev.get("ia"):
+                p["ia"] = prev["ia"]
+            if (prev.get("ctx") or {}).get("tape"):
+                p["ctx"]["tape"] = prev["ctx"]["tape"]
         if self.veto and self.avisar:
             p["ia"] = self.veto.consultar(self, p, r, c, ts)
             if self.veto.modo == "activo" and (p["ia"] or {}).get("decision") == "vetar":
@@ -633,6 +689,10 @@ class Bot:
                    f"{'Débito' if precio > 0 else 'Crédito'} {abs(precio):.2f} · riesgo ${(ancho + precio if precio < 0 else precio) * 100 * n:,.0f}\n"
                    f"Por qué: {regla}\n{plan}" + (f"\n{ia_txt(p.get('ia'))}" if p.get("ia") else ""), ["green_circle"], 5)
 
+    @staticmethod
+    def clave(p):
+        return p["t_in"][:5] + "|" + ",".join(f"{sd}{K:.0f}{q:+d}" for sd, K, q in sorted(p["legs"]))
+
     def estructura(self, p):
         ks = sorted({K for _, K, _ in p["legs"]})
         nom = {"tend": "Débito", "venta": "Crédito", "pin": "IC de pin"}[p["tipo"]]
@@ -652,6 +712,10 @@ class Bot:
         if m < pb["abre"]:
             return
         lad = r.get("lad") or lad_bs(r, ts, pb["cierre"])
+        if not c["con_gamma"]:
+            return                                  # sin lectura γ no hay régimen: no se abre nada
+        c["edad_g"] = edad_gamma(ts, r)
+        gamma_vieja = c["edad_g"] is not None and c["edad_g"] > pb["gamma_edad"]
         # A · gamma negativa + tendencia alineada → débito a favor
         if c["g"] == -1 and c["T"] != 0 and c["mom"] == c["T"] and m <= pb["ultima_tend"] and self.puede(m, c["T"]):
             sd = "c" if c["T"] > 0 else "p"
@@ -670,7 +734,7 @@ class Bot:
                            objetivo=obj)
                 return
         # B · gamma positiva → venta anclada a un nivel (soporte abajo / resistencia arriba)
-        if c["g"] == 1 and m <= pb["ultima_venta"]:
+        if c["g"] == 1 and m <= pb["ultima_venta"] and not gamma_vieja:
             for dire in ([1, -1] if c["T"] == 0 else [c["T"]]):
                 if not self.puede(m, dire) or any(p["tipo"] == "venta" and p["dir"] == dire for p in self.abiertas):
                     continue
@@ -699,7 +763,7 @@ class Bot:
                     return
         # C · IC de pin al final del día
         a, b = pb["pin"]
-        if a <= m <= b and c["g"] == 1 and c["mp"] and abs(c["px"] - c["mp"]) <= pb["pin_dist"] \
+        if a <= m <= b and c["g"] == 1 and c["mp"] and not gamma_vieja and abs(c["px"] - c["mp"]) <= pb["pin_dist"] \
                 and not any(p["tipo"] == "pin" for p in self.abiertas) and self.n_ent < pb["max_ops"] \
                 and self.pnl_dia() > pb["stop_dia"]:
             def pick(sd):
@@ -734,7 +798,7 @@ class Bot:
             self.ult_perdida = m
         self.ops.append({"id": p["id"], "fecha": self.f, "estructura": self.estructura(p), "tipo": p["tipo"],
                          "entra": et(p["t_in"]), "sale": et(ts), "entrada": p["entrada"], "salida": round(precio, 2),
-                         "n": p["n"], "pnl": pnl, "regla": p["regla"], "estimado": p.get("estimado", False), "motivo": motivo, "ctx": p["ctx"], "ia": p.get("ia"),
+                         "n": p["n"], "pnl": pnl, "regla": p["regla"], "estimado": p.get("estimado", False), "motivo": motivo, "ctx": p["ctx"], "ia": p.get("ia"), "clave": self.clave(p),
                          "mejor": round((p["max"]) * 100 * p["n"], 0), "peor": round(p["min"] * 100 * p["n"], 0)})
         if self.avisar:
             mandar(f"PAPEL · Cerrar {self.estructura(p)} · {'+' if pnl >= 0 else '−'}${abs(pnl):,.0f}",
@@ -793,6 +857,9 @@ class Bot:
             self.cerrar(p, ts, intrinseco(p["legs"], px), f"Vencimiento: SPX liquidó en {px:.2f}")
 
     def paso(self, ts, r, cad=None):
+        if self.ult_min is not None and ts[:5].zfill(5) <= self.ult_min:
+            return                                  # lectura repetida del mismo minuto (dos recolectores)
+        self.ult_min = ts[:5].zfill(5)
         self.ruta.append((ts, r["px"]))
         if mins(ts) >= 8 * 60 + 30:
             self.dia.append((ts, r))
@@ -812,8 +879,8 @@ class Bot:
         return {"fecha": self.f, "pnl": self.pnl_dia(), "ops": n, "ganadoras": g, "nota": self.nota, "vetadas": self.vetadas,
                 "clasif": [{k: v for k, v in c.items() if k != "m"} for c in self.clasif],
                 "real": self.real or (etiquetar_dia(self.dia) if self.dia and (not self.avisar or mins(self.dia[-1][0]) >= self.pb["cierre"] - 5) else None),
-                "abiertas": [{"estructura": self.estructura(p), "entra": et(p["t_in"]), "entrada": p["entrada"], "regla": p["regla"]}
-                             for p in self.abiertas]}
+                "abiertas": [{"estructura": self.estructura(p), "entra": et(p["t_in"]), "entrada": p["entrada"], "regla": p["regla"],
+                              "clave": self.clave(p), "ia": p.get("ia"), "ctx": p["ctx"]} for p in self.abiertas]}
 
 
 # ------------------------------------------------------------------ datos
@@ -840,8 +907,25 @@ def leer_dia(fecha):
     return out
 
 
+def leer_tape_min(fecha):
+    """Resumen del tape por minuto ("HH:MM" → {neto, flujo5, spot, edad}) que guardó el bot en vivo."""
+    out = {}
+    for f in (HIST / f"tape_min_{fecha}.jsonl", HIST / f"tape_min_{fecha}.jsonl.gz"):
+        if f.exists():
+            txt = gzip.decompress(f.read_bytes()).decode() if f.suffix == ".gz" else f.read_text(encoding="utf-8")
+            for ln in txt.splitlines():
+                try:
+                    j = json.loads(ln)
+                    out[j["ts"][:5].zfill(5)] = {"neto": j.get("neto"), "flujo5": j.get("flujo5"), "spot": j.get("spot"), "edad": j.get("edad")}
+                except (ValueError, KeyError):
+                    pass
+            break
+    return out
+
+
 def correr_dia(fecha, pb=None):
     b = Bot(fecha, pb or PB)
+    b.tape_hist = leer_tape_min(fecha)
     filas = leer_dia(fecha)
     for ts, r in filas:
         if mins(ts) < 8 * 60 + 30:
@@ -922,7 +1006,27 @@ def tema_alertas():
     return t
 
 
+_CANDADO = None
+
+
+def una_sola_instancia(puerto=47321):
+    """Candado: si ya hay un bot corriendo en esta PC, no arranca otro (evita alertas y publicaciones dobles)."""
+    global _CANDADO
+    import socket
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        s.bind(("127.0.0.1", puerto))
+        s.listen(1)
+    except OSError:
+        return False
+    _CANDADO = s
+    return True
+
+
 def vivo():
+    if not una_sola_instancia():
+        print("⚠ Ya hay un bot de papel corriendo en esta computadora. No abro otro. (Cierra esta ventana.)")
+        return
     traer_remoto()
     t = tema_alertas()
     hoy = dt.datetime.now(dt.timezone(dt.timedelta(hours=-6))).date().isoformat()
@@ -932,6 +1036,14 @@ def vivo():
         est = {}
     b = Bot(hoy)
     b.avisar = True
+    b.tape_hist = leer_tape_min(hoy)
+    try:                                   # lo ya publicado hoy, para reanudar sin perder la opinión de Claude ni el tape
+        prev = (json.loads(OUT.read_text(encoding="utf-8")).get("dias") or {}).get(hoy) or {}
+        for o in (prev.get("operaciones") or []) + (prev.get("abiertas") or []):
+            if o.get("clave"):
+                b.previo[o["clave"]] = {"ia": o.get("ia"), "ctx": o.get("ctx")}
+    except Exception:
+        pass
     mk = Marcador()
     tl = TapeLog(hoy)
     b.veto = Veto()
