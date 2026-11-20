@@ -1,13 +1,14 @@
 {
- "actualizado": "2026-11-19T21:08:30Z",
+ "actualizado": "2026-11-20T15:10:09Z",
  "activas": [
-  "grab-leaps|slcerca",
+  "grab-leaps|sl",
   "ibit-acciones|sl",
   "mstx-acciones|sl",
   "tsm-put-spread|sl",
   "vst-call-spread|vig0|133.0"
  ],
  "recordados": [
+  "crwv-calls|rec|2026-11-20|expira hoy sin valor: pasarla a cerradas",
   "vst-call-spread|rec|2026-11-11|decidir la reestructura (vence el 20-nov): mariposa, 133/138C o put spread 133/128"
  ]
 }
