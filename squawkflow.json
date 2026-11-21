@@ -1,0 +1,109 @@
+{
+ "_nota": "Niveles de SquawkFlow publicados ANTES de cada sesión (SPX, todos los vencimientos, OI liquidado el día hábil anterior). Fuente: squawkflow.com/session/FECHA. Solo contexto: no es recomendación.",
+ "dias": {
+  "2026-11-03": {
+   "regimen": "negativa",
+   "flip": 7638.32,
+   "call_wall": 8100,
+   "put_wall": 7500,
+   "net_gex_mmm": -91.58,
+   "url": "https://squawkflow.com/session/2026-11-03"
+  },
+  "2026-11-04": {
+   "regimen": "positiva",
+   "flip": 7628.91,
+   "call_wall": 8100,
+   "put_wall": 7500,
+   "net_gex_mmm": -67.68,
+   "url": "https://squawkflow.com/session/2026-11-04"
+  },
+  "2026-11-05": {
+   "regimen": "positiva",
+   "flip": 7652.87,
+   "call_wall": 8100,
+   "put_wall": 7500,
+   "net_gex_mmm": 3.32,
+   "url": "https://squawkflow.com/session/2026-11-05"
+  },
+  "2026-11-06": {
+   "regimen": "negativa",
+   "flip": 7589.11,
+   "call_wall": 8100,
+   "put_wall": 7300,
+   "net_gex_mmm": -104.7,
+   "url": "https://squawkflow.com/session/2026-11-06"
+  },
+  "2026-11-09": {
+   "regimen": "negativa",
+   "flip": 7579.16,
+   "call_wall": 8100,
+   "put_wall": 7300,
+   "net_gex_mmm": -101.38,
+   "url": "https://squawkflow.com/session/2026-11-09"
+  },
+  "2026-11-11": {
+   "regimen": "positiva",
+   "flip": 7579.13,
+   "call_wall": 8100,
+   "put_wall": 7500,
+   "net_gex_mmm": -67.67,
+   "url": "https://squawkflow.com/session/2026-11-11"
+  },
+  "2026-11-12": {
+   "regimen": "negativa",
+   "flip": 7593.59,
+   "call_wall": 7700,
+   "put_wall": 7500,
+   "net_gex_mmm": -2.78,
+   "url": "https://squawkflow.com/session/2026-11-12"
+  },
+  "2026-11-13": {
+   "regimen": "positiva",
+   "flip": 7593.46,
+   "call_wall": 8100,
+   "put_wall": 7500,
+   "net_gex_mmm": -34.55,
+   "url": "https://squawkflow.com/session/2026-11-13"
+  },
+  "2026-11-16": {
+   "regimen": "negativa",
+   "flip": 7587.43,
+   "call_wall": 8100,
+   "put_wall": 7500,
+   "net_gex_mmm": -46.6,
+   "url": "https://squawkflow.com/session/2026-11-16"
+  },
+  "2026-11-17": {
+   "regimen": "negativa",
+   "flip": 7552.62,
+   "call_wall": 8100,
+   "put_wall": 7300,
+   "net_gex_mmm": -100.16,
+   "url": "https://squawkflow.com/session/2026-11-17"
+  },
+  "2026-11-18": {
+   "regimen": "negativa",
+   "flip": 7528.6,
+   "call_wall": 8100,
+   "put_wall": 7300,
+   "net_gex_mmm": -104.28,
+   "url": "https://squawkflow.com/session/2026-11-18"
+  },
+  "2026-11-19": {
+   "regimen": "negativa",
+   "flip": 7509.44,
+   "call_wall": 8100,
+   "put_wall": 7300,
+   "net_gex_mmm": -104.81,
+   "url": "https://squawkflow.com/session/2026-11-19"
+  },
+  "2026-11-20": {
+   "regimen": "negativa",
+   "flip": 7428.5,
+   "call_wall": 8100,
+   "put_wall": 7100,
+   "net_gex_mmm": -113.29,
+   "url": "https://squawkflow.com/session/2026-11-20"
+  }
+ }
+}

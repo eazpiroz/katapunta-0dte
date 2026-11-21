@@ -111,16 +111,16 @@ details summary:before{content:"▸ ";color:var(--brand)} details[open] summary:
     <div class="kpi"><div class="k">Régimen a las 10:00</div><div class="v" id="kReg">—</div><div class="d" id="kRegD">acierto contra el cierre</div></div>
     <div class="kpi"><div class="k">Tu lectura</div><div class="v" id="kTuya">—</div><div class="d" id="kTuyaD">régimen en la Bitácora</div></div>
     <div class="kpi"><div class="k">Clasificador (Claude)</div><div class="v" id="kIA">—</div><div class="d" id="kIAD">10, 11 y 13 h</div></div>
+    <div class="kpi"><div class="k">SquawkFlow antes de abrir</div><div class="v" id="kSq">—</div><div class="d" id="kSqD">régimen de todos los vencimientos</div></div>
     <div class="kpi"><div class="k">PIN de las 15:00</div><div class="v" id="kPin">—</div><div class="d">error mediano al cierre</div></div>
     <div class="kpi"><div class="k">GEX propio = manual</div><div class="v" id="kGex">—</div><div class="d">% de minutos con el mismo régimen</div></div>
     <div class="kpi"><div class="k">Veto de Claude</div><div class="v" id="kVeto">—</div><div class="d" id="kVetoD">ahorro − costo</div></div>
-    <div class="kpi"><div class="k">Bot de papel</div><div class="v" id="kBot">—</div><div class="d" id="kBotD"></div></div>
-    <div class="kpi"><div class="k">Tu SPX 0DTE real</div><div class="v" id="kReal">—</div><div class="d" id="kRealD"></div></div>
+    <div class="kpi"><div class="k">Bot de papel vs tu real</div><div class="v" id="kBot">—</div><div class="d" id="kBotD"></div></div>
   </section>
   <section class="panel" aria-labelledby="hDia">
     <h2 id="hDia">Día por día <small>✓ acertó · ✗ falló · · sin lectura</small></h2>
     <div class="scroll"><table>
-      <thead><tr><th>Día</th><th>Cierre fue</th><th>10:00</th><th>Tú</th><th class="hide-s">Claude 10/11/13</th><th class="hide-s">PIN err</th><th class="hide-s">GEX =</th><th>Bot</th><th>Real</th></tr></thead>
+      <thead><tr><th>Día</th><th>Cierre fue</th><th>10:00</th><th>Tú</th><th class="hide-s">Squawk</th><th class="hide-s">Claude 10/11/13</th><th class="hide-s">PIN err</th><th class="hide-s">GEX =</th><th>Bot</th><th>Real</th></tr></thead>
       <tbody id="tDia"></tbody>
     </table></div>
   </section>
@@ -145,10 +145,11 @@ function pinta(n){
   const gx=xs.map(x=>x.gex_coincide).filter(v=>v!=null); $("kGex").textContent=gx.length?Math.round(gx.reduce((s,v)=>s+v,0)/gx.length)+"%":"—";
   const ah=xs.reduce((s,x)=>s+x.veto.ahorro,0), co=xs.reduce((s,x)=>s+x.veto.costo,0), nv=xs.reduce((s,x)=>s+x.veto.n,0);
   $("kVeto").textContent=usd(ah-co); $("kVeto").className="v "+cls(ah-co); $("kVetoD").textContent=`${nv} vetos · ahorró ${usd(ah)} · costó ${usd(co)}`;
-  const bx=xs.filter(x=>x.bot&&x.bot.pnl!=null), bt=bx.reduce((s,x)=>s+x.bot.pnl,0); $("kBot").textContent=usd(bt); $("kBot").className="v "+cls(bt); $("kBotD").textContent=`${bx.length} días en papel`;
-  const rx=xs.filter(x=>x.real&&x.real.pnl!=null), rt=rx.reduce((s,x)=>s+x.real.pnl,0); $("kReal").textContent=rx.length?usd(rt):"—"; $("kReal").className="v "+cls(rt); $("kRealD").textContent=`${rx.length} días con datos`;
+  [a,t]=cnt(xs,x=>x.squawk&&x.squawk.ok); $("kSq").textContent=pct(a,t); $("kSqD").textContent=t?`${a} de ${t} días · γ− → tendencia, γ+ → rango`:"sin datos";
+  const bx=xs.filter(x=>x.bot&&x.bot.pnl!=null), bt=bx.reduce((s,x)=>s+x.bot.pnl,0); $("kBot").textContent=usd(bt); $("kBot").className="v "+cls(bt);
+  const rx=xs.filter(x=>x.real&&x.real.pnl!=null), rt=rx.reduce((s,x)=>s+x.real.pnl,0); $("kBotD").innerHTML=`${bx.length} días en papel · real <span class="${cls(rt)}">${rx.length?usd(rt):"—"}</span> en ${rx.length} días`;
   $("tDia").innerHTML=xs.slice().reverse().map(x=>`<tr><td>${dia(x.fecha)}</td><td>${x.etiqueta||"—"}</td>
-    <td>${x.regimen10.pred} ${mark(x.regimen10.ok)}</td><td>${x.tuya.lectura?x.tuya.lectura+" "+mark(x.tuya.ok):"—"}</td>
+    <td>${x.regimen10.pred} ${mark(x.regimen10.ok)}</td><td>${x.tuya.lectura?x.tuya.lectura+" "+mark(x.tuya.ok):"—"}</td><td class="hide-s">${x.squawk?(x.squawk.regimen==="positiva"?"γ+ ":"γ− ")+mark(x.squawk.ok):"—"}</td>
     <td class="hide-s">${x.clasif.length?x.clasif.map(c=>mark(c.ok_ia)).join(" "):"—"}</td>
     <td class="hide-s num">${x.pin15.error!=null?x.pin15.error.toFixed(0):"—"}</td>
     <td class="hide-s num">${x.gex_coincide!=null?x.gex_coincide+"%":"—"}</td>

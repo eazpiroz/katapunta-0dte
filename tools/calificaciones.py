@@ -6,6 +6,7 @@ Por día califica:
   · Clasificador del bot (reglas y Claude) a las 10:00, 11:00 y 13:00 ET.
   · PIN de las 15:00 ET contra el cierre oficial (error en puntos).
   · GEX propio contra la lectura manual del perfil γ (% de minutos con el mismo régimen).
+  · Régimen publicado por SquawkFlow antes de abrir (todos los vencimientos) contra el cierre.
   · Veto de Claude: dinero que habría ahorrado (vetos de perdedoras) y costado (vetos de ganadoras).
   · Bot de papel contra tu SPX 0DTE real (neto de comisiones, de bitacora_auto).
 
@@ -113,6 +114,7 @@ def calificar():
     papel = json.loads((HERE / "papel.json").read_text(encoding="utf-8")) if (HERE / "papel.json").exists() else {}
     liq = json.loads((HERE / "liquidaciones.json").read_text(encoding="utf-8")) if (HERE / "liquidaciones.json").exists() else {}
     bitacora = json_url("https://0dte.katapunta.com/bitacora.json?t=%d" % dt.datetime.now().timestamp())
+    squawk = (json_url("https://0dte.katapunta.com/squawkflow.json?t=%d" % dt.datetime.now().timestamp()) or {}).get("dias", {})
     archivos = {}
     for f in glob.glob(str(HIST / "20??-??-??.jsonl*")):
         archivos.setdefault(os.path.basename(f)[:10], f)      # .jsonl antes que .jsonl.gz si están los dos
@@ -166,6 +168,10 @@ def calificar():
                        for c in clas],
             "pin15": {"pin": pin, "error": round(abs(pin - cierre), 1) if pin else None},
             "gex_coincide": coinc,
+            "squawk": (lambda q: {"regimen": q["regimen"], "flip": q.get("flip"),
+                                  "pred": "rango" if q["regimen"] == "positiva" else "tendencia",
+                                  "ok": acierta("rango" if q["regimen"] == "positiva" else "tendencia", etiqueta)}
+                       if q else None)(squawk.get(fecha)),
             "veto": {"n": len(vet), "ahorro": round(ahorro), "costo": round(costo)},
             "bot": {"pnl": pd.get("pnl"), "ops": pd.get("ops"), "ganadoras": pd.get("ganadoras")} if pd else None,
             "real": {"pnl": real, "fuente": fuente} if real is not None else None,
