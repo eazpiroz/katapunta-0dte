@@ -37,6 +37,7 @@ PB = {
     "cierre": 15 * 60,         # liquidación
     "gtol": 3.0,               # banda del zero γ para llamar positiva / negativa
     "riesgo": 1000.0,          # $ máximos en riesgo por operación
+    "capital": 3500.0,         # capital del bot: el riesgo abierto (buying power en uso) nunca pasa de aquí
     "max_ctr": 5,
     "max_ops": 5,              # entradas por día
     "stop_dia": -1500.0,       # si el día llega aquí, no abre más
@@ -55,7 +56,8 @@ PB = {
     # --- candidatas en prueba (apagadas en v1; solo las usa el probador de variantes)
     "a_recorrido": 0,          # A: no comprar si el objetivo está a menos de N pts (0 = apagado)
     "obj_pasa_largo": False,   # A: el TP por nivel solo cuenta si el objetivo pasa el strike largo
-    "b_sin_tendencia": False,  # B: no vender si el clasificador (reglas) dice tendencia          # min: con la lectura γ (perfil manual) más vieja que esto, no abre B ni C (A sí, va por tendencia)
+    "b_sin_tendencia": False,  # B: no vender si el clasificador (reglas) dice tendencia
+    "c_quietud": 0,            # C ampliada: con SPX a ≤10 pts del PIN del tablero y rango de 30 min ≤ N pts, IC sin exigir gamma + (0 = apagado)          # min: con la lectura γ (perfil manual) más vieja que esto, no abre B ni C (A sí, va por tendencia)
 }
 
 
@@ -649,6 +651,10 @@ class Bot:
             return False
         return True
 
+    def bp_uso(self):
+        """Buying power en uso = pérdida máxima de lo abierto (en verticales Schwab aparta exactamente eso)."""
+        return sum((p["ancho"] + p["entrada"] if p["entrada"] < 0 else p["entrada"]) * 100 * p["n"] for p in self.abiertas)
+
     def ctr(self, riesgo_spread):
         return max(1, min(self.pb["max_ctr"], int(self.pb["riesgo"] // max(1.0, riesgo_spread * 100))))
 
@@ -657,6 +663,10 @@ class Bot:
         credito = precio < 0
         riesgo = ancho + precio if credito else precio          # precio <0 = crédito
         n = self.ctr(riesgo)
+        libre = self.pb["capital"] - self.bp_uso()
+        n = min(n, int(libre // max(1.0, riesgo * 100)))
+        if n < 1:
+            return                                  # no alcanza el capital del bot
         p = {"id": f"{self.f}-{len(self.ops) + len(self.abiertas) + 1}", "tipo": tipo, "dir": dire, "legs": legs,
              "entrada": round(precio, 2), "n": n, "ancho": ancho, "regla": regla, "ancla": ancla, "obj": objetivo,
              "t_in": ts[:5], "estimado": bool(r.get("_bs")), "ctx": {**{k: c[k] for k in ("px", "zg", "g", "T", "mp", "mn", "tf2", "edad_g")},
@@ -772,7 +782,12 @@ class Bot:
                     return
         # C · IC de pin al final del día
         a, b = pb["pin"]
-        if a <= m <= b and c["g"] == 1 and c["mp"] and not gamma_vieja and abs(c["px"] - c["mp"]) <= pb["pin_dist"] \
+        pin_t = (r.get("pin") or [None])[0]
+        ult = [x for _, x in list(self.ruta)[-30:]]
+        quieto = pb["c_quietud"] and pin_t and len(ult) >= 25 and max(ult) - min(ult) <= pb["c_quietud"] \
+            and abs(c["px"] - pin_t) <= pb["pin_dist"]
+        clasico = c["g"] == 1 and c["mp"] and not gamma_vieja and abs(c["px"] - c["mp"]) <= pb["pin_dist"]
+        if a <= m <= b and (clasico or quieto) \
                 and not any(p["tipo"] == "pin" for p in self.abiertas) and self.n_ent < pb["max_ops"] \
                 and self.pnl_dia() > pb["stop_dia"]:
             def pick(sd):
@@ -783,6 +798,8 @@ class Bot:
                 cred = xc[5] + xp[5] - pb["slip"]
                 legs = [("p", xp[3], 1), ("p", xp[2], -1), ("c", xc[2], -1), ("c", xc[3], 1)]
                 self.abrir(ts, r, c, "pin", 0, legs, -cred, 5,
+                           (f"C · pin por quietud: SPX a {abs(c['px'] - pin_t):.0f} pts del PIN {pin_t:.0f} y rango de 30 min de "
+                            f"{max(ult) - min(ult):.0f} pts → IC δ0.20 al vencimiento; stop solo si sale del corto") if (quieto and not clasico) else
                            f"C · pin: gamma positiva y precio a {abs(c['px'] - c['mp']):.0f} pts del major + {c['mp']:.0f} → "
                            f"IC δ0.20 al vencimiento; stop solo si sale del corto")
 
@@ -886,6 +903,7 @@ class Bot:
         n = len(self.ops)
         g = sum(1 for o in self.ops if o["pnl"] > 0)
         return {"fecha": self.f, "pnl": self.pnl_dia(), "ops": n, "ganadoras": g, "nota": self.nota, "vetadas": self.vetadas,
+                "capital": self.pb["capital"], "bp_uso": round(self.bp_uso()),
                 "clasif": [{k: v for k, v in c.items() if k != "m"} for c in self.clasif],
                 "real": self.real or (etiquetar_dia(self.dia) if self.dia and (not self.avisar or mins(self.dia[-1][0]) >= self.pb["cierre"] - 5) else None),
                 "abiertas": [{"estructura": self.estructura(p), "entra": et(p["t_in"]), "entrada": p["entrada"], "regla": p["regla"],

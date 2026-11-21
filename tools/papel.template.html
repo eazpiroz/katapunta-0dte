@@ -177,9 +177,11 @@ function fila(nom,arr,acierto){const p=arr.reduce((s,o)=>s+o.pnl,0),w=arr.filter
   const dias=Object.keys(d.dias||{}).sort(), ops=dias.flatMap(f=>d.dias[f].operaciones||[]);
   const act=new Date(d.actualizado);
   const abHoy=(d.dias[dias[dias.length-1]]||{}).abiertas||[];
-  $("banner").textContent=(abHoy.length?`${abHoy.length} posición${abHoy.length>1?"es":""} abierta${abHoy.length>1?"s":""} ahora · `:"")+`Actualizado ${act.toLocaleString("es-MX",{timeZone:"America/New_York",dateStyle:"medium",timeStyle:"short"})} ET · ${dias.length} días · último modo: ${d.modo==="vivo"?"en vivo":"repetición del historial"}`;
+  const bpHoy=(d.dias[dias[dias.length-1]]||{}).bp_uso||0;
+  $("banner").textContent=(abHoy.length?`${abHoy.length} posición${abHoy.length>1?"es":""} abierta${abHoy.length>1?"s":""} ahora · buying power en uso $${bpHoy.toLocaleString("en-US")} · `:"")+`Actualizado ${act.toLocaleString("es-MX",{timeZone:"America/New_York",dateStyle:"medium",timeStyle:"short"})} ET · ${dias.length} días · último modo: ${d.modo==="vivo"?"en vivo":"repetición del historial"}`;
   const tot=ops.reduce((s,o)=>s+o.pnl,0), win=ops.filter(o=>o.pnl>0), gan=win.reduce((s,o)=>s+o.pnl,0), per=-ops.filter(o=>o.pnl<0).reduce((s,o)=>s+o.pnl,0);
-  $("kPnl").textContent=usd(tot); $("kPnl").className="v "+cls(tot); $("kPnlD").textContent=ops.length+" operaciones";
+  $("kPnl").textContent=usd(tot); $("kPnl").className="v "+cls(tot); const cap=(d.playbook||{}).capital||3500;
+  $("kPnlD").textContent=ops.length+" operaciones · "+(tot>=0?"+":"")+(100*tot/cap).toFixed(1)+"% sobre capital de $"+cap.toLocaleString("en-US");
   $("kWin").textContent=ops.length?Math.round(100*win.length/ops.length)+"%":"—"; $("kWinD").textContent=win.length+" ganadoras";
   $("kPF").textContent=per?(gan/per).toFixed(2):"—";
   const conReal=dias.filter(f=>R[f]!=null), rt=conReal.reduce((s,f)=>s+R[f],0), bt=conReal.reduce((s,f)=>s+d.dias[f].pnl,0);
@@ -211,7 +213,7 @@ function fila(nom,arr,acierto){const p=arr.reduce((s,o)=>s+o.pnl,0),w=arr.filter
   const P=d.playbook||{}, hm=m=>{m+=60;return Math.floor(m/60)+":"+String(m%60).padStart(2,"0")+" ET";};
   $("pbv").textContent=P.version||"";
   const items=[["Abre desde",hm(P.abre)],["Último débito de tendencia",hm(P.ultima_tend)],["Última venta",hm(P.ultima_venta)],
-    ["IC de pin",P.pin?hm(P.pin[0])+"–"+hm(P.pin[1]):"—"],["Riesgo por operación",usd(P.riesgo)],["Máx. entradas por día",P.max_ops],
+    ["IC de pin",P.pin?hm(P.pin[0])+"–"+hm(P.pin[1]):"—"],["Riesgo por operación",usd(P.riesgo)],["Capital del bot",usd(P.capital||3500)],["Máx. entradas por día",P.max_ops],
     ["Stop del día",usd(P.stop_dia)],["Enfriar tras pérdida",P.enfriar+" min"],["Antes de voltear dirección",P.contra+" min"],
     ["Débito: δ / ancho / máx",P.deb_delta+" / "+P.deb_ancho+" / "+Math.round(P.deb_max*100)+"%"],["Débito TP / SL",Math.round(P.deb_tp*100)+"% máx / −"+Math.round(P.deb_sl*100)+"%"],
     ["Venta: δ máx / ancho / crédito mín",P.ven_dmax+" / "+P.ven_ancho+" / "+Math.round(P.ven_min*100)+"%"],["Venta TP / catástrofe",Math.round(P.ven_tp*100)+"% / "+P.ven_cat+"×"],
