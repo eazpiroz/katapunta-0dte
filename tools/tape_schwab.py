@@ -141,8 +141,12 @@ class Tape:
             r[p["lado"]] += p["prem"]
             r["n"] += p["n"]
         top = sorted(res.values(), key=lambda r: -(r["B"] + r["V"] + r["M"]))[:12]
-        neto = lambda t: sum(r["B"] - r["V"] for r in res.values() if r["t"] == t)
+        neto = lambda t, rs=None: sum(r["B"] - r["V"] for r in (rs if rs is not None else res.values()) if r["t"] == t)
+        # 21-nov (#24): ITM de más de 30 pts = cierres, rolls y coberturas; fuera del neto y del gráfico "otm"
+        otm = [r for r in res.values() if not spot or not ((r["t"] == "C" and r["k"] < spot - 30) or (r["t"] == "P" and r["k"] > spot + 30))]
+        top_otm = sorted(otm, key=lambda r: -(r["B"] + r["V"] + r["M"]))[:12]
         return {"ts": int(time.time()), "spot": spot, "min": MIN,
+                "strikes_otm": top_otm, "neto_otm": {"C": neto("C", otm), "P": neto("P", otm)},
                 "prints": [{k: v for k, v in p.items() if k != "ts"} for p in list(limpios)[-60:]][::-1],
                 "spreads": [{k: v for k, v in p.items() if k != "ts"} for p in self.prints if p["spread"]][-20:][::-1],
                 "strikes": top, "neto": {"C": neto("C"), "P": neto("P")}}

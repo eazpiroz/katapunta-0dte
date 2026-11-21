@@ -655,7 +655,7 @@ def build_ticker(c, tk, q, manual, today, state, vixinfo, macro):
     lad = {"v": [], "c": []}
     if ks:
         fb = lambda o, f: float((o or {}).get(f) or 0)
-        LADW = {"SPX": ((5, 10), (10, 20)), "SPY": ((1, 2), (1, 2)), "QQQ": ((1, 2), (1, 2))}[tk]
+        LADW = {"SPX": ((5, 10, 15), (10, 20)), "SPY": ((1, 2), (1, 2)), "QQQ": ((1, 2), (1, 2))}[tk]
         for side in ("c", "p"):
             sg_ = 1 if side == "c" else -1
             for dl in (0.05, 0.10, 0.15, 0.20, 0.25):

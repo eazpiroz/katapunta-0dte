@@ -207,6 +207,7 @@ a{color:#5CC1BF}a:hover{color:#8ADBD7}
 <div style="display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12px; color: #93A9A9">
 <span style="display: flex; align-items: center; gap: 6px"><span style="width: 4px; height: 10px; background: #5FD4A0"></span><span style="width: 4px; height: 10px; background: #F07F74"></span>Velas 5m</span>
 <span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px dotted #F07F74"></span>EMA 9</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px dashed #8ADBD7"></span>VWAP</span>
 <span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px solid #E6B655"></span>SMA 20</span>
 <span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; height: 9px; background: rgba(232, 237, 245, 0.12); border-top: 2px solid #5FD4A0; border-bottom: 2px solid #F07F74"></span>Canal (call wall / put wall)</span>
 <span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px dotted #F2EFE8"></span>Zero Gamma</span>
@@ -253,6 +254,7 @@ a{color:#5CC1BF}a:hover{color:#8ADBD7}
 <path d="{{chart.sma200}}" fill="none" stroke="#A78BFA" stroke-width="1.5" vector-effect="non-scaling-stroke"></path>
 <path d="{{chart.ema21}}" fill="none" stroke="#E6B655" stroke-width="1.5" vector-effect="non-scaling-stroke"></path>
 <path d="{{chart.ema9}}" fill="none" stroke="#F07F74" stroke-width="1.5" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"></path>
+<path d="{{chart.vwap}}" fill="none" stroke="#8ADBD7" stroke-width="1.5" stroke-dasharray="7 4" vector-effect="non-scaling-stroke"></path>
 </svg>
 <template data-k="for" list="{{chart.levels}}" as="lv" hint-placeholder-count="7"><div style="{{lv.lineStyle}}"></div></template>
 <template data-k="for" list="{{chart.off}}" as="o" hint-placeholder-count="1"><span style="{{o.style}}">{{o.t}}</span></template>
@@ -288,8 +290,9 @@ a{color:#5CC1BF}a:hover{color:#8ADBD7}
 <path d="{{chart.semG}}" fill="#5FD4A0"></path>
 <path d="{{chart.semA}}" fill="#E6B655"></path>
 <path d="{{chart.semR}}" fill="#F07F74"></path>
+<path d="{{chart.semN}}" fill="#3A5254"></path>
 </svg>
-<span style="padding-left: 8px; white-space: nowrap"><span style="color: #5FD4A0">●</span> vender prima <span style="color: #E6B655">●</span> reservas <span style="color: #F07F74">●</span> tendencia</span>
+<span style="padding-left: 8px; white-space: nowrap"><span style="color: #5FD4A0">●</span> vender prima <span style="color: #E6B655">●</span> reservas <span style="color: #F07F74">●</span> tendencia <span style="color: #3A5254">●</span> primeros 30 min</span>
 <span></span>
 </div>
 </template>
@@ -357,7 +360,7 @@ a{color:#5CC1BF}a:hover{color:#8ADBD7}
 </template>
 </div>
 </div>
-<div style="font-size: 11px; color: #93A9A9; line-height: 1.5; border-top: 1px solid #1E3739; padding-top: 8px">Reglas fijas: iron condor con gamma positiva por volumen, sin momentum y VIX bajando (cortos en delta 15). Verticales vendidos detrás del techo/piso y del delta 15, a favor del momentum. Verticales comprados solo con momentum fuerte alineado en 5m, 15m y 1H, mejor si acelera o hay gamma negativa. Alas de 10; precios a mitad de la cadena. Describe el entorno; no es recomendación de entrada. Detalle técnico, agenda completa y bitácora en la vista Completa.</div>
+<div style="font-size: 11px; color: #93A9A9; line-height: 1.5; border-top: 1px solid #1E3739; padding-top: 8px">Reglas fijas: iron condor con gamma positiva por volumen, sin momentum y VIX bajando (cortos en delta 15). Verticales vendidos detrás del techo/piso y del delta 15, a favor del momentum. Verticales comprados solo con momentum fuerte alineado en 5m, 15m y 1H, mejor si acelera o hay gamma negativa. Alas de 10 (15 con VIX &gt; 20, crédito mínimo 1.80); precios a mitad de la cadena. Describe el entorno; no es recomendación de entrada. Detalle técnico, agenda completa y bitácora en la vista Completa.</div>
 </section>
 </template>
 
@@ -507,7 +510,7 @@ a{color:#5CC1BF}a:hover{color:#8ADBD7}
 </div>
 </div>
 </template>
-<script>window.BUILD='d906edb5';
+<script>window.BUILD='01a135bf';
 (function(){
   const tpl = document.getElementById('tpl');
   const mount = document.getElementById('app');
@@ -676,7 +679,7 @@ class Component extends DCLogic {
           { day: 'Vie 30-oct', cut: '15:59 ET · Perfil γ latest', zg: '7,580.9', gm: '7,580 / 7,590', range: '±1σ 7,557 – 7,605', close: '7,580.07', result: 'Cerró a 0.3 pts del major long gamma (State 7,580.4). El mínimo 7,527.6 rompió −1σ a media sesión.' },
           { day: 'Lun 2-nov', cut: 'Pre-apertura · Perfil γ next + Cboe', zg: '7,593.4', gm: '7,650 / 7,500', range: 'EM 7,514 – 7,646', close: '—', result: 'Pendiente' }
         ],
-        footer: 'Fuentes: TradingView (SPX, SPY, VIX en tiempo real; ES1! con 10 min de retraso), Cboe delayed quotes (15 min), Perfil γ (lectura manual).'
+        footer: 'Fuentes: TradingView (SPX, SPY, VIX en tiempo real; ES1! con 10 min de retraso), Schwab (cadena 0DTE y tape cada minuto), perfil γ (lectura manual).'
       },
       SPY: {
         sym: 'SPY', spot: 756, closeTxt: '755.72', tickers: spxTickers,
@@ -704,7 +707,7 @@ class Component extends DCLogic {
         log: [
           { day: 'Lun 2-nov', cut: 'Pre-apertura · Perfil γ next + Cboe', zg: '755.59', gm: '760 / 750', range: 'EM 748.89 – 762.55', close: '—', result: 'Pendiente · primer registro de SPY' }
         ],
-        footer: 'Fuentes: TradingView (SPX, SPY, VIX en tiempo real; ES1! con 10 min de retraso), Cboe delayed quotes (15 min), Perfil γ (lectura manual).'
+        footer: 'Fuentes: TradingView (SPX, SPY, VIX en tiempo real; ES1! con 10 min de retraso), Schwab (cadena 0DTE y tape cada minuto), perfil γ (lectura manual).'
       },
       NDX: {
         sym: 'NDX', spot: 28400, closeTxt: '28,384.85', tickers: ndxTickers,
@@ -733,7 +736,7 @@ class Component extends DCLogic {
         log: [
           { day: 'Lun 2-nov', cut: 'Pre-apertura · Perfil γ next + Cboe', zg: '28,500.5', gm: '28,520 / 28,000', range: 'EM 27,973 – 28,796', close: '—', result: 'Pendiente · primer registro de NDX' }
         ],
-        footer: 'Fuentes: TradingView (QQQ y VXN en tiempo real; NDX con 15 min y NQ1! con 10 min de retraso), Cboe delayed quotes (15 min), Perfil γ (lectura manual).'
+        footer: 'Fuentes: TradingView (QQQ y VXN en tiempo real; NDX con 15 min y NQ1! con 10 min de retraso), Schwab (cadena 0DTE y tape cada minuto), perfil γ (lectura manual).'
       },
       QQQ: {
         sym: 'QQQ', spot: 690, closeTxt: '690.49', tickers: ndxTickers,
@@ -761,7 +764,7 @@ class Component extends DCLogic {
         log: [
           { day: 'Lun 2-nov', cut: 'Pre-apertura · Perfil γ next + Cboe', zg: '688.39', gm: '700 / 680', range: 'EM 680.40 – 700.58', close: '—', result: 'Pendiente · primer registro de QQQ' }
         ],
-        footer: 'Fuentes: TradingView (QQQ y VXN en tiempo real; NDX con 15 min y NQ1! con 10 min de retraso), Cboe delayed quotes (15 min), Perfil γ (lectura manual).'
+        footer: 'Fuentes: TradingView (QQQ y VXN en tiempo real; NDX con 15 min y NQ1! con 10 min de retraso), Schwab (cadena 0DTE y tape cada minuto), perfil γ (lectura manual).'
       }
     };
     const LC = { up: '#5FD4A0', dn: '#F07F74', zg: '#D3DCDA', am: '#E6B655', th: '#6E8786' };
@@ -923,10 +926,11 @@ class Component extends DCLogic {
       const step = arr => { if (!arr || !arr.length) return 'M0 0'; const a = arr.slice(0, n); let s = 'M0 ' + Y(a[0]).toFixed(1); a.forEach((val, i) => { s += 'H' + ((i + 1) * W).toFixed(1); if (i + 1 < a.length) s += 'V' + Y(a[i + 1]).toFixed(1); }); return s; };
       const stepN = arr => { let s = '', pv = null; (arr || []).forEach((val, i) => { if (val == null) { pv = null; return; } const y = Y(val).toFixed(1); s += (pv == null ? 'M' + (i * W).toFixed(1) + ' ' + y : 'V' + y) + 'H' + ((i + 1) * W).toFixed(1); pv = val; }); return s || 'M0 0'; };
       const dyn = cfg.dyn || {};
+      const vwA = []; { let s_ = 0, sv = 0, sn = 0; for (let i = 0; i < n; i++) { const tp_ = (h[i] + l[i] + c[i]) / 3, w_ = (v && v[i]) || 0; s_ += tp_ * w_; sv += w_; sn += tp_; vwA.push(sv ? s_ / sv : sn / (i + 1)); } }   // 21-nov (#14): VWAP (precio típico; sin volumen del índice, promedio simple como el recolector)
       // sombreado de régimen: precio vs zero gamma por vela
       let shP = '', shN = '';
       (dyn.z || []).forEach((zv, i) => { if (zv == null) return; const r = 'M' + (i * W).toFixed(1) + ' 0H' + ((i + 1) * W).toFixed(1) + 'V400H' + (i * W).toFixed(1) + 'Z'; if (c[i] > zv) shP += r; else shN += r; });
-      const semP = { g: '', a: '', r: '' };
+      const semP = { g: '', a: '', r: '', n: '' };
       (cfg.sem || []).forEach((st_, i) => { if (st_) semP[st_] += 'M' + (i * W).toFixed(1) + ' 0H' + ((i + 1) * W - Math.min(1, W * 0.15)).toFixed(1) + 'V10H' + (i * W).toFixed(1) + 'Z'; });
       // canal sombreado entre call wall y put wall, por vela
       let chF = '';
@@ -998,7 +1002,7 @@ class Component extends DCLogic {
       if (!cfg.live) xt.push({ label: fmtET(510) + ' lun', style: 'position: absolute; top: 2px; left: 80%; transform: translateX(-50%); white-space: nowrap; color: #D3DCDA' });
       return {
         wickUp: wu || 'M0 0', wickDn: wd || 'M0 0', bodyUp: bu || 'M0 0', bodyDn: bd || 'M0 0',
-        ema9: curve(ema(9)), ema21: curve(sma(20)), sma200: cfg.cabina ? 'M0 0' : curve(s200), chFill: chF || 'M0 0', pinDots: pinDots, pills: pills, cabina: !!cfg.cabina, noCabina: !cfg.cabina, zgDyn: stepN(dyn.z), cwDyn: stepN(dyn.c), pwDyn: stepN(dyn.p), shPos: shP || 'M0 0', shNeg: shN || 'M0 0', semG: semP.g || 'M0 0', semA: semP.a || 'M0 0', semR: semP.r || 'M0 0', hasSem: !!(cfg.sem && cfg.sem.some(Boolean)),
+        ema9: curve(ema(9)), vwap: cfg.live ? curve(vwA) : 'M0 0', semN: semP.n || 'M0 0', ema21: curve(sma(20)), sma200: cfg.cabina ? 'M0 0' : curve(s200), chFill: chF || 'M0 0', pinDots: pinDots, pills: pills, cabina: !!cfg.cabina, noCabina: !cfg.cabina, zgDyn: stepN(dyn.z), cwDyn: stepN(dyn.c), pwDyn: stepN(dyn.p), shPos: shP || 'M0 0', shNeg: shN || 'M0 0', semG: semP.g || 'M0 0', semA: semP.a || 'M0 0', semR: semP.r || 'M0 0', hasSem: !!(cfg.sem && cfg.sem.some(Boolean)),
         events: evMarks, evList: evList, evSummary: evSummary,
         emStyle: cfg.cabina ? 'display: none' : 'position: absolute; left: 0; right: 0; top: ' + emTop.toFixed(2) + '%; height: ' + (emBot - emTop).toFixed(2) + '%; background: rgba(242, 181, 68, 0.06); border-top: 1px dashed rgba(242, 181, 68, 0.45); border-bottom: 1px dashed rgba(242, 181, 68, 0.45)',
         pinBand: cfg.pinz ? 'position: absolute; left: 0; right: 0; top: ' + P(cfg.pinz[1]).toFixed(2) + '%; height: ' + (P(cfg.pinz[0]) - P(cfg.pinz[1])).toFixed(2) + '%; background: rgba(232, 210, 122, 0.10); border-top: 1px dashed rgba(232, 210, 122, 0.55); border-bottom: 1px dashed rgba(232, 210, 122, 0.55)' : 'display: none',
@@ -1070,6 +1074,8 @@ class Component extends DCLogic {
     const lr = L ? L.reads[L.reads.length - 1] : null;
     // 12-nov: una lectura manual sin cadena (recolector caído) no trae em/vix/rows…; se completan con la última lectura que sí los tenga
     if (lr) for (let i = L.reads.length - 2; i >= 0; i--) { const pr = L.reads[i]; for (const k in pr) if (lr[k] == null) lr[k] = pr[k]; }
+    const ageG = (lr && lr.gt) ? toMin(lr.t) - toMin(lr.gt) : null;   // 21-nov (#6): edad del perfil γ en minutos
+    const gOld = ageG != null && ageG > 20, gAmb = ageG != null && ageG > 10;
     let liveCfg = null, liveRows = null;
     if (lr) {
       const fv2 = x => x.toLocaleString('en-US', { maximumFractionDigits: x > 1000 ? 0 : 2 });
@@ -1099,6 +1105,11 @@ class Component extends DCLogic {
       const vTxt = vt > 0 ? volName + ' subiendo' : vt < 0 ? volName + ' bajando' : volName + ' lateral';
       const cl = s => Math.max(1, Math.min(3, s));
       const vsTxt = (k, alt) => { const v = lr.vs && lr.vs[k]; if (!v || !v[0]) return alt; const sold = k === 'bc' || k === 'bp'; const wd = Math.abs(v[1] - v[0]); const pr = v[2] || 0; return (sold ? 'Vender ' + fv2(v[0]) + ' / comprar ' + fv2(v[1]) + ' · crédito ' + pr.toFixed(2) + ' · riesgo máx $' + Math.round((wd - pr) * 100) : 'Comprar ' + fv2(v[0]) + ' / vender ' + fv2(v[1]) + ' · débito ' + pr.toFixed(2) + ' · ganancia máx $' + Math.round((wd - pr) * 100)) + ' por contrato'; };
+      const vixN = parseFloat(lr.vix && lr.vix.px) || 0;
+      // 21-nov (#23): corto que pague el crédito mínimo, con el ala más ancha de la escalera (15 con VIX > 20)
+      const minC = vixN > 20 ? 1.80 : 0.50;
+      const pickV = (sd, lim) => { const LV = ((lr.lad && lr.lad.v) || []).filter(x => x[0] === sd && (lim == null || (sd === 'c' ? x[2] >= lim : x[2] <= lim))); if (!LV.length) return null; const wmax = Math.max(...LV.map(x => Math.abs(x[3] - x[2]))); const cand = LV.filter(x => Math.abs(x[3] - x[2]) === wmax && x[5] >= minC).sort((a, b) => a[1] - b[1]); return cand[0] ? { k: cand[0][2], kl: cand[0][3], cr: cand[0][5], w: wmax } : { none: true, w: wmax }; };
+      const sellTxt = (sd, lim, fb) => { const q = pickV(sd, lim); if (!q) return / 0\.00 /.test(fb) ? 'Sin crédito suficiente (mín ' + minC.toFixed(2) + ') · no vender' : fb; if (q.none) return 'Sin crédito suficiente con alas de ' + q.w + ' (mín ' + minC.toFixed(2) + ') ' + (sd === 'c' ? 'arriba del techo' : 'abajo del piso') + ' · no vender'; return 'Vender ' + fv2(q.k) + ' / comprar ' + fv2(q.kl) + ' · crédito ' + q.cr.toFixed(2) + ' (mín ' + minC.toFixed(2) + ') · alas de ' + q.w + ' · riesgo máx $' + Math.round((q.w - q.cr) * 100) + ' · salida si vale ' + (2 * q.cr).toFixed(2) + ' (−$' + Math.round(q.cr * 100) + ')'; };
       const vcol = vt > 0 ? R : vt < 0 ? G : '#93A9A9';
       const c15 = (lr.vix && lr.vix.c15) || [];
       const clo = Math.min(...c15.map(x => Math.min(x[2], x[4]))), chi = Math.max(...c15.map(x => Math.max(x[1], x[4]))), cspan = (chi - clo) || 1;
@@ -1150,7 +1161,7 @@ class Component extends DCLogic {
         const inZ = near.filter(x => x[0] >= z0 - mt / 2 && x[0] <= z1 + mt / 2);
         const anc = inZ.reduce((b, x) => (x[1] + x[2] > b[1] + b[2]) ? x : b, inZ[0] || near[0]);
         const alt = gP ? (sp != null && rnd(sp) !== prim ? rnd(sp) : rnd(cn)) : gMid && cp ? rnd(cp) : gR && cp ? rnd((cp + cn) / 2) !== prim ? rnd((cp + cn) / 2) : null : anc && anc[0] !== prim ? anc[0] : ks.filter(k => k !== prim).reduce((b, k) => Math.abs(k - ctr) < Math.abs(b - ctr) ? k : b, null);
-        PN = { cert, prim, alt, z0, z1, mpV, anc, gR, gP, gX, gMid, nvG, cn, cp };
+        PN = { cert: (gOld && cert !== 'BAJA') ? 'BAJA' : cert, prim, alt, z0, z1, mpV, anc, gR, gP, gX, gMid, nvG, cn, cp };
       }
       const certCol = PN ? (PN.cert === 'ALTA' ? '#5BD69A' : PN.cert === 'MEDIA' ? '#E6B655' : '#93A9A9') : '#93A9A9';
       // series del perfil γ por vela de 5 min: historia de Perfil γ (day.gx) o, si no hay, lecturas manuales
@@ -1159,26 +1170,26 @@ class Component extends DCLogic {
       if (nC) {
         const src = gxs ? gxs.map(r => ({ i: r[0], z: r[1], c: r[2], p: r[3], n: r[4] }))
           : L.reads.filter(r => r.gt).map(r => ({ i: Math.max(0, Math.round((toMin(r.t) - 510) / 5) - 1), z: r.zg, c: r.cwv || r.mp, p: r.pwv || r.mn, n: r.nv }));
-        if (gxs && lr.gt) src.push({ i: nC - 1, z: lr.zg, c: lr.cwv || lr.mp, p: lr.pwv || lr.mn, n: lr.nv });
+        if (gxs && lr.gt && !gOld) src.push({ i: nC - 1, z: lr.zg, c: lr.cwv || lr.mp, p: lr.pwv || lr.mn, n: lr.nv });
         src.sort((a, b) => a.i - b.i);
         let k = -1, cur = null;
-        for (let i = 0; i < nC; i++) { while (k + 1 < src.length && src[k + 1].i <= i) { k++; cur = src[k]; } gzS.push(cur ? cur.z : null); gcS.push(cur ? cur.c : null); gpS.push(cur ? cur.p : null); gnS.push(cur && cur.n != null ? cur.n : null); }
+        for (let i = 0; i < nC; i++) { while (k + 1 < src.length && src[k + 1].i <= i) { k++; cur = src[k]; } const ok = cur && (gxs || i - cur.i <= 4); gzS.push(ok ? cur.z : null); gcS.push(ok ? cur.c : null); gpS.push(ok ? cur.p : null); gnS.push(ok && cur.n != null ? cur.n : null); }   // 21-nov (#13): sin lectura >20 min no se arrastra el nivel
       }
       // FILTRO DE ENTRADA (aprobado 4-nov): intensidad = GEX neto por volumen del perfil γ; límite = precio a < 5 pts del zero gamma;
       // tendencia = 3+ velas de 5 min seguidas fuera del canal de majors por volumen con GEX neto negativo
       const lastGx = gxs && gxs.length ? gxs[gxs.length - 1] : null;
       const nv = lr.nv != null ? lr.nv : (lastGx && lastGx[4] != null ? lastGx[4] : null);
       const intens = nv == null ? null : nv >= 200 ? 'fuerte +' : nv <= -300 ? 'fuerte −' : 'neutro';
-      const limP = tk === 'SPX' ? 5 : 0.5;
+      const limP = tk === 'SPX' ? 5 : 0.5, farP = tk === 'SPX' ? 50 : 5;   // 21-nov (#15): γ− a más de 50 pts del zero gamma = tendencia
       const enLim = !noG && lr.zg != null && Math.abs(dz) < limP;
       // historial del filtro por vela (franja del mapa)
       const semS = []; { let run = 0, rl = 0;
         for (let i = 0; i < nC; i++) {
           const c = L.c[i], z = gzS[i], hc = gcS[i], hp = gpS[i], n_ = gnS[i];
-          if (z == null) { semS.push(null); run = 0; rl = 0; continue; }
+          if (z == null || i < 6) { semS.push(z == null ? null : 'n'); run = 0; rl = 0; continue; }   // primeros 30 min: gris (no se entra)
           const sd = (hc != null && c > hc) ? 1 : (hp != null && c < hp) ? -1 : 0;
           run = sd && sd === rl ? run + 1 : (sd ? 1 : 0); rl = sd;
-          const tr = run >= 3 && ((n_ != null && n_ < 0) || c < z);
+          const tr = (run >= 3 && ((n_ != null && n_ < 0) || c < z)) || c < z - farP;
           semS.push(tr ? 'r' : (Math.abs(c - z) < limP || c < z || (n_ != null && n_ <= -300)) ? 'a' : 'g');
         } }
       let fuera = 0, lado = 0;
@@ -1194,15 +1205,17 @@ class Component extends DCLogic {
       const tendencia = !noG && fuera >= 3 && ((nv != null && nv < 0) || gneg);
       const nvTxt = nv == null ? '' : 'GEX ' + (nv >= 0 ? '+' : '−') + fv2(Math.round(Math.abs(nv)));
       const fil = noG ? { c: '#93A9A9', t: 'Sin lectura del perfil γ: no hay filtro de entrada' }
+        : gOld ? { c: '#93A9A9', t: 'Perfil γ vencido: última lectura hace ' + ageG + ' min (' + fmtET(toMin(lr.gt)) + ' ET) · régimen y PIN sin confirmar, no hay filtro de entrada' }
         : tendencia ? { c: R, t: 'Tendencia: precio ' + (lado > 0 ? 'arriba del call wall' : 'abajo del put wall') + ' ' + fuera * 5 + ' min' + (nvTxt ? ', ' + nvTxt : '') + ' · no IC, no vender el lado ' + (lado > 0 ? 'de calls' : 'de puts') }
         : enLim ? { c: '#E6B655', t: 'Régimen indefinido: precio a ' + fv2(Math.round(Math.abs(dz) * 10) / 10) + ' pts del Zero Gamma · esperar' }
+        : (gneg && (vixN > 25 || (nv != null && nv < -100) || dz < -farP)) ? { c: R, t: 'No vender prima: gamma negativa' + (nvTxt ? ' (' + nvTxt + ')' : '') + ', precio ' + fv2(Math.round(Math.abs(dz))) + ' pts abajo del Zero Gamma' + (vixN ? ' · ' + volName + ' ' + vixN.toFixed(1) : '') + ' · favorece bear call arriba del techo o put debit' }
         : { c: (gneg || intens === 'fuerte −') ? '#E6B655' : G, t: 'Condiciones para vender prima: ' + (gpos ? 'rango' : 'gamma negativa') + (nvTxt ? ' (' + nvTxt + ')' : '') + ', precio a ' + fv2(Math.round(Math.abs(dz))) + ' pts del Zero Gamma · ' + (intens === 'fuerte +' ? 'IC en rango restante' : intens === 'fuerte −' ? (dz < 0 ? 'solo bear call (lado de calls), en Delta 10' : 'solo bull put (lado de puts), en Delta 10') : 'IC en Delta 15') };
       SIMPLE[tk] = {
         fil: fil,
         macro: lr.macro || '',
         lect: [
           noG ? { label: 'RÉGIMEN GAMMA', ic: '◐', pill: 'SIN LECTURA', pillCol: '#E6B655', value: 'Sin lectura', color: '#93A9A9', note: '⚠ Falta la lectura del perfil γ (más de 30 min). Sin ella no hay régimen.' }
-              : { label: 'RÉGIMEN GAMMA', ic: '◐', pill: tendencia ? 'TENDENCIA' : enLim ? 'LÍMITE' : gpos ? (intens === 'fuerte +' ? 'RANGO FUERTE' : 'RANGO') : gneg ? (intens === 'fuerte −' ? 'TENDENCIA FUERTE' : 'AMPLIFICA') : 'LÍMITE', pillCol: gpos ? '#5FD4A0' : gneg ? '#F07F74' : '#93A9A9', value: gpos ? 'Gamma +' : gneg ? 'Gamma −' : 'En el límite', color: gpos ? '#5FD4A0' : gneg ? '#F07F74' : '#D3DCDA', note: '• Zero Gamma ' + fv2(lr.zg) + '\n• Distancia al precio ' + (dz >= 0 ? '+' : '−') + (Math.round(Math.abs(dz) * 10) / 10).toFixed(1) + (intens ? '\n• Intensidad ' + nvTxt + ' (' + intens + ') · rango 15m típico ~' + (intens === 'fuerte +' ? 9 : intens === 'fuerte −' ? 16 : 12) + ' pts' : '') + '\n• Canal (majors por volumen, se mueven con el precio) ' + fv2(lr.pwv || lr.mnv || lr.mn) + ' – ' + fv2(lr.cwv || lr.mpv || lr.mp) + '\n• ' + (gpos ? 'Amortigua → rango' : gneg ? 'Amplifica → tendencia' : 'Cualquier movimiento cambia el régimen') + '\n• ' + (lr.gt ? 'Lectura ' + fmtET(toMin(lr.gt)) + ' ET' : 'Estimado') },
+              : { label: 'RÉGIMEN GAMMA', ic: '◐', pill: gOld ? 'VENCIDO' : tendencia ? 'TENDENCIA' : enLim ? 'LÍMITE' : gpos ? (intens === 'fuerte +' ? 'RANGO FUERTE' : 'RANGO') : gneg ? (intens === 'fuerte −' ? 'TENDENCIA FUERTE' : 'AMPLIFICA') : 'LÍMITE', pillCol: gpos ? '#5FD4A0' : gneg ? '#F07F74' : '#93A9A9', value: gpos ? 'Gamma +' : gneg ? 'Gamma −' : 'En el límite', color: gpos ? '#5FD4A0' : gneg ? '#F07F74' : '#D3DCDA', note: '• Zero Gamma ' + fv2(lr.zg) + '\n• Distancia al precio ' + (dz >= 0 ? '+' : '−') + (Math.round(Math.abs(dz) * 10) / 10).toFixed(1) + (intens ? '\n• Intensidad ' + nvTxt + ' (' + intens + ') · rango 15m típico ~' + (intens === 'fuerte +' ? 9 : intens === 'fuerte −' ? 16 : 12) + ' pts' : '') + '\n• Canal (majors por volumen, se mueven con el precio) ' + fv2(lr.pwv || lr.mnv || lr.mn) + ' – ' + fv2(lr.cwv || lr.mpv || lr.mp) + '\n• ' + (gpos ? 'Amortigua → rango' : gneg ? 'Amplifica → tendencia' : 'Cualquier movimiento cambia el régimen') + '\n• ' + (lr.gt ? 'Lectura ' + fmtET(toMin(lr.gt)) + ' ET' + (gOld ? ' ⚠ vencida (hace ' + ageG + ' min)' : gAmb ? ' (hace ' + ageG + ' min)' : '') : 'Estimado') },
           { label: 'MOMENTUM', ic: '➚', pill: momA ? (momAcc ? 'ACELERANDO' : 'ALINEADO') : mom.filter(v => v).length + '/3', pillCol: momA > 0 ? G : momA < 0 ? R : '#93A9A9', value: momA > 0 ? 'Alcista 3/3' : momA < 0 ? 'Bajista 3/3' : 'Sin alinear', color: momA > 0 ? G : momA < 0 ? R : '#D3DCDA', dots: ['5m', '15m', '1H'].map((t, i) => ({ tf: t, col: mom[i] > 0 ? G : mom[i] < 0 ? R : N })), note: (momA ? (momAcc ? 'Acelerando (MACD 5m creciendo). ' : 'Sin aceleración en 5m. ') : '') + 'Fuerte = EMA 9 sobre/bajo EMA 21 con ambas inclinadas, precio vs SMA 20 (media de Bollinger), RSI 14 vs 50, histograma MACD y precio vs VWAP, en 5m, 15m y 1H a la vez. Sirve para compras direccionales.' + (gpos && !momA ? ' Gamma positiva por volumen: día de rango.' : '') + (lr.fz ? ' ' + lr.fz : '') },
           { label: volName, ic: '∿', pill: lr.vix.nh ? 'MÁX. DEL DÍA' : '', pillCol: R, value: vt > 0 ? '▲ Subiendo' : vt < 0 ? '▼ Bajando' : '► Lateral', color: vcol, spark: spark, note: (lr.vix.nh ? '⚠ Nuevo máximo del día · ' : '') + 'Velas de 15m · amarillo = SMA 20' },
           { label: 'RANGO RESTANTE', ic: '↔', sub: '±' + fv2(Math.round((rr[1] - rr[0]) / 2)), value: fv2(rr[0]) + ' – ' + fv2(rr[1]), color: '#E6B655', rng: 1, rng_open: rng.open, rng_rem: rng.rem, rng_dA: rng.dA, rng_dB: rng.dB, rng_px: rng.px, rngL: fv2(rlo), rngR: fv2(rhi), note: (d15 ? 'Delta 15: ' + fv2(d15[0]) + ' / ' + fv2(d15[1]) + '\n' : '') + 'Apertura (fijo): ' + fv2(lr.em[0]) + ' – ' + fv2(lr.em[1]) },
@@ -1212,8 +1225,8 @@ class Component extends DCLogic {
         ].filter(Boolean),
         est: [
           ['Iron condor', (tendencia || enLim || intens === 'fuerte −') ? 1 : cl(1 + (gpos ? 1 : 0) + (!momA ? 1 : 0) + (vt < 0 ? 1 : 0) - (gneg ? 1 : 0) + (intens === 'fuerte +' ? 1 : 0)), (tendencia ? 'Tendencia fuera del canal · ' : enLim ? 'Régimen indefinido · ' : '') + gTxt + (intens ? ' · intensidad ' + intens : '') + ' · ' + (momA ? 'con momentum' : 'sin momentum') + ' · ' + vTxt, lr.icd ? 'Delta 15: cortos ' + fv2(lr.icd[0]) + ' / ' + fv2(lr.icd[1]) + (lr.icd[2] ? ' · crédito ' + lr.icd[2].toFixed(2) : '') + ' · alas de ' + lr.icd[3] + (gneg && lr.ic2 ? ' · en γ− alternativa ajustada: ' + fv2(lr.ic2[0]) + ' / ' + fv2(lr.ic2[1]) + (lr.ic2[2] ? ' (' + lr.ic2[2].toFixed(2) + ')' : '') : '') : (lr.ic ? 'Cortos ' + fv2(lr.ic[0]) + ' / ' + fv2(lr.ic[1]) : 'Cortos fuera de ' + fv2(lr.piso[0]) + ' / ' + fv2(lr.techo[0]))],
-          ['Bear call vendido', (tendencia && lado > 0) || enLim ? 1 : cl((intens === 'fuerte −' && dz < 0 ? 1 : 0) + 1 + (bearA ? 1 : 0) + (gpos ? 1 : 0) + ((lr.fz && lr.fz.indexOf('frenado') >= 0 && (lr.fz.indexOf('superior') >= 0 || lr.fz.indexOf('techo') >= 0)) ? 1 : 0)), (bearA ? 'Momentum bajista' : 'Sin momentum bajista') + ' · ' + (gpos ? 'techo firme (γ+)' : 'techo en γ−'), vsTxt('bc', 'Corto arriba de ' + fv2(res))],
-          ['Bull put vendido', (tendencia && lado < 0) || enLim ? 1 : cl((intens === 'fuerte −' && dz > 0 ? 1 : 0) + 1 + (bullA ? 1 : 0) + (gpos ? 1 : 0) - (gneg ? 1 : 0)), (bullA ? 'Momentum alcista' : 'Sin momentum alcista') + ' · ' + (gneg ? 'piso frágil (γ−)' : 'piso firme (γ+)'), vsTxt('bp', 'Corto abajo de ' + fv2(sup))],
+          ['Bear call vendido', (tendencia && lado > 0) || enLim ? 1 : cl((intens === 'fuerte −' && dz < 0 ? 1 : 0) + 1 + (bearA ? 1 : 0) + (gpos ? 1 : 0) + ((lr.fz && lr.fz.indexOf('frenado') >= 0 && (lr.fz.indexOf('superior') >= 0 || lr.fz.indexOf('techo') >= 0)) ? 1 : 0)), (bearA ? 'Momentum bajista' : 'Sin momentum bajista') + ' · ' + (gpos ? 'techo firme (γ+)' : 'techo en γ−'), sellTxt('c', lr.techo[0], vsTxt('bc', 'Corto arriba de ' + fv2(res)))],
+          ['Bull put vendido', (tendencia && lado < 0) || enLim ? 1 : cl((intens === 'fuerte −' && dz > 0 ? 1 : 0) + 1 + (bullA ? 1 : 0) + (gpos ? 1 : 0) - (gneg ? 1 : 0)), (bullA ? 'Momentum alcista' : 'Sin momentum alcista') + ' · ' + (gneg ? 'piso frágil (γ−)' : 'piso firme (γ+)'), sellTxt('p', lr.piso[0], vsTxt('bp', 'Corto abajo de ' + fv2(sup)))],
           ['Bull call comprado', cl(1 + (bullA ? 1 : 0) + (bullA && (gneg || momAcc) ? 1 : 0)), gTxt + ' · ' + (bullA ? 'momentum alcista 3 TF' + (momAcc ? ' acelerando' : '') : 'sin momentum alcista'), vsTxt('cc', 'Objetivo ' + fv2(lr.techo[0]))],
           ['Bear put comprado', cl(1 + (bearA ? 1 : 0) + (bearA && (gneg || momAcc || (lr.pinmov && lr.pinmov.indexOf('major −') === 0)) ? 1 : 0)), gTxt + ' · ' + (bearA ? 'momentum bajista 3 TF' + (momAcc ? ' acelerando' : '') : 'sin momentum bajista'), vsTxt('pp', 'Objetivo ' + fv2(lr.piso[0]))]
         ]
@@ -1264,9 +1277,9 @@ class Component extends DCLogic {
       });
       const pinNow = PN ? PN.prim : null;
       const pills = [
-        cwN ? { v: cwN, t: fv2(Math.round(cwN)), bg: '#5FD4A0', fg: '#0B1617' } : null,
-        pwN ? { v: pwN, t: fv2(Math.round(pwN)), bg: '#F07F74', fg: '#FFFFFF' } : null,
-        lr.zg ? { v: lr.zg, t: fv2(Math.round(lr.zg)), bg: '#0B1617', fg: '#F2EFE8', bd: '#F2EFE8' } : null,
+        (gOld ? lr.mpv : cwN) ? { v: gOld ? lr.mpv : cwN, t: fv2(Math.round(gOld ? lr.mpv : cwN)), bg: '#5FD4A0', fg: '#0B1617' } : null,   // 21-nov (#13): con perfil vencido, majors propios (Schwab)
+        (gOld ? lr.mnv : pwN) ? { v: gOld ? lr.mnv : pwN, t: fv2(Math.round(gOld ? lr.mnv : pwN)), bg: '#F07F74', fg: '#FFFFFF' } : null,
+        lr.zg ? { v: lr.zg, t: fv2(Math.round(lr.zg)) + (gOld ? ' · ' + fmtET(toMin(lr.gt)) : ''), bg: '#0B1617', fg: gOld ? '#6F8584' : '#F2EFE8', bd: gOld ? '#3A5254' : '#F2EFE8' } : null,
         pinNow && toMin(lr.t) >= 780 ? { v: pinNow, t: '◉ ' + fv2(pinNow), bg: '#FFFFFF', fg: '#0B1617' } : null,
         { v: lr.px, t: fv2(lr.px), bg: '#5FD4A0', fg: '#FFFFFF' }
       ].filter(Boolean);
@@ -1285,7 +1298,7 @@ class Component extends DCLogic {
       ? { txt: (nowMin < 510 ? 'Pre-market' : (nowMin >= 900 ? 'Cierre' : 'En vivo')) + ' · lectura ' + fmtET(nowMin) + ' ET', chip: 'display: flex; align-items: center; gap: 8px; border: 1px solid #1F4D47; background: #0F2421; color: #5FD4C4; padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 500', dot: 'width: 7px; height: 7px; border-radius: 50%; background: #5FD4A0' }
       : { txt: 'Sin datos de hoy · recolector apagado', chip: 'display: flex; align-items: center; gap: 8px; border: 1px solid #5A2A26; background: #351A18; color: #F07F74; padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 500', dot: 'width: 7px; height: 7px; border-radius: 50%; background: #F07F74' };
     const nxt = lr ? nowMin + 15 : 0;
-    const readTxt = lr && lr.auto ? 'Cadena Schwab cada minuto' + (lr.gt ? ' · perfil γ ' + fmtET(toMin(lr.gt)) + ' ET' : '') : lr ? (nowMin >= 900 ? 'Sesión cerrada' : 'Próxima lectura ~' + fmtET(nxt) + ' ET') : 'Los paneles de abajo son un ejemplo, no el mercado de hoy';
+    const readTxt = lr && lr.auto ? 'Cadena Schwab cada minuto' + (lr.gt ? ' · perfil γ ' + fmtET(toMin(lr.gt)) + ' ET' + (gOld ? ' ⚠ vencido (hace ' + ageG + ' min)' : gAmb ? ' (hace ' + ageG + ' min)' : '') : '') + ((() => { try { const p_ = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Mexico_City', hourCycle: 'h23', year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', minute: 'numeric' }).formatToParts(new Date()); const g_ = t => p_.find(x => x.type === t).value; const rm = +g_('hour') * 60 + +g_('minute'), hoy = g_('year') + '-' + g_('month') + '-' + g_('day'), ag = rm - toMin(lr.t); return (LIVE.date === hoy && rm >= 510 && rm <= 900 && ag > 10) ? ' · ⚠ Schwab sin datos hace ' + ag + ' min' : ''; } catch (e) { return ''; } })()) : lr ? (nowMin >= 900 ? 'Sesión cerrada' : 'Próxima lectura ~' + fmtET(nxt) + ' ET') : 'Los paneles de abajo son un ejemplo, no el mercado de hoy';
     const GEXS = {
       SPX: {7450:-240,7460:-57,7470:-31,7480:-40,7490:-241,7500:-729,7510:-78,7520:-110,7530:-62,7540:-152,7550:-514,7560:-93,7570:-316,7580:-138,7590:-272,7600:-1156,7610:-183,7620:-263,7630:-88,7640:-142,7650:-374,7660:54,7670:-4,7680:-36,7690:-7,7700:-161,7710:-9,7720:9},
       SPY: {743:-4.2,744:-7.0,745:-36.1,746:-18.0,747:-7.5,748:-7.8,749:-5.4,750:-123.5,751:-12.9,752:-14.0,753:-22.8,754:-32.9,755:-100.7,756:-36.1,757:-107.6,758:-28.2,759:-61.0,760:-169.4,761:-8.5,762:-11.4,763:-19.0,764:-22.4,765:-97.8,766:-4.0,767:13.5,768:0.5,769:8.1,770:13.9},
@@ -1344,17 +1357,19 @@ class Component extends DCLogic {
     const TPj = LIVE.tape, tpAge = TPj && TPj.ts ? Date.now() / 1000 - TPj.ts : 1e9;
     const fK = v => '$' + (Math.abs(v) >= 1e6 ? (v / 1e6).toFixed(2) + 'M' : Math.abs(v) >= 1e3 ? Math.round(v / 1e3) + 'K' : Math.round(v));
     const etH = h => { const p = String(h).split(':'); return ((+p[0] + 1) % 24) + ':' + p[1] + (p[2] ? ':' + p[2] : ''); };   // CDMX → ET (nov–mar)
-    const tpMx = TPj ? Math.max(1, ...(TPj.strikes || []).map(r => r.B + r.V + r.M)) : 1;
+    const spT = TPj && (TPj.spot || (lr && lr.px)), deepT = r => spT && ((r.t === 'C' && r.k < spT - 30) || (r.t === 'P' && r.k > spT + 30));   // 21-nov (#24): ITM > 30 pts = cierres/coberturas
+    const tpS = TPj ? (TPj.strikes_otm || (TPj.strikes || []).filter(r => !deepT(r))) : [], tpN = TPj ? (TPj.neto_otm || TPj.neto) : null;
+    const tpMx = TPj ? Math.max(1, ...tpS.map(r => r.B + r.V + r.M)) : 1;
     const tp = (TPj && tk === 'SPX' && tpAge < 1800) ? {
       on: true, min: TPj.min || 100,
       age: tpAge < 90 ? 'en vivo · hace ' + Math.round(tpAge) + ' s' : 'hace ' + Math.round(tpAge / 60) + ' min',
       ageC: tpAge < 90 ? '#8ADBD7' : '#E6B655',
-      prints: (TPj.prints || []).slice(0, 12).map(p => ({ h: etH(p.h), k: p.k + (p.t === 'C' ? 'C' : 'P'), kc: p.t === 'C' ? '#5FD4A0' : '#F07F74', n: p.n, px: (+p.px).toFixed(2),
+      prints: (TPj.prints || []).slice(0, 12).map(p => ({ h: etH(p.h), k: p.k + (p.t === 'C' ? 'C' : 'P') + (deepT(p) ? ' ITM' : ''), kc: p.t === 'C' ? '#5FD4A0' : '#F07F74', n: p.n, px: (+p.px).toFixed(2),
         lado: p.lado === 'B' ? 'Compra' : p.lado === 'V' ? 'Venta' : 'Medio', lc: p.lado === 'B' ? '#5FD4A0' : p.lado === 'V' ? '#F07F74' : '#93A9A9', prem: fK(p.prem) })),
       empty: !(TPj.prints || []).length,
-      nc: (TPj.neto.C > 0 ? '+' : TPj.neto.C < 0 ? '−' : '') + fK(Math.abs(TPj.neto.C)), ncC: TPj.neto.C > 0 ? '#5FD4A0' : TPj.neto.C < 0 ? '#F07F74' : '#F2EFE8',
-      np: (TPj.neto.P > 0 ? '+' : TPj.neto.P < 0 ? '−' : '') + fK(Math.abs(TPj.neto.P)), npC: TPj.neto.P > 0 ? '#5FD4A0' : TPj.neto.P < 0 ? '#F07F74' : '#F2EFE8',
-      strikes: (TPj.strikes || []).slice(0, 8).map(r => ({ k: r.k + r.t, kc: r.t === 'C' ? '#5FD4A0' : '#F07F74', tot: fK(r.B + r.V + r.M),
+      nc: (tpN.C > 0 ? '+' : tpN.C < 0 ? '−' : '') + fK(Math.abs(tpN.C)), ncC: tpN.C > 0 ? '#5FD4A0' : tpN.C < 0 ? '#F07F74' : '#F2EFE8',
+      np: (tpN.P > 0 ? '+' : tpN.P < 0 ? '−' : '') + fK(Math.abs(tpN.P)), npC: tpN.P > 0 ? '#5FD4A0' : tpN.P < 0 ? '#F07F74' : '#F2EFE8',
+      strikes: tpS.slice(0, 8).map(r => ({ k: r.k + r.t, kc: r.t === 'C' ? '#5FD4A0' : '#F07F74', tot: fK(r.B + r.V + r.M),
         wB: (100 * r.B / tpMx).toFixed(1) + '%', wV: (100 * r.V / tpMx).toFixed(1) + '%', wM: (100 * r.M / tpMx).toFixed(1) + '%' }))
     } : { on: false };
     return {
