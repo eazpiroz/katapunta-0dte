@@ -94,6 +94,8 @@ def motor(op, cartera, mismo_dia_cerrada):
     fecha = op["fecha"]
     if sub in ("SPX", "SPXW") and all(p.get("vence") == fecha for p in op["patas"]):
         return "SPX 0DTE"
+    if op.get("liquidacion"):
+        return "SPX 0DTE"
     if mismo_dia_cerrada:
         return "Scalping"
     opc = [p for p in op["patas"] if p["tipo"] == "OPTION"]
@@ -106,8 +108,9 @@ def motor(op, cartera, mismo_dia_cerrada):
             return "Wheel"
     if not opc and cartera.get(sub, 0) >= 100:
         return "Wheel"
-    if opc and cartera.get(sub, 0) >= 100 and opc[0]["pc"] == "CALL" and all((p["cant"] or 0) < 0 for p in opc):
-        return "Wheel"
+    if (len(opc) == 1 and opc[0]["pc"] == "CALL" and cartera.get(sub, 0) >= 100
+            and opc[0]["efecto"] == "CLOSING" and (opc[0]["cant"] or 0) > 0):
+        return "Wheel"                                         # recompra de un call cubierto
     return "Swing"
 
 
@@ -122,8 +125,15 @@ def leer(d1, d2):
         ps = patas(t)
         if not ps or not ts:
             continue
-        ops.append({"id": str(t.get("orderId") or t.get("activityId")), "fecha": ts.date().isoformat(),
-                    "hora": ts.strftime("%H:%M"), "neto": t.get("netAmount"), "patas": ps})
+        fecha = ts.date().isoformat()
+        liq = False
+        # liquidación en efectivo de SPX/SPXW vencido (Schwab la registra de madrugada del día siguiente)
+        if all(p["tipo"] == "OPTION" and (p["subyacente"] or "").replace("$", "") in ("SPX", "SPXW")
+               and p["vence"] and p["vence"] < fecha and p["efecto"] == "CLOSING" for p in ps):
+            fecha, liq = ps[0]["vence"], True
+            t = dict(t, orderId=f"liq-{fecha}")
+        ops.append({"id": str(t.get("orderId") or t.get("activityId")), "fecha": fecha, "liquidacion": liq,
+                    "hora": "16:00" if liq else ts.strftime("%H:%M"), "neto": t.get("netAmount"), "patas": ps})
     # agrupar patas de la misma orden (Schwab manda una transacción por pata en algunos spreads)
     por_orden = {}
     for o in ops:
