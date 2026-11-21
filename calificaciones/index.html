@@ -114,6 +114,7 @@ details summary:before{content:"▸ ";color:var(--brand)} details[open] summary:
     <div class="kpi"><div class="k">SquawkFlow antes de abrir</div><div class="v" id="kSq">—</div><div class="d" id="kSqD">régimen de todos los vencimientos</div></div>
     <div class="kpi"><div class="k">PIN de las 15:00</div><div class="v" id="kPin">—</div><div class="d">error mediano al cierre</div></div>
     <div class="kpi"><div class="k">GEX propio = manual</div><div class="v" id="kGex">—</div><div class="d">% de minutos con el mismo régimen</div></div>
+    <div class="kpi"><div class="k">Tu disciplina</div><div class="v" id="kDis">—</div><div class="d" id="kDisD">días que cumplieron el Playbook</div></div>
     <div class="kpi"><div class="k">Veto de Claude</div><div class="v" id="kVeto">—</div><div class="d" id="kVetoD">ahorro − costo</div></div>
     <div class="kpi"><div class="k">Bot de papel vs tu real</div><div class="v" id="kBot">—</div><div class="d" id="kBotD"></div></div>
   </section>
@@ -123,6 +124,14 @@ details summary:before{content:"▸ ";color:var(--brand)} details[open] summary:
       <thead><tr><th>Día</th><th>Cierre fue</th><th>10:00</th><th>Tú</th><th class="hide-s">Squawk</th><th class="hide-s">Claude 10/11/13</th><th class="hide-s">PIN err</th><th class="hide-s">GEX =</th><th>Bot</th><th>Real</th></tr></thead>
       <tbody id="tDia"></tbody>
     </table></div>
+  </section>
+  <section class="panel" aria-labelledby="hDis">
+    <h2 id="hDis">Disciplina por día <small>tus operaciones reales de SPX 0DTE contra el Playbook</small></h2>
+    <div class="scroll"><table>
+      <thead><tr><th>Día</th><th>Entradas <small>(máx 5)</small></th><th>Antes de 10:00</th><th>Riesgo máx. por op. <small>(≤ $1,000)</small></th><th>Stop diario <small>(−$1,500)</small></th><th>Cumplió</th></tr></thead>
+      <tbody id="tDis"></tbody>
+    </table></div>
+    <p class="sub" id="disNota"></p>
   </section>
   <p class="foot">Real = SPX 0DTE neto de comisiones leído de Schwab (o la Bitácora en días anteriores). La liquidación de un día se suma con la lectura de la mañana siguiente. Herramienta de lectura de mercado; no es recomendación de inversión.</p>
 </div>
@@ -145,6 +154,14 @@ function pinta(n){
   const gx=xs.map(x=>x.gex_coincide).filter(v=>v!=null); $("kGex").textContent=gx.length?Math.round(gx.reduce((s,v)=>s+v,0)/gx.length)+"%":"—";
   const ah=xs.reduce((s,x)=>s+x.veto.ahorro,0), co=xs.reduce((s,x)=>s+x.veto.costo,0), nv=xs.reduce((s,x)=>s+x.veto.n,0);
   $("kVeto").textContent=usd(ah-co); $("kVeto").className="v "+cls(ah-co); $("kVetoD").textContent=`${nv} vetos · ahorró ${usd(ah)} · costó ${usd(co)}`;
+  const dx=xs.filter(x=>x.disciplina&&!x.disciplina.incidencia), dok=dx.filter(x=>x.disciplina.ok).length, ninc=xs.filter(x=>x.disciplina&&x.disciplina.incidencia).length;
+  $("kDis").textContent=dx.length?`${dok} de ${dx.length}`:"—"; $("kDis").className="v "+(dx.length?(dok===dx.length?"pos":"neg"):""); $("kDisD").textContent=dx.length?`días que cumplieron el Playbook${ninc?` · ${ninc} con falla del broker aparte`:""}`:"sin operaciones reales leídas";
+  const ok=b=>b?'<span class="pos">✓</span>':'<span class="neg">✗</span>';
+  $("tDis").innerHTML=xs.filter(x=>x.disciplina).slice().reverse().map(x=>{const g=x.disciplina,c=g.cumple;return `<tr><td>${dia(x.fecha)}${g.incidencia?' <span title="'+g.incidencia+'">⚠️ broker</span>':''}</td>
+    <td class="num">${g.entradas} ${ok(c.entradas)}</td><td>${g.antes_10.length?g.antes_10.join(", ")+" "+ok(false):ok(true)}</td>
+    <td class="num">${usd(g.riesgo_max).replace("+","")} ${ok(c.riesgo_op)}${g.excede_riesgo.length?` <small>(${g.excede_riesgo.length} ops)</small>`:""}</td>
+    <td>${ok(c.stop_dia)}</td><td>${g.incidencia?"no cuenta":ok(g.ok)}</td></tr>`;}).join("");
+  $("disNota").textContent=xs.some(x=>x.disciplina&&x.disciplina.incidencia)?"⚠️ broker = día con falla de Schwab (órdenes duplicadas); se muestra pero no cuenta en la disciplina.":"";
   [a,t]=cnt(xs,x=>x.squawk&&x.squawk.ok); $("kSq").textContent=pct(a,t); $("kSqD").textContent=t?`${a} de ${t} días · γ− → tendencia, γ+ → rango`:"sin datos";
   const bx=xs.filter(x=>x.bot&&x.bot.pnl!=null), bt=bx.reduce((s,x)=>s+x.bot.pnl,0); $("kBot").textContent=usd(bt); $("kBot").className="v "+cls(bt);
   const rx=xs.filter(x=>x.real&&x.real.pnl!=null), rt=rx.reduce((s,x)=>s+x.real.pnl,0); $("kBotD").innerHTML=`${bx.length} días en papel · real <span class="${cls(rt)}">${rx.length?usd(rt):"—"}</span> en ${rx.length} días`;

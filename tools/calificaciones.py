@@ -9,6 +9,8 @@ Por día califica:
   · Régimen publicado por SquawkFlow antes de abrir (todos los vencimientos) contra el cierre.
   · Veto de Claude: dinero que habría ahorrado (vetos de perdedoras) y costado (vetos de ganadoras).
   · Bot de papel contra tu SPX 0DTE real (neto de comisiones, de bitacora_auto).
+  · Disciplina en tus operaciones reales: máx. 5 entradas, nada antes de las 10:00 ET, riesgo ≤ $1,000 por
+    operación y stop diario de −$1,500. Los días con incidencia del broker (incidencias.json) se marcan aparte.
 
     python calificaciones.py              → escribe calificaciones.json
     python calificaciones.py --publicar   → además lo sube a la rama live (lo lee la página /calificaciones)
@@ -26,6 +28,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 HIST = HERE / "historial"
+INCIDENCIAS = {}
 GTOL = 3.0
 
 
@@ -87,6 +90,54 @@ def json_url(url):
         return None
 
 
+REGLAS = {"max_entradas": 5, "desde": "10:00", "riesgo_op": 1000.0, "stop_dia": -1500.0}
+
+
+def riesgo_orden(o):
+    """Pérdida máxima de una orden de apertura: débito = lo pagado; crédito = ancho × contratos × 100 − crédito."""
+    neto = o.get("neto") or 0
+    if neto <= 0:
+        return round(-neto, 2)
+    anchos, cortos = [], {}
+    for pc in ("CALL", "PUT"):
+        xs = [p for p in o["patas"] if p.get("pc") == pc and p.get("strike") is not None]
+        sh = [p for p in xs if (p.get("cant") or 0) < 0]
+        lg = [p for p in xs if (p.get("cant") or 0) > 0]
+        if sh and lg:
+            anchos.append(max(abs(a["strike"] - b["strike"]) for a in sh for b in lg))
+            cortos[pc] = sum(-(p["cant"]) for p in sh)
+    if not anchos:
+        return None                                   # crédito sin protección: riesgo no definido
+    return round(max(anchos) * 100 * max(cortos.values()) - neto, 2)
+
+
+def disciplina(fecha, real_pnl):
+    """Cumplimiento del Playbook en tus operaciones reales de SPX 0DTE (de bitacora_auto)."""
+    vistos, ops = set(), []
+    for f in sorted((HERE / "bitacora_auto").glob("20??-??-??.json")):
+        try:
+            j = json.loads(f.read_text(encoding="utf-8"))
+        except ValueError:
+            continue
+        for o in j.get("ops", []):
+            k = (o.get("id"), o.get("fecha"), o.get("hora"))
+            if o.get("motor") == "SPX 0DTE" and o.get("fecha") == fecha and k not in vistos:
+                vistos.add(k); ops.append(o)
+    if not ops:
+        return None
+    ab = [o for o in ops if any(p.get("efecto") == "OPENING" for p in o["patas"]) and not o.get("liquidacion")]
+    temprano = [o["hora"] for o in ab if o["hora"] < REGLAS["desde"]]
+    riesgos = [(o["hora"], riesgo_orden(o)) for o in ab]
+    excede = [(h, r) for h, r in riesgos if r is None or r > REGLAS["riesgo_op"]]
+    stop = real_pnl is not None and real_pnl <= REGLAS["stop_dia"]
+    checks = {"entradas": len(ab) <= REGLAS["max_entradas"], "horario": not temprano,
+              "riesgo_op": not excede, "stop_dia": not stop}
+    inc = INCIDENCIAS.get(fecha)
+    return {"entradas": len(ab), "antes_10": temprano, "riesgo_max": max((r for _, r in riesgos if r is not None), default=0),
+            "excede_riesgo": excede, "rebasa_stop": stop, "cumple": checks,
+            "ok": all(checks.values()), "incidencia": inc}
+
+
 def real_0dte(fecha, bitacora):
     """SPX 0DTE real del día: bitacora_auto (neto de comisiones) si algún archivo cubre ese día; si no, la Bitácora.
     Junta todos los archivos porque la liquidación de un día llega en la lectura del día siguiente."""
@@ -113,6 +164,8 @@ def real_0dte(fecha, bitacora):
 def calificar():
     papel = json.loads((HERE / "papel.json").read_text(encoding="utf-8")) if (HERE / "papel.json").exists() else {}
     liq = json.loads((HERE / "liquidaciones.json").read_text(encoding="utf-8")) if (HERE / "liquidaciones.json").exists() else {}
+    global INCIDENCIAS
+    INCIDENCIAS = (json_url("https://0dte.katapunta.com/incidencias.json?t=%d" % dt.datetime.now().timestamp()) or {}).get("dias", {})
     bitacora = json_url("https://0dte.katapunta.com/bitacora.json?t=%d" % dt.datetime.now().timestamp())
     squawk = (json_url("https://0dte.katapunta.com/squawkflow.json?t=%d" % dt.datetime.now().timestamp()) or {}).get("dias", {})
     archivos = {}
@@ -175,6 +228,7 @@ def calificar():
             "veto": {"n": len(vet), "ahorro": round(ahorro), "costo": round(costo)},
             "bot": {"pnl": pd.get("pnl"), "ops": pd.get("ops"), "ganadoras": pd.get("ganadoras")} if pd else None,
             "real": {"pnl": real, "fuente": fuente} if real is not None else None,
+            "disciplina": disciplina(fecha, real),
         })
     return {"actualizado": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"), "dias": dias}
 
