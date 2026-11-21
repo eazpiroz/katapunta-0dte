@@ -51,7 +51,11 @@ PB = {
     "ven_cat": 2.5,            # stop de catástrofe: el spread vale 2.5× el crédito
     "nivel_buf": 3.0,          # stop por nivel: cierra si el precio pasa el ancla por 3 pts dos minutos seguidos
     "pin_dist": 10.0,          # IC de pin: precio a ≤10 pts del major +
-    "gamma_edad": 30,          # min: con la lectura γ (perfil manual) más vieja que esto, no abre B ni C (A sí, va por tendencia)
+    "gamma_edad": 30,
+    # --- candidatas en prueba (apagadas en v1; solo las usa el probador de variantes)
+    "a_recorrido": 0,          # A: no comprar si el objetivo está a menos de N pts (0 = apagado)
+    "obj_pasa_largo": False,   # A: el TP por nivel solo cuenta si el objetivo pasa el strike largo
+    "b_sin_tendencia": False,  # B: no vender si el clasificador (reglas) dice tendencia          # min: con la lectura γ (perfil manual) más vieja que esto, no abre B ni C (A sí, va por tendencia)
 }
 
 
@@ -728,13 +732,18 @@ class Bot:
                     obj = c["mn"] if c["mn"] and c["mn"] < c["px"] - 5 else c["piso"]
                 else:
                     obj = c["mp"] if c["mp"] and c["mp"] > c["px"] + 5 else c["techo"]
+                if pb["a_recorrido"] and obj and abs(c["px"] - obj) < pb["a_recorrido"]:
+                    return                          # ya no queda recorrido hasta el objetivo
+                if pb["obj_pasa_largo"] and obj and not ((c["T"] < 0 and obj <= x[2]) or (c["T"] > 0 and obj >= x[2])):
+                    obj = None                      # el objetivo no pasa el strike largo: sale por TP de %
                 self.abrir(ts, r, c, "tend", c["T"], [(sd, x[2], 1), (sd, x[3], -1)], deb, pb["deb_ancho"],
                            f"A · gamma negativa ({c['px']:.0f} < zero γ {c['zg']:.0f}) y tendencia "
                            f"{'alcista' if c['T'] > 0 else 'bajista'} en 5 y 15 min con momentum → débito a favor; objetivo {obj}",
                            objetivo=obj)
                 return
         # B · gamma positiva → venta anclada a un nivel (soporte abajo / resistencia arriba)
-        if c["g"] == 1 and m <= pb["ultima_venta"] and not gamma_vieja:
+        tend_dia = pb["b_sin_tendencia"] and self.clasif and self.clasif[-1]["reglas"]["tipo"] == "tendencia"
+        if c["g"] == 1 and m <= pb["ultima_venta"] and not gamma_vieja and not tend_dia:
             for dire in ([1, -1] if c["T"] == 0 else [c["T"]]):
                 if not self.puede(m, dire) or any(p["tipo"] == "venta" and p["dir"] == dire for p in self.abiertas):
                     continue

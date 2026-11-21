@@ -126,6 +126,11 @@ variantes = {
     "sin regla B": {"ultima_venta": 0},
     "venta TP 65%": {"ven_tp": 0.65},
     "sin regla C": {"pin": (0, 0)},
+    "A: recorrido ≥10": {"a_recorrido": 10},
+    "A: recorrido ≥15": {"a_recorrido": 15},
+    "A: objetivo pasa el largo": {"obj_pasa_largo": True},
+    "B: apagada en tendencia": {"b_sin_tendencia": True},
+    "65% + recorrido ≥15": {"deb_tp": 0.65, "a_recorrido": 15},
 }
 fechas = sorted({f.name[:10] for f in carpeta.glob("20??-??-??.jsonl*")})
 por_dia = {}                                   # variante → {fecha: (pnl, ops, ganadoras)}
