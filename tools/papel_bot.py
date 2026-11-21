@@ -205,7 +205,12 @@ def sonar(veces=3):
     threading.Thread(target=_s, daemon=True).start()
 
 
-def mandar(titulo, texto, tags, prioridad=4):
+def mandar_yo(titulo, texto, tags, prioridad=4):
+    """Avisos de operación del bot (arranque, llaves, reanudar): solo a tu tema, no al del grupo."""
+    mandar(titulo, texto, tags, prioridad, grupo=False)
+
+
+def mandar(titulo, texto, tags, prioridad=4, grupo=True):
     if prioridad >= 5:
         sonar()
         print("\n" + "=" * 70 + f"\n🔔 {titulo}\n{texto}\n" + "=" * 70 + "\n")
@@ -221,16 +226,16 @@ def mandar(titulo, texto, tags, prioridad=4):
             urllib.request.urlopen("https://api.callmebot.com/whatsapp.php?" + q, timeout=20)
         except Exception as e:
             print("alerta WhatsApp:", e)
-    try:
-        if not cfg.get("ntfy"):
-            return
-        import urllib.request
-        body = json.dumps({"topic": cfg["ntfy"], "title": titulo, "message": texto, "tags": tags,
-                           "priority": prioridad, "click": "https://0dte.katapunta.com/papel/"}).encode()
-        urllib.request.urlopen(urllib.request.Request(cfg.get("servidor", "https://ntfy.sh"), data=body,
-                               headers={"Content-Type": "application/json"}), timeout=10)
-    except Exception as e:
-        print("alerta:", e)
+    temas = [cfg.get("ntfy")] + (list(cfg.get("ntfy_grupo") or []) if grupo else [])   # ntfy_grupo: temas extra (grupo de estudio)
+    import urllib.request
+    for tema in [t for t in temas if t]:
+        try:
+            body = json.dumps({"topic": tema, "title": titulo, "message": texto, "tags": tags,
+                               "priority": prioridad, "click": "https://0dte.katapunta.com/papel/"}).encode()
+            urllib.request.urlopen(urllib.request.Request(cfg.get("servidor", "https://ntfy.sh"), data=body,
+                                   headers={"Content-Type": "application/json"}), timeout=10)
+        except Exception as e:
+            print(f"alerta ({tema[:16]}…):", e)
 
 
 MESES = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]
@@ -399,7 +404,7 @@ class Veto:
             res = {"error": f"HTTP {e.code}"}
             if e.code in (401, 403) and not self.aviso_llave:
                 self.aviso_llave = True
-                mandar("PAPEL · Llave de IA inválida o vencida", "La segunda opinión de Claude está apagada. "
+                mandar_yo("PAPEL · Llave de IA inválida o vencida", "La segunda opinión de Claude está apagada. "
                        "Crea una llave nueva en console.anthropic.com y pégala en papel_ia.json.", ["warning"], 4)
         except Exception as e:
             res = {"error": e.__class__.__name__, "detalle": str(e)[:300]}
@@ -1079,7 +1084,7 @@ def vivo():
     if est.get("fecha") == hoy:          # reinicio a media sesión: re-procesa el historial de hoy sin marcas reales
         print("Reanudando: vuelvo a pasar el historial de hoy.")
     print(f"Bot de papel en marcha ({PB['version']}). Solo papel: no existe código de órdenes. Ctrl+C para salir.\n")
-    mandar("PAPEL · Bot en marcha", f"{PB['version']} · empieza a buscar entradas a las {et('09:00')} ET. "
+    mandar_yo("PAPEL · Bot en marcha", f"{PB['version']} · empieza a buscar entradas a las {et('09:00')} ET. "
            "Las órdenes vienen escritas como en thinkorswim para el espejo en paperMoney.", ["robot"], 2)
     sin_datos = 0
     primera = True
@@ -1124,7 +1129,7 @@ def vivo():
           if filas and primera:
               primera = False
               if b.ops or b.abiertas:
-                  mandar("PAPEL · Reanudado", "Al ponerse al día con el historial de hoy:\n"
+                  mandar_yo("PAPEL · Reanudado", "Al ponerse al día con el historial de hoy:\n"
                          + "\n".join(f"Cerrada {o['entra']}→{o['sale']} ET {o['estructura']} {o['pnl']:+,.0f}" for o in b.ops)
                          + ("\n" if b.ops and b.abiertas else "")
                          + "\n".join(f"Abierta desde {et(p['t_in'])} ET: {orden_tos(p, hoy, True, p['entrada'])}" for p in b.abiertas),
