@@ -1,5 +1,5 @@
 {
- "actualizado": "2026-11-21T20:58:02+00:00",
+ "actualizado": "2026-11-21T21:52:38+00:00",
  "dias": [
   {
    "fecha": "2026-11-03",
@@ -21,6 +21,12 @@
     "error": null
    },
    "gex_coincide": 24,
+   "squawk": {
+    "regimen": "negativa",
+    "flip": 7638.32,
+    "pred": "tendencia",
+    "ok": false
+   },
    "veto": {
     "n": 0,
     "ahorro": 0,
@@ -53,6 +59,12 @@
     "error": 11.4
    },
    "gex_coincide": 62,
+   "squawk": {
+    "regimen": "positiva",
+    "flip": 7628.91,
+    "pred": "rango",
+    "ok": false
+   },
    "veto": {
     "n": 0,
     "ahorro": 0,
@@ -85,6 +97,12 @@
     "error": 46.3
    },
    "gex_coincide": 100,
+   "squawk": {
+    "regimen": "positiva",
+    "flip": 7652.87,
+    "pred": "rango",
+    "ok": false
+   },
    "veto": {
     "n": 0,
     "ahorro": 0,
@@ -117,6 +135,12 @@
     "error": 3.1
    },
    "gex_coincide": 65,
+   "squawk": {
+    "regimen": "negativa",
+    "flip": 7589.11,
+    "pred": "tendencia",
+    "ok": false
+   },
    "veto": {
     "n": 0,
     "ahorro": 0,
@@ -149,6 +173,12 @@
     "error": null
    },
    "gex_coincide": 100,
+   "squawk": {
+    "regimen": "negativa",
+    "flip": 7579.16,
+    "pred": "tendencia",
+    "ok": true
+   },
    "veto": {
     "n": 0,
     "ahorro": 0,
@@ -184,6 +214,12 @@
     "error": 44.4
    },
    "gex_coincide": 99,
+   "squawk": {
+    "regimen": "positiva",
+    "flip": 7579.13,
+    "pred": "rango",
+    "ok": false
+   },
    "veto": {
     "n": 0,
     "ahorro": 0,
@@ -219,6 +255,12 @@
     "error": null
    },
    "gex_coincide": 81,
+   "squawk": {
+    "regimen": "negativa",
+    "flip": 7593.59,
+    "pred": "tendencia",
+    "ok": false
+   },
    "veto": {
     "n": 0,
     "ahorro": 0,
@@ -254,6 +296,12 @@
     "error": 31.7
    },
    "gex_coincide": 60,
+   "squawk": {
+    "regimen": "positiva",
+    "flip": 7593.46,
+    "pred": "rango",
+    "ok": true
+   },
    "veto": {
     "n": 0,
     "ahorro": 0,
@@ -285,6 +333,12 @@
     "error": 17.1
    },
    "gex_coincide": 98,
+   "squawk": {
+    "regimen": "negativa",
+    "flip": 7587.43,
+    "pred": "tendencia",
+    "ok": true
+   },
    "veto": {
     "n": 0,
     "ahorro": 0,
@@ -342,6 +396,12 @@
     "error": 40.8
    },
    "gex_coincide": 99,
+   "squawk": {
+    "regimen": "negativa",
+    "flip": 7552.62,
+    "pred": "tendencia",
+    "ok": false
+   },
    "veto": {
     "n": 0,
     "ahorro": 0,
@@ -399,6 +459,12 @@
     "error": 23.5
    },
    "gex_coincide": 80,
+   "squawk": {
+    "regimen": "negativa",
+    "flip": 7528.6,
+    "pred": "tendencia",
+    "ok": false
+   },
    "veto": {
     "n": 0,
     "ahorro": 0,
@@ -456,6 +522,12 @@
     "error": 24.1
    },
    "gex_coincide": 93,
+   "squawk": {
+    "regimen": "negativa",
+    "flip": 7509.44,
+    "pred": "tendencia",
+    "ok": true
+   },
    "veto": {
     "n": 1,
     "ahorro": 0,
@@ -513,6 +585,12 @@
     "error": 89.2
    },
    "gex_coincide": 100,
+   "squawk": {
+    "regimen": "negativa",
+    "flip": 7428.5,
+    "pred": "tendencia",
+    "ok": true
+   },
    "veto": {
     "n": 1,
     "ahorro": 0,
