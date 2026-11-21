@@ -1,0 +1,532 @@
+{
+ "actualizado": "2026-11-21T20:58:02+00:00",
+ "dias": [
+  {
+   "fecha": "2026-11-03",
+   "cierre": 7568.92,
+   "etiqueta": "rango",
+   "regimen10": {
+    "g": 1,
+    "fuente": "manual",
+    "pred": "rango",
+    "ok": true
+   },
+   "tuya": {
+    "lectura": null,
+    "ok": null
+   },
+   "clasif": [],
+   "pin15": {
+    "pin": null,
+    "error": null
+   },
+   "gex_coincide": 24,
+   "veto": {
+    "n": 0,
+    "ahorro": 0,
+    "costo": 0
+   },
+   "bot": {
+    "pnl": 386.0,
+    "ops": 5,
+    "ganadoras": 5
+   },
+   "real": null
+  },
+  {
+   "fecha": "2026-11-04",
+   "cierre": 7688.62,
+   "etiqueta": "tendencia",
+   "regimen10": {
+    "g": 1,
+    "fuente": "propio",
+    "pred": "rango",
+    "ok": false
+   },
+   "tuya": {
+    "lectura": null,
+    "ok": null
+   },
+   "clasif": [],
+   "pin15": {
+    "pin": 7700,
+    "error": 11.4
+   },
+   "gex_coincide": 62,
+   "veto": {
+    "n": 0,
+    "ahorro": 0,
+    "costo": 0
+   },
+   "bot": {
+    "pnl": -320.0,
+    "ops": 5,
+    "ganadoras": 2
+   },
+   "real": null
+  },
+  {
+   "fecha": "2026-11-05",
+   "cierre": 7353.73,
+   "etiqueta": "tendencia",
+   "regimen10": {
+    "g": -1,
+    "fuente": "manual",
+    "pred": "tendencia",
+    "ok": true
+   },
+   "tuya": {
+    "lectura": null,
+    "ok": null
+   },
+   "clasif": [],
+   "pin15": {
+    "pin": 7400,
+    "error": 46.3
+   },
+   "gex_coincide": 100,
+   "veto": {
+    "n": 0,
+    "ahorro": 0,
+    "costo": 0
+   },
+   "bot": {
+    "pnl": 1208.0,
+    "ops": 5,
+    "ganadoras": 3
+   },
+   "real": null
+  },
+  {
+   "fecha": "2026-11-06",
+   "cierre": 7376.86,
+   "etiqueta": "rango",
+   "regimen10": {
+    "g": 1,
+    "fuente": "manual",
+    "pred": "rango",
+    "ok": true
+   },
+   "tuya": {
+    "lectura": null,
+    "ok": null
+   },
+   "clasif": [],
+   "pin15": {
+    "pin": 7380,
+    "error": 3.1
+   },
+   "gex_coincide": 65,
+   "veto": {
+    "n": 0,
+    "ahorro": 0,
+    "costo": 0
+   },
+   "bot": {
+    "pnl": -805.0,
+    "ops": 5,
+    "ganadoras": 3
+   },
+   "real": null
+  },
+  {
+   "fecha": "2026-11-09",
+   "cierre": 7549.94,
+   "etiqueta": "tendencia",
+   "regimen10": {
+    "g": 1,
+    "fuente": "manual",
+    "pred": "rango",
+    "ok": false
+   },
+   "tuya": {
+    "lectura": "tendencia",
+    "ok": true
+   },
+   "clasif": [],
+   "pin15": {
+    "pin": null,
+    "error": null
+   },
+   "gex_coincide": 100,
+   "veto": {
+    "n": 0,
+    "ahorro": 0,
+    "costo": 0
+   },
+   "bot": {
+    "pnl": 70.0,
+    "ops": 1,
+    "ganadoras": 1
+   },
+   "real": {
+    "pnl": -210,
+    "fuente": "bitacora"
+   }
+  },
+  {
+   "fecha": "2026-11-11",
+   "cierre": 7619.38,
+   "etiqueta": "tendencia",
+   "regimen10": {
+    "g": 1,
+    "fuente": "propio",
+    "pred": "rango",
+    "ok": false
+   },
+   "tuya": {
+    "lectura": null,
+    "ok": null
+   },
+   "clasif": [],
+   "pin15": {
+    "pin": 7575,
+    "error": 44.4
+   },
+   "gex_coincide": 99,
+   "veto": {
+    "n": 0,
+    "ahorro": 0,
+    "costo": 0
+   },
+   "bot": {
+    "pnl": 10.0,
+    "ops": 2,
+    "ganadoras": 1
+   },
+   "real": {
+    "pnl": 690,
+    "fuente": "bitacora"
+   }
+  },
+  {
+   "fecha": "2026-11-12",
+   "cierre": 7592.4,
+   "etiqueta": "rango",
+   "regimen10": {
+    "g": 1,
+    "fuente": "manual",
+    "pred": "rango",
+    "ok": true
+   },
+   "tuya": {
+    "lectura": null,
+    "ok": null
+   },
+   "clasif": [],
+   "pin15": {
+    "pin": null,
+    "error": null
+   },
+   "gex_coincide": 81,
+   "veto": {
+    "n": 0,
+    "ahorro": 0,
+    "costo": 0
+   },
+   "bot": {
+    "pnl": 2215.0,
+    "ops": 5,
+    "ganadoras": 3
+   },
+   "real": {
+    "pnl": 1410,
+    "fuente": "bitacora"
+   }
+  },
+  {
+   "fecha": "2026-11-13",
+   "cierre": 7561.67,
+   "etiqueta": "rango",
+   "regimen10": {
+    "g": -1,
+    "fuente": "manual",
+    "pred": "tendencia",
+    "ok": false
+   },
+   "tuya": {
+    "lectura": null,
+    "ok": null
+   },
+   "clasif": [],
+   "pin15": {
+    "pin": 7530,
+    "error": 31.7
+   },
+   "gex_coincide": 60,
+   "veto": {
+    "n": 0,
+    "ahorro": 0,
+    "costo": 0
+   },
+   "bot": null,
+   "real": {
+    "pnl": -3875,
+    "fuente": "bitacora"
+   }
+  },
+  {
+   "fecha": "2026-11-16",
+   "cierre": 7417.12,
+   "etiqueta": "tendencia",
+   "regimen10": {
+    "g": -1,
+    "fuente": "manual",
+    "pred": "tendencia",
+    "ok": true
+   },
+   "tuya": {
+    "lectura": null,
+    "ok": null
+   },
+   "clasif": [],
+   "pin15": {
+    "pin": 7400,
+    "error": 17.1
+   },
+   "gex_coincide": 98,
+   "veto": {
+    "n": 0,
+    "ahorro": 0,
+    "costo": 0
+   },
+   "bot": {
+    "pnl": 2450.0,
+    "ops": 2,
+    "ganadoras": 2
+   },
+   "real": {
+    "pnl": -29.0,
+    "fuente": "schwab"
+   }
+  },
+  {
+   "fecha": "2026-11-17",
+   "cierre": 7340.84,
+   "etiqueta": "rango",
+   "regimen10": {
+    "g": 1,
+    "fuente": "manual",
+    "pred": "rango",
+    "ok": true
+   },
+   "tuya": {
+    "lectura": null,
+    "ok": null
+   },
+   "clasif": [
+    {
+     "hora": "10:00",
+     "reglas": "rango",
+     "ia": null,
+     "ok_reglas": true,
+     "ok_ia": null
+    },
+    {
+     "hora": "11:00",
+     "reglas": "tendencia",
+     "ia": "tendencia",
+     "ok_reglas": false,
+     "ok_ia": false
+    },
+    {
+     "hora": "13:00",
+     "reglas": "tendencia",
+     "ia": null,
+     "ok_reglas": false,
+     "ok_ia": null
+    }
+   ],
+   "pin15": {
+    "pin": 7300,
+    "error": 40.8
+   },
+   "gex_coincide": 99,
+   "veto": {
+    "n": 0,
+    "ahorro": 0,
+    "costo": 0
+   },
+   "bot": {
+    "pnl": 985.0,
+    "ops": 5,
+    "ganadoras": 2
+   },
+   "real": {
+    "pnl": 45.13,
+    "fuente": "schwab"
+   }
+  },
+  {
+   "fecha": "2026-11-18",
+   "cierre": 7323.52,
+   "etiqueta": "rango",
+   "regimen10": {
+    "g": 1,
+    "fuente": "manual",
+    "pred": "rango",
+    "ok": true
+   },
+   "tuya": {
+    "lectura": null,
+    "ok": null
+   },
+   "clasif": [
+    {
+     "hora": "10:00",
+     "reglas": "rango",
+     "ia": null,
+     "ok_reglas": true,
+     "ok_ia": null
+    },
+    {
+     "hora": "11:00",
+     "reglas": "tendencia",
+     "ia": null,
+     "ok_reglas": false,
+     "ok_ia": null
+    },
+    {
+     "hora": "13:00",
+     "reglas": "rango",
+     "ia": null,
+     "ok_reglas": true,
+     "ok_ia": null
+    }
+   ],
+   "pin15": {
+    "pin": 7300,
+    "error": 23.5
+   },
+   "gex_coincide": 80,
+   "veto": {
+    "n": 0,
+    "ahorro": 0,
+    "costo": 0
+   },
+   "bot": {
+    "pnl": -328.0,
+    "ops": 5,
+    "ganadoras": 3
+   },
+   "real": {
+    "pnl": -2575.29,
+    "fuente": "schwab"
+   }
+  },
+  {
+   "fecha": "2026-11-19",
+   "cierre": 7175.89,
+   "etiqueta": "tendencia",
+   "regimen10": {
+    "g": -1,
+    "fuente": "manual",
+    "pred": "tendencia",
+    "ok": true
+   },
+   "tuya": {
+    "lectura": null,
+    "ok": null
+   },
+   "clasif": [
+    {
+     "hora": "10:00",
+     "reglas": "rango",
+     "ia": "tendencia",
+     "ok_reglas": false,
+     "ok_ia": true
+    },
+    {
+     "hora": "11:00",
+     "reglas": "tendencia",
+     "ia": "tendencia",
+     "ok_reglas": true,
+     "ok_ia": true
+    },
+    {
+     "hora": "13:00",
+     "reglas": "tendencia",
+     "ia": "tendencia",
+     "ok_reglas": true,
+     "ok_ia": true
+    }
+   ],
+   "pin15": {
+    "pin": 7200,
+    "error": 24.1
+   },
+   "gex_coincide": 93,
+   "veto": {
+    "n": 1,
+    "ahorro": 0,
+    "costo": 150
+   },
+   "bot": {
+    "pnl": 1400.0,
+    "ops": 3,
+    "ganadoras": 2
+   },
+   "real": {
+    "pnl": -1744.4,
+    "fuente": "schwab"
+   }
+  },
+  {
+   "fecha": "2026-11-20",
+   "cierre": 6910.79,
+   "etiqueta": "tendencia",
+   "regimen10": {
+    "g": 0,
+    "fuente": "propio",
+    "pred": "incierto",
+    "ok": null
+   },
+   "tuya": {
+    "lectura": null,
+    "ok": null
+   },
+   "clasif": [
+    {
+     "hora": "10:00",
+     "reglas": "rango",
+     "ia": "tendencia",
+     "ok_reglas": false,
+     "ok_ia": true
+    },
+    {
+     "hora": "11:00",
+     "reglas": "tendencia",
+     "ia": "tendencia",
+     "ok_reglas": true,
+     "ok_ia": true
+    },
+    {
+     "hora": "13:00",
+     "reglas": "tendencia",
+     "ia": "tendencia",
+     "ok_reglas": true,
+     "ok_ia": true
+    }
+   ],
+   "pin15": {
+    "pin": 7000,
+    "error": 89.2
+   },
+   "gex_coincide": 100,
+   "veto": {
+    "n": 1,
+    "ahorro": 0,
+    "costo": 328
+   },
+   "bot": {
+    "pnl": 2850.0,
+    "ops": 3,
+    "ganadoras": 3
+   },
+   "real": {
+    "pnl": 0.0,
+    "fuente": "schwab"
+   }
+  }
+ ]
+}
