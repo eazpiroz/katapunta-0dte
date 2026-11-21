@@ -1,5 +1,5 @@
 {
- "actualizado": "2026-11-21T21:52:38+00:00",
+ "actualizado": "2026-11-21T22:24:35+00:00",
  "dias": [
   {
    "fecha": "2026-11-03",
@@ -37,7 +37,8 @@
     "ops": 5,
     "ganadoras": 5
    },
-   "real": null
+   "real": null,
+   "disciplina": null
   },
   {
    "fecha": "2026-11-04",
@@ -75,7 +76,8 @@
     "ops": 5,
     "ganadoras": 2
    },
-   "real": null
+   "real": null,
+   "disciplina": null
   },
   {
    "fecha": "2026-11-05",
@@ -113,7 +115,8 @@
     "ops": 5,
     "ganadoras": 3
    },
-   "real": null
+   "real": null,
+   "disciplina": null
   },
   {
    "fecha": "2026-11-06",
@@ -151,7 +154,8 @@
     "ops": 5,
     "ganadoras": 3
    },
-   "real": null
+   "real": null,
+   "disciplina": null
   },
   {
    "fecha": "2026-11-09",
@@ -192,7 +196,8 @@
    "real": {
     "pnl": -210,
     "fuente": "bitacora"
-   }
+   },
+   "disciplina": null
   },
   {
    "fecha": "2026-11-11",
@@ -233,7 +238,8 @@
    "real": {
     "pnl": 690,
     "fuente": "bitacora"
-   }
+   },
+   "disciplina": null
   },
   {
    "fecha": "2026-11-12",
@@ -274,7 +280,8 @@
    "real": {
     "pnl": 1410,
     "fuente": "bitacora"
-   }
+   },
+   "disciplina": null
   },
   {
    "fecha": "2026-11-13",
@@ -311,7 +318,8 @@
    "real": {
     "pnl": -3875,
     "fuente": "bitacora"
-   }
+   },
+   "disciplina": null
   },
   {
    "fecha": "2026-11-16",
@@ -352,6 +360,62 @@
    "real": {
     "pnl": -29.0,
     "fuente": "schwab"
+   },
+   "disciplina": {
+    "entradas": 23,
+    "antes_10": [
+     "09:31",
+     "09:41",
+     "09:48"
+    ],
+    "riesgo_max": 3409.76,
+    "excede_riesgo": [
+     [
+      "09:41",
+      3409.76
+     ],
+     [
+      "10:08",
+      3409.76
+     ],
+     [
+      "10:14",
+      3409.76
+     ],
+     [
+      "10:38",
+      1689.76
+     ],
+     [
+      "11:09",
+      1549.76
+     ],
+     [
+      "11:55",
+      1649.76
+     ],
+     [
+      "13:25",
+      1569.76
+     ],
+     [
+      "13:44",
+      1669.76
+     ],
+     [
+      "14:49",
+      1589.76
+     ]
+    ],
+    "rebasa_stop": false,
+    "cumple": {
+     "entradas": false,
+     "horario": false,
+     "riesgo_op": false,
+     "stop_dia": true
+    },
+    "ok": false,
+    "incidencia": null
    }
   },
   {
@@ -415,6 +479,21 @@
    "real": {
     "pnl": 45.13,
     "fuente": "schwab"
+   },
+   "disciplina": {
+    "entradas": 6,
+    "antes_10": [],
+    "riesgo_max": 402.44,
+    "excede_riesgo": [],
+    "rebasa_stop": false,
+    "cumple": {
+     "entradas": false,
+     "horario": true,
+     "riesgo_op": true,
+     "stop_dia": true
+    },
+    "ok": false,
+    "incidencia": null
    }
   },
   {
@@ -478,6 +557,48 @@
    "real": {
     "pnl": -2575.29,
     "fuente": "schwab"
+   },
+   "disciplina": {
+    "entradas": 15,
+    "antes_10": [
+     "09:49"
+    ],
+    "riesgo_max": 3409.76,
+    "excede_riesgo": [
+     [
+      "10:01",
+      1654.88
+     ],
+     [
+      "10:41",
+      1049.76
+     ],
+     [
+      "11:12",
+      3329.76
+     ],
+     [
+      "11:28",
+      3409.76
+     ],
+     [
+      "12:41",
+      3329.76
+     ],
+     [
+      "15:30",
+      1282.32
+     ]
+    ],
+    "rebasa_stop": true,
+    "cumple": {
+     "entradas": false,
+     "horario": false,
+     "riesgo_op": false,
+     "stop_dia": false
+    },
+    "ok": false,
+    "incidencia": null
    }
   },
   {
@@ -541,6 +662,23 @@
    "real": {
     "pnl": -1744.4,
     "fuente": "schwab"
+   },
+   "disciplina": {
+    "entradas": 4,
+    "antes_10": [
+     "09:59"
+    ],
+    "riesgo_max": 849.76,
+    "excede_riesgo": [],
+    "rebasa_stop": true,
+    "cumple": {
+     "entradas": true,
+     "horario": false,
+     "riesgo_op": true,
+     "stop_dia": false
+    },
+    "ok": false,
+    "incidencia": "Falla de Schwab: órdenes duplicadas al cancelar varias veces; queja abierta, en revisión de reembolso"
    }
   },
   {
@@ -604,7 +742,8 @@
    "real": {
     "pnl": 0.0,
     "fuente": "schwab"
-   }
+   },
+   "disciplina": null
   }
  ]
 }
