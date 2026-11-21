@@ -11,4 +11,7 @@ if errorlevel 1 (
 )
 timeout /t 60 /nobreak >nul
 start "Katapunta - Bot de papel" cmd /c iniciar_papel.bat
+rem Bitacora automatica: recoge la liquidacion nocturna de ayer y actualiza la tarjeta de calificaciones
+python bitacora_auto.py --ayer >> cierre_log.txt 2>&1
+python calificaciones.py --publicar >> cierre_log.txt 2>&1
 exit

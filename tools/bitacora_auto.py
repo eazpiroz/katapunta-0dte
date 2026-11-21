@@ -7,6 +7,7 @@ No guarda números de cuenta completos ni el hash de la cuenta.
     python bitacora_auto.py --probar 2026-11-16 2026-11-20   → imprime y guarda bitacora_auto/muestra.json
     python bitacora_auto.py                                   → hoy
     python bitacora_auto.py 2026-11-18                        → un día
+    python bitacora_auto.py --ayer                            → el día hábil anterior (lo corre el arranque de la mañana)
 
 Motores (regla confirmada por Eduardo, 21-nov-2026):
   SPX/SPXW que vence el mismo día           → SPX 0DTE
@@ -156,7 +157,13 @@ def leer(d1, d2):
 
 def main():
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
-    hoy = dt.datetime.now(ET).date().isoformat()
+    hoy = dt.datetime.now(ET).date()
+    if "--ayer" in sys.argv:                      # la mañana siguiente: recoge la liquidación nocturna del 0DTE
+        d = hoy - dt.timedelta(days=1)
+        while d.weekday() >= 5:
+            d -= dt.timedelta(days=1)
+        hoy = d
+    hoy = hoy.isoformat()
     d1 = args[0] if args else hoy
     d2 = args[1] if len(args) > 1 else d1
     try:

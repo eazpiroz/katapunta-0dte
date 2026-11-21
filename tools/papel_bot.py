@@ -57,6 +57,7 @@ PB = {
     "a_recorrido": 0,          # A: no comprar si el objetivo está a menos de N pts (0 = apagado)
     "obj_pasa_largo": False,   # A: el TP por nivel solo cuenta si el objetivo pasa el strike largo
     "b_sin_tendencia": False,  # B: no vender si el clasificador (reglas) dice tendencia
+    "gamma_propia": False,     # sin lectura γ manual (o con más de gamma_edad min): usar el régimen del GEX propio (cadena de Schwab)
     "c_quietud": 0,            # C ampliada: con SPX a ≤10 pts del PIN del tablero y rango de 30 min ≤ N pts, IC sin exigir gamma + (0 = apagado)          # min: con la lectura γ (perfil manual) más vieja que esto, no abre B ni C (A sí, va por tendencia)
 }
 
@@ -639,7 +640,23 @@ class Bot:
         return {"px": px, "zg": round(zg, 1), "g": g, "T": T, "mom": mom, "mp": r.get("mp"), "mn": r.get("mn"),
                 "techo": (r.get("techo") or [None])[0], "piso": (r.get("piso") or [None])[0], "tf2": tf2,
                 "cw": (r.get("cw") or [None])[0], "pw": (r.get("pw") or [None])[0],
-                "con_gamma": zgv is not None, "edad_g": None}
+                "con_gamma": zgv is not None, "edad_g": None, "g_prop": self.g_propia(r), "zge": r.get("zge"),
+                "fuente_g": "manual" if zgv is not None else None}
+
+    @staticmethod
+    def g_propia(r):
+        """Régimen según el GEX propio del recolector (cadena de Schwab): +1 / −1, o 0 si es incierto."""
+        reg = r.get("reg") or {}
+        return 0 if reg.get("inc") or reg.get("d0") not in (1, -1) else reg["d0"]
+
+    def usar_propia(self, c):
+        """Candidata gamma_propia: cambia el régimen al del GEX propio. Devuelve True si lo aplicó."""
+        if not self.pb.get("gamma_propia") or not c["g_prop"]:
+            return False
+        c["g"], c["con_gamma"], c["fuente_g"] = c["g_prop"], True, "propia"
+        if not c["con_gamma"] or c["zg"] == c["px"]:
+            c["zg"] = c["zge"] or c["px"]
+        return True
 
     def pnl_dia(self):
         return sum(o["pnl"] for o in self.ops)
@@ -731,10 +748,12 @@ class Bot:
         if m < pb["abre"]:
             return
         lad = r.get("lad") or lad_bs(r, ts, pb["cierre"])
-        if not c["con_gamma"]:
+        if not c["con_gamma"] and not self.usar_propia(c):
             return                                  # sin lectura γ no hay régimen: no se abre nada
-        c["edad_g"] = edad_gamma(ts, r)
+        c["edad_g"] = edad_gamma(ts, r) if c["fuente_g"] == "manual" else None
         gamma_vieja = c["edad_g"] is not None and c["edad_g"] > pb["gamma_edad"]
+        if gamma_vieja and self.usar_propia(c):
+            gamma_vieja = False                     # lectura manual vieja → régimen del GEX propio
         # A · gamma negativa + tendencia alineada → débito a favor
         if c["g"] == -1 and c["T"] != 0 and c["mom"] == c["T"] and m <= pb["ultima_tend"] and self.puede(m, c["T"]):
             sd = "c" if c["T"] > 0 else "p"
