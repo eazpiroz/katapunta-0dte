@@ -367,12 +367,12 @@ a{color:#5CC1BF}a:hover{color:#8ADBD7}
 <span style="font-size: 11px; color: {{tp.ageC}}">{{tp.age}}</span>
 </div>
 <div style="display: flex; flex-wrap: wrap; gap: 16px">
-<div style="flex: 1 1 340px; min-width: 0; display: flex; flex-direction: column">
-<div style="display: grid; grid-template-columns: 64px 64px 52px 60px 1fr 70px; gap: 8px; font-size: 11px; font-weight: 500; letter-spacing: 0.2em; color: #5CC1BF; padding: 0 0 6px">
+<div style="flex: 1 1 340px; min-width: 0; overflow-x: auto; display: flex; flex-direction: column">
+<div style="display: grid; grid-template-columns: 60px 58px 44px 48px minmax(64px, 1fr) 58px; gap: 6px; font-size: 10px; font-weight: 500; letter-spacing: 0.08em; color: #5CC1BF; padding: 0 0 6px">
 <span>HORA ET</span><span>STRIKE</span><span>CONTR.</span><span>PRECIO</span><span>LADO</span><span style="text-align: right">PRIMA</span>
 </div>
 <sc-for list="{{tp.prints}}" as="pr" hint-placeholder-count="8">
-<div style="display: grid; grid-template-columns: 64px 64px 52px 60px 1fr 70px; gap: 8px; align-items: center; padding: 5px 0; border-top: 1px solid #1E3739; font-size: 13px; font-family: 'IBM Plex Mono', ui-monospace, monospace">
+<div style="display: grid; grid-template-columns: 60px 58px 44px 48px minmax(64px, 1fr) 58px; gap: 6px; align-items: center; padding: 5px 0; border-top: 1px solid #1E3739; font-size: 13px; font-family: 'IBM Plex Mono', ui-monospace, monospace">
 <span style="color: #93A9A9">{{pr.h}}</span>
 <span style="font-weight: 600; color: {{pr.kc}}">{{pr.k}}</span>
 <span>{{pr.n}}</span>
@@ -406,9 +406,35 @@ a{color:#5CC1BF}a:hover{color:#8ADBD7}
 <span style="text-align: right">{{st.tot}}</span>
 </div>
 </sc-for>
+<sc-if value="{{tp.v2}}" hint-placeholder-val="{{false}}">
+<div style="font-size: 11px; font-weight: 500; letter-spacing: 0.2em; color: #5CC1BF; margin-top: 4px">BLOQUES ACUMULADOS · +{{tp.bn}} CONTR. EN 5 MIN</div>
+<sc-for list="{{tp.bloques}}" as="bl" hint-placeholder-count="3">
+<div style="display: grid; grid-template-columns: 92px 64px 1fr 62px; gap: 8px; align-items: center; font-size: 12px; font-family: 'IBM Plex Mono', ui-monospace, monospace">
+<span style="color: #93A9A9">{{bl.h}}</span>
+<span style="font-weight: 600; color: {{bl.kc}}">{{bl.k}}</span>
+<span><span style="font-family: 'Poppins', sans-serif; font-weight: 600; color: {{bl.lc}}">{{bl.lado}}</span> · {{bl.n}} en {{bl.piezas}}</span>
+<span style="text-align: right">{{bl.prem}}</span>
+</div>
+</sc-for>
+<sc-if value="{{tp.sinBloques}}" hint-placeholder-val="{{false}}">
+<div style="font-size: 12px; color: #93A9A9">Sin bloques todavía.</div>
+</sc-if>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 4px">
+<div style="background: #0D1B1D; border: 1px solid #1E3739; border-radius: 8px; padding: 10px 12px">
+<div style="font-size: 11px; letter-spacing: 0.2em; color: #5CC1BF">LIQUIDEZ ±15 PTS</div>
+<div style="font-size: 16px; font-weight: 700; font-family: 'IBM Plex Mono', ui-monospace, monospace; color: {{tp.liqC}}">{{tp.liq}}</div>
+<div style="font-size: 11px; color: #93A9A9">{{tp.liqSub}}</div>
+</div>
+<div style="background: #0D1B1D; border: 1px solid #1E3739; border-radius: 8px; padding: 10px 12px">
+<div style="font-size: 11px; letter-spacing: 0.2em; color: #5CC1BF">VOLUMEN &gt; OI</div>
+<div style="font-size: 13px; font-weight: 600; font-family: 'IBM Plex Mono', ui-monospace, monospace; line-height: 1.5">{{tp.apert}}</div>
+<div style="font-size: 11px; color: #93A9A9">posiciones nuevas seguras</div>
 </div>
 </div>
-<div style="font-size: 11px; color: #93A9A9; line-height: 1.5; border-top: 1px solid #1E3739; padding-top: 8px">Tape aproximado desde el streamer de Schwab: cada renglón es un salto de volumen de +{{tp.min}} contratos en un strike 0DTE. Compra = se pagó el ask, venta = se vendió al bid, medio = entre ambos. Se excluyen probables spreads (mismo tamaño en dos strikes en 2 s). Neto = prima comprada − vendida. Sin códigos de condición: dos operaciones juntas pueden verse como una.</div>
+</sc-if>
+</div>
+</div>
+<div style="font-size: 11px; color: #93A9A9; line-height: 1.5; border-top: 1px solid #1E3739; padding-top: 8px">Tape aproximado desde el streamer de Schwab: cada renglón es un salto de volumen de +{{tp.min}} contratos en un strike 0DTE. Compra = se pagó el ask (Compra+ = arriba del ask), venta = se vendió al bid (Venta+ = debajo del bid), medio = entre ambos. Bloque = piezas del mismo contrato y lado que suman +{{tp.bn}} contratos en 5 min (órdenes divididas). Volumen &gt; OI = el strike ya negoció más contratos que los abiertos al inicio del día, así que hay posiciones nuevas. Liquidez = ancho bid/ask en % del precio medio contra la primera media hora, y quién tiene más tamaño (bid o ask). Se excluyen probables spreads (mismo tamaño en dos strikes en 2 s). Neto = prima comprada − vendida. Sin códigos de condición: dos operaciones juntas pueden verse como una.</div>
 </section>
 </sc-if>
 
@@ -1278,12 +1304,21 @@ class Component extends DCLogic {
       age: tpAge < 90 ? 'en vivo · hace ' + Math.round(tpAge) + ' s' : 'hace ' + Math.round(tpAge / 60) + ' min',
       ageC: tpAge < 90 ? '#8ADBD7' : '#E6B655',
       prints: (TPj.prints || []).slice(0, 12).map(p => ({ h: etH(p.h), k: p.k + (p.t === 'C' ? 'C' : 'P') + (deepT(p) ? ' ITM' : ''), kc: p.t === 'C' ? '#5FD4A0' : '#F07F74', n: p.n, px: (+p.px).toFixed(2),
-        lado: p.lado === 'B' ? 'Compra' : p.lado === 'V' ? 'Venta' : 'Medio', lc: p.lado === 'B' ? '#5FD4A0' : p.lado === 'V' ? '#F07F74' : '#93A9A9', prem: fK(p.prem) })),
+        lado: ({ 'C+': 'Compra+', C: 'Compra', 'V+': 'Venta+', V: 'Venta' })[p.agr] || (p.lado === 'B' ? 'Compra' : p.lado === 'V' ? 'Venta' : 'Medio'), lc: p.lado === 'B' ? '#5FD4A0' : p.lado === 'V' ? '#F07F74' : '#93A9A9', prem: fK(p.prem) })),
       empty: !(TPj.prints || []).length,
       nc: (tpN.C > 0 ? '+' : tpN.C < 0 ? '−' : '') + fK(Math.abs(tpN.C)), ncC: tpN.C > 0 ? '#5FD4A0' : tpN.C < 0 ? '#F07F74' : '#F2EFE8',
       np: (tpN.P > 0 ? '+' : tpN.P < 0 ? '−' : '') + fK(Math.abs(tpN.P)), npC: tpN.P > 0 ? '#5FD4A0' : tpN.P < 0 ? '#F07F74' : '#F2EFE8',
       strikes: tpS.slice(0, 8).map(r => ({ k: r.k + r.t, kc: r.t === 'C' ? '#5FD4A0' : '#F07F74', tot: fK(r.B + r.V + r.M),
-        wB: (100 * r.B / tpMx).toFixed(1) + '%', wV: (100 * r.V / tpMx).toFixed(1) + '%', wM: (100 * r.M / tpMx).toFixed(1) + '%' }))
+        wB: (100 * r.B / tpMx).toFixed(1) + '%', wV: (100 * r.V / tpMx).toFixed(1) + '%', wM: (100 * r.M / tpMx).toFixed(1) + '%' })),
+      v2: TPj.v === 2, bn: TPj.bloque_n || 300,
+      bloques: (TPj.bloques || []).slice(0, 5).map(b => ({ h: etH(b.h_ini).slice(0, -3) + '–' + etH(b.h).slice(0, -3), k: b.k + b.t, kc: b.t === 'C' ? '#5FD4A0' : '#F07F74',
+        lado: (b.lado === 'B' ? 'Compra' : 'Venta') + (b.agr || ''), lc: b.lado === 'B' ? '#5FD4A0' : '#F07F74', n: b.n, piezas: b.piezas, prem: fK(b.prem) })),
+      sinBloques: !(TPj.bloques || []).length,
+      liq: TPj.liq && TPj.liq.ancho != null ? TPj.liq.ancho + '%' + (TPj.liq.x ? ' · ' + TPj.liq.x + '×' : '') : '—',
+      liqC: TPj.liq && TPj.liq.x >= 1.5 ? '#F07F74' : TPj.liq && TPj.liq.x >= 1.2 ? '#E6B655' : '#F2EFE8',
+      liqSub: (() => { const L = TPj.liq; if (!L) return 'sin lectura'; const d = t => L[t] && L[t].desb != null ? (L[t].desb > 0.2 ? 'más bid' : L[t].desb < -0.2 ? 'más ask' : 'parejo') : '—';
+        return (L.x ? (L.x >= 1.5 ? 'spread muy abierto · ' : L.x >= 1.2 ? 'spread abriéndose · ' : 'normal · ') : 'base a las 9:00 ET · ') + 'calls ' + d('C') + ' · puts ' + d('P'); })(),
+      apert: (TPj.apertura || []).slice(0, 3).map(a => a.k + a.t + ' ' + (a.x ? a.x + '×' : 'nuevo')).join(' · ') || '—'
     } : { on: false };
     return {
       d, rows, tabs, tp,

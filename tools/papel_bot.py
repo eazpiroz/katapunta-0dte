@@ -467,6 +467,7 @@ class TapeLog:
         import collections
         self.hoy, self.f = hoy, HIST / f"tape_min_{hoy}.jsonl"
         self.vistos, self.min_ult, self.ult = set(), None, None
+        self.min_prev_ok = False        # en la primera foto los bloques ya existían: no son nuevos
         self.flujo = collections.deque(maxlen=5)       # (dC, dP) de prima neta por minuto, últimos 5 min
 
     def tick(self):
@@ -498,9 +499,21 @@ class TapeLog:
         self.flujo.append((dC, dP))
         self.ult = {"neto": snap.get("neto"), "flujo5": {"C": sum(x[0] for x in self.flujo), "P": sum(x[1] for x in self.flujo)},
                     "spot": snap.get("spot"), "edad": int(time.time()) - int(snap.get("ts") or 0)}
+        bl_nuevos = []                  # Tape v2: bloques acumulados que no estaban en la foto anterior
+        for b in snap.get("bloques", []):
+            k = ("bl", b.get("h_ini"), b.get("h"), b.get("k"), b.get("t"))
+            if k not in self.vistos:
+                self.vistos.add(k)
+                bl_nuevos.append(b)
         linea = {"ts": m, "spot": snap.get("spot"), "neto": snap.get("neto"), "flujo5": self.ult["flujo5"],
                  "edad": self.ult["edad"], "strikes": snap.get("strikes", [])[:6], "nuevos": nuevos,
                  "spreads": len(snap.get("spreads", []))}
+        if snap.get("v") == 2:
+            linea.update({"bloques_nuevos": bl_nuevos if self.min_prev_ok else [], "liq": snap.get("liq"),
+                          "apertura": (snap.get("apertura") or [])[:3], "agr": snap.get("agr")})
+            self.ult.update({"liq": snap.get("liq"), "apertura": (snap.get("apertura") or [])[:3],
+                             "bloques": [b for b in snap.get("bloques", [])][:3]})
+        self.min_prev_ok = True
         with open(self.f, "a", encoding="utf-8") as fh:
             fh.write(json.dumps(linea, separators=(",", ":"), ensure_ascii=False) + "\n")
 

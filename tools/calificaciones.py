@@ -229,8 +229,20 @@ def calificar():
             "bot": {"pnl": pd.get("pnl"), "ops": pd.get("ops"), "ganadoras": pd.get("ganadoras")} if pd else None,
             "real": {"pnl": real, "fuente": fuente} if real is not None else None,
             "disciplina": disciplina(fecha, real),
+            "tape": _tape(fecha),
         })
     return {"actualizado": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"), "dias": dias}
+
+
+def _tape(fecha):
+    """Tape v2: % de eventos de flujo grande tras los que el SPX fue a favor a 15 y 30 min."""
+    try:
+        import tape_estudio as TE
+        r = TE.reaccion(HIST, fecha)
+        return r if r and r.get("n") else None
+    except Exception as e:
+        print("tape", fecha, e)
+        return None
 
 
 def publicar(data):

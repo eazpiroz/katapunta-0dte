@@ -231,5 +231,17 @@ if con_tape:
     print(f"\nCriterio: adoptar solo si mejora el acumulado con ≥10 días de tape (hoy: {len(con_tape)}).")
 else:
     print("Sin días con tape registrado todavía.")
+# 7. Tape v2: ¿el flujo grande anticipa al SPX? (todos los días con tape en la carpeta)
+import tape_estudio as TE
+print(f"\n## Reacción del precio al tape (acumulado de todos los días con tape)\n")
+TE.main(carpeta)
+hoy_t = leer_tape()
+if hoy_t and any("liq" in t for t in hoy_t):
+    lq = [t["liq"] for t in hoy_t if t.get("liq") and t["liq"].get("x")]
+    peor = max(lq, key=lambda x: x["x"]) if lq else None
+    bl = sum(len(t.get("bloques_nuevos") or []) for t in hoy_t)
+    print(f"\nHoy: {bl} bloques acumulados · liquidez: spread {'máx ' + str(peor['x']) + '× la base' if peor else 'sin base'}"
+          f" · volumen > OI al cierre: {', '.join(str(int(a['k'])) + a['t'] for a in (hoy_t[-1].get('apertura') or [])) or '—'}")
+
 print("\nNota: la repetición marca con Black-Scholes; en vivo el bot marca con la cadena real de Schwab. "
       "Muestra chica: una variante solo es candidata si mejora el acumulado sin depender de un solo día.")

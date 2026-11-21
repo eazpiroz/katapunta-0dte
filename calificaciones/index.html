@@ -116,12 +116,13 @@ details summary:before{content:"▸ ";color:var(--brand)} details[open] summary:
     <div class="kpi"><div class="k">GEX propio = manual</div><div class="v" id="kGex">—</div><div class="d">% de minutos con el mismo régimen</div></div>
     <div class="kpi"><div class="k">Tu disciplina</div><div class="v" id="kDis">—</div><div class="d" id="kDisD">días que cumplieron el Playbook</div></div>
     <div class="kpi"><div class="k">Veto de Claude</div><div class="v" id="kVeto">—</div><div class="d" id="kVetoD">ahorro − costo</div></div>
+    <div class="kpi"><div class="k">Tape a 15 min</div><div class="v" id="kTape">—</div><div class="d" id="kTapeD">flujo grande → SPX a favor</div></div>
     <div class="kpi"><div class="k">Bot de papel vs tu real</div><div class="v" id="kBot">—</div><div class="d" id="kBotD"></div></div>
   </section>
   <section class="panel" aria-labelledby="hDia">
     <h2 id="hDia">Día por día <small>✓ acertó · ✗ falló · · sin lectura</small></h2>
     <div class="scroll"><table>
-      <thead><tr><th>Día</th><th>Cierre fue</th><th>10:00</th><th>Tú</th><th class="hide-s">Squawk</th><th class="hide-s">Claude 10/11/13</th><th class="hide-s">PIN err</th><th class="hide-s">GEX =</th><th>Bot</th><th>Real</th></tr></thead>
+      <thead><tr><th>Día</th><th>Cierre fue</th><th>10:00</th><th>Tú</th><th class="hide-s">Squawk</th><th class="hide-s">Claude 10/11/13</th><th class="hide-s">PIN err</th><th class="hide-s">GEX =</th><th class="hide-s">Tape 15'</th><th>Bot</th><th>Real</th></tr></thead>
       <tbody id="tDia"></tbody>
     </table></div>
   </section>
@@ -163,6 +164,8 @@ function pinta(n){
     <td>${ok(c.stop_dia)}</td><td>${g.incidencia?"no cuenta":ok(g.ok)}</td></tr>`;}).join("");
   $("disNota").textContent=xs.some(x=>x.disciplina&&x.disciplina.incidencia)?"⚠️ broker = día con falla de Schwab (órdenes duplicadas); se muestra pero no cuenta en la disciplina.":"";
   [a,t]=cnt(xs,x=>x.squawk&&x.squawk.ok); $("kSq").textContent=pct(a,t); $("kSqD").textContent=t?`${a} de ${t} días · γ− → tendencia, γ+ → rango`:"sin datos";
+  const tx=xs.filter(x=>x.tape&&x.tape.n), tn=tx.reduce((s,x)=>s+x.tape.n,0), tf=tx.reduce((s,x)=>s+x.tape.n*x.tape.a_favor_15/100,0);
+  $("kTape").textContent=tn?Math.round(100*tf/tn)+"%":"—"; $("kTapeD").textContent=tn?`${tn} eventos en ${tx.length} días · 50% = moneda al aire`:"sin tape registrado";
   const bx=xs.filter(x=>x.bot&&x.bot.pnl!=null), bt=bx.reduce((s,x)=>s+x.bot.pnl,0); $("kBot").textContent=usd(bt); $("kBot").className="v "+cls(bt);
   const rx=xs.filter(x=>x.real&&x.real.pnl!=null), rt=rx.reduce((s,x)=>s+x.real.pnl,0); $("kBotD").innerHTML=`${bx.length} días en papel · real <span class="${cls(rt)}">${rx.length?usd(rt):"—"}</span> en ${rx.length} días`;
   $("tDia").innerHTML=xs.slice().reverse().map(x=>`<tr><td>${dia(x.fecha)}</td><td>${x.etiqueta||"—"}</td>
@@ -170,6 +173,7 @@ function pinta(n){
     <td class="hide-s">${x.clasif.length?x.clasif.map(c=>mark(c.ok_ia)).join(" "):"—"}</td>
     <td class="hide-s num">${x.pin15.error!=null?x.pin15.error.toFixed(0):"—"}</td>
     <td class="hide-s num">${x.gex_coincide!=null?x.gex_coincide+"%":"—"}</td>
+    <td class="hide-s num" title="${x.tape?x.tape.n+' eventos':''}">${x.tape?x.tape.a_favor_15+"%":"—"}</td>
     <td class="num ${cls(x.bot&&x.bot.pnl)}">${x.bot?usd(x.bot.pnl):"—"}</td>
     <td class="num ${cls(x.real&&x.real.pnl)}">${x.real?usd(x.real.pnl):"—"}</td></tr>`).join("");
 }

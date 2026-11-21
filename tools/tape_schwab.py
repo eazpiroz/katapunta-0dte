@@ -7,6 +7,16 @@ TOTAL_VOLUME, clasificándolos contra el bid/ask del momento:
 Filtro: solo saltos de +100 contratos; si dos strikes saltan el mismo tamaño en menos de 2 s se
 marcan como probable spread y salen de la lista principal.
 
+Tape v2 (21-nov, manual "Flujo y Liquidez"):
+  · 5 niveles de agresividad: C+ arriba del ask · C en el ask · M medio · V en el bid · V+ debajo del bid
+    (el campo "lado" sigue siendo B/M/V para no romper el bot ni la revisión).
+  · Bloques acumulados (órdenes divididas): piezas de +10 contratos del mismo contrato y lado que en 5 min
+    suman +300 contratos en 2 o más piezas. El filtro de +100 tiraba justo esas órdenes partidas.
+  · Volumen vs OI de apertura: si el volumen del día supera el OI con el que abrió el strike, por fuerza
+    hay posiciones nuevas (la regla del OI del día siguiente no sirve en 0DTE: el contrato ya venció).
+  · Liquidez cerca del precio (±15 pts): ancho bid/ask en % del medio, contra la base de la primera media
+    hora, y desbalance de tamaños bid vs ask.
+
 Publica tape.json en la rama live cada 30 s. Usa las mismas llaves que flightdeck_recolector.py
 (debe estar en la misma carpeta). Solo librería estándar.
 
@@ -21,11 +31,33 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import flightdeck_recolector as R
 
 MIN = int(sys.argv[sys.argv.index("--min") + 1]) if "--min" in sys.argv else 100   # contratos mínimos por print
+MIN_ACUM = 10        # piezas mínimas que cuentan para un bloque acumulado
+BLOQ_S = 300         # ventana del bloque (5 min)
+BLOQ_N = 300         # contratos acumulados para declarar bloque
+APERT_VOL = 500      # volumen mínimo para reportar volumen > OI
+LIQ_PTS = 15         # zona de liquidez alrededor del precio
 SPREAD_S = 2.0       # ventana para emparejar patas de un spread
 N_STR = 30           # strikes por lado (5 pts) alrededor del precio
 PUB_S = 30           # segundos entre publicaciones
 RESUB_S = 600        # re-centrar strikes cada 10 min
-CAMPOS = "0,2,3,4,8,16,17,18,20,21"   # símbolo, bid, ask, last, vol total, bid size, ask size, last size, strike, tipo
+CAMPOS = "0,2,3,4,8,9,16,17,18,20,21"   # símbolo, bid, ask, last, vol total, OI, bid size, ask size, last size, strike, tipo
+NIVEL = {"C+": "Compra+", "C": "Compra", "M": "Medio", "V": "Venta", "V+": "Venta+"}
+
+
+def nivel(px, bid, ask):
+    """Agresividad según dónde se ejecutó contra el bid/ask del momento."""
+    e = 0.001
+    if not px:
+        return "M"
+    if ask and px > ask + e:
+        return "C+"
+    if ask and px >= ask - e:
+        return "C"
+    if bid and px < bid - e:
+        return "V+"
+    if bid and px <= bid + e:
+        return "V"
+    return "M"
 
 
 # ---------------------------------------------------------------- websocket mínimo (RFC 6455, cliente)
@@ -91,16 +123,43 @@ class WS:
 # ---------------------------------------------------------------- lógica del tape (sin red, se puede probar)
 class Tape:
     def __init__(self):
-        self.q = {}                         # símbolo → {bid, ask, last, vol, k, t}
+        self.q = {}                         # símbolo → {bid, ask, last, vol, oi, bsz, asz, k, t}
         self.prints = deque(maxlen=400)
         self.pend = deque()                 # prints recientes para emparejar spreads
+        self.acum = {}                      # (k, t, lado) → deque de piezas en la ventana del bloque
+        self.bloques = deque(maxlen=60)
+        self.agr = {"C": dict.fromkeys(NIVEL, 0), "P": dict.fromkeys(NIVEL, 0)}   # prima por nivel (prints de +MIN)
+        self.liq_base = []                  # anchos medianos de la primera media hora (base del día)
+        self.nbloq = 0
+
+    def _bloque(self, p):
+        """Acumula piezas de un mismo contrato y lado; declara bloque al pasar BLOQ_N en 2+ piezas."""
+        if p["lado"] == "M":
+            return None
+        cola = self.acum.setdefault((p["k"], p["t"], p["lado"]), deque())
+        while cola and p["ts"] - cola[0]["ts"] > BLOQ_S:
+            cola.popleft()
+        cola.append(p)
+        n = sum(x["n"] for x in cola)
+        if len(cola) < 2 or n < BLOQ_N:
+            return None
+        b = {"ts": p["ts"], "h_ini": cola[0]["h"], "h": p["h"], "k": p["k"], "t": p["t"], "lado": p["lado"],
+             "n": n, "piezas": len(cola), "prem": sum(x["prem"] for x in cola),
+             "px": round(sum(x["px"] * x["n"] for x in cola) / n, 2),
+             "agr": "+" if any(x["agr"].endswith("+") for x in cola) else ""}
+        cola.clear()
+        self.bloques.append(b)
+        self.nbloq += 1
+        print(f'BLOQUE {b["h_ini"]}–{b["h"]} {b["k"]:g}{b["t"]} {b["n"]} en {b["piezas"]} piezas @ {b["px"]} '
+              f'{"compra" if b["lado"] == "B" else "venta"}{b["agr"]}  ${b["prem"]:,}')
+        return b
 
     def update(self, d, ts):
         sy = d.get("key") or d.get("0")
         if not sy:
             return None
         q = self.q.setdefault(sy, {"vol": None})
-        for f, name in (("2", "bid"), ("3", "ask"), ("4", "last"), ("18", "lsz")):
+        for f, name in (("2", "bid"), ("3", "ask"), ("4", "last"), ("9", "oi"), ("16", "bsz"), ("17", "asz"), ("18", "lsz")):
             if f in d and d[f] is not None:
                 q[name] = float(d[f])
         if "20" in d:
@@ -116,24 +175,73 @@ class Tape:
             return None
         v = float(d["8"])
         prev, q["vol"] = q["vol"], v
-        if prev is None or v - prev < MIN:
+        if prev is None or v - prev < MIN_ACUM:
             return None
         sz, px = int(v - prev), q.get("last") or 0
         bid, ask = q.get("bid") or 0, q.get("ask") or 0
-        lado = "B" if ask and px >= ask else "V" if bid and px <= bid else "M"
+        agr = nivel(px, bid, ask)
+        lado = "B" if agr.startswith("C") else "V" if agr.startswith("V") else "M"
         p = {"ts": ts, "h": time.strftime("%H:%M:%S", time.localtime(ts)), "k": q["k"], "t": q["t"],
-             "n": sz, "px": round(px, 2), "bid": bid, "ask": ask, "lado": lado,
+             "n": sz, "px": round(px, 2), "bid": bid, "ask": ask, "lado": lado, "agr": agr,
              "prem": round(sz * px * 100), "bloque": bool(q.get("lsz", 0) >= MIN), "spread": False}
+        if sz < MIN:                        # pieza chica: solo cuenta para bloques acumulados
+            self._bloque(p)
+            return None
         while self.pend and ts - self.pend[0]["ts"] > SPREAD_S:
             self.pend.popleft()
         for o in self.pend:
             if o["n"] == sz and (o["k"], o["t"]) != (p["k"], p["t"]):
+                if not o["spread"]:                     # ya había contado en la prima por nivel: se descuenta
+                    self.agr[o["t"]][o["agr"]] -= o["prem"]
                 o["spread"] = p["spread"] = True
         self.pend.append(p)
         self.prints.append(p)
+        if not p["spread"]:
+            self.agr[p["t"]][agr] += p["prem"]
+            self._bloque(p)
         return p
 
-    def snapshot(self, spot=None):
+    def apertura(self):
+        """Strikes donde el volumen del día ya supera el OI de apertura: hay posiciones nuevas seguro."""
+        out = []
+        for q in self.q.values():
+            vol, oi = q.get("vol") or 0, q.get("oi")
+            if oi is None or vol < APERT_VOL or "k" not in q:
+                continue
+            if vol > oi:
+                out.append({"k": q["k"], "t": q["t"], "vol": int(vol), "oi": int(oi),
+                            "x": round(vol / oi, 1) if oi else None})
+        return sorted(out, key=lambda r: -(r["x"] or 999))[:8]
+
+    def liquidez(self, spot, hora_min=None):
+        """Ancho bid/ask (% del medio) y desbalance de tamaños en ±LIQ_PTS del precio, por tipo."""
+        if not spot:
+            return None
+        res = {}
+        for t in ("C", "P"):
+            anchos, bs, as_ = [], 0, 0
+            for q in self.q.values():
+                if q.get("t") != t or "k" not in q or abs(q["k"] - spot) > LIQ_PTS:
+                    continue
+                b, a = q.get("bid") or 0, q.get("ask") or 0
+                if b > 0 and a > b:
+                    anchos.append((a - b) / ((a + b) / 2) * 100)
+                bs += q.get("bsz") or 0
+                as_ += q.get("asz") or 0
+            anchos.sort()
+            res[t] = {"ancho": round(anchos[len(anchos) // 2], 1) if anchos else None,
+                      "desb": round((bs - as_) / (bs + as_), 2) if bs + as_ else None, "n": len(anchos)}
+        meds = [r["ancho"] for r in res.values() if r["ancho"] is not None]
+        actual = sum(meds) / len(meds) if meds else None
+        if actual is not None and hora_min is not None and 510 <= hora_min < 540:   # 8:30–9:00 CDMX
+            self.liq_base.append(actual)
+        base = sorted(self.liq_base)[len(self.liq_base) // 2] if len(self.liq_base) >= 5 else None
+        res["ancho"] = round(actual, 1) if actual is not None else None
+        res["base"] = round(base, 1) if base else None
+        res["x"] = round(actual / base, 2) if actual and base else None
+        return res
+
+    def snapshot(self, spot=None, hora_min=None):
         limpios = [p for p in self.prints if not p["spread"]]
         res = {}
         for p in limpios:
@@ -149,7 +257,11 @@ class Tape:
                 "strikes_otm": top_otm, "neto_otm": {"C": neto("C", otm), "P": neto("P", otm)},
                 "prints": [{k: v for k, v in p.items() if k != "ts"} for p in list(limpios)[-60:]][::-1],
                 "spreads": [{k: v for k, v in p.items() if k != "ts"} for p in self.prints if p["spread"]][-20:][::-1],
-                "strikes": top, "neto": {"C": neto("C"), "P": neto("P")}}
+                "strikes": top, "neto": {"C": neto("C"), "P": neto("P")},
+                # Tape v2
+                "v": 2, "bloque_n": BLOQ_N, "bloque_s": BLOQ_S,
+                "bloques": [{k: v for k, v in b.items() if k != "ts"} for b in self.bloques][-15:][::-1],
+                "agr": self.agr, "apertura": self.apertura(), "liq": self.liquidez(spot, hora_min)}
 
 
 # ---------------------------------------------------------------- Schwab
@@ -236,7 +348,8 @@ def run():
             st, j = R.gh_req(tok, "GET", path + f"?ref={R.BRANCH}")
             sha["v"] = j.get("sha") if st == 200 else ""
         body = {"message": "tape " + R.now().strftime("%H:%M"), "branch": R.BRANCH,
-                "content": base64.b64encode(json.dumps(tape.snapshot(spot), separators=(",", ":")).encode()).decode()}
+                "content": base64.b64encode(json.dumps(tape.snapshot(spot, R.now().hour * 60 + R.now().minute),
+                                                       separators=(",", ":")).encode()).decode()}
         if sha["v"]:
             body["sha"] = sha["v"]
         st, j = R.gh_req(tok, "PUT", path, body)
@@ -284,7 +397,7 @@ def run():
                             if p:
                                 n_pr += 1
                             if p and not p["spread"]:
-                                print(f'{p["h"]} {p["k"]:g}{p["t"]} {p["n"]:>5} @ {p["px"]:<6} {p["lado"]}  ${p["prem"]:,}')
+                                print(f'{p["h"]} {p["k"]:g}{p["t"]} {p["n"]:>5} @ {p["px"]:<6} {p["agr"]:<2}  ${p["prem"]:,}')
                 for r in msg.get("response", []):
                     code = (r.get("content") or {}).get("code")
                     if code not in (0, None):
@@ -333,6 +446,21 @@ def prueba():
     print(json.dumps(snap, indent=1, ensure_ascii=False)[:1500])
     assert [p["lado"] for p in snap["prints"]] == ["V", "B"], snap["prints"]
     assert len(snap["spreads"]) == 2 and snap["neto"]["C"] == 30000 and snap["neto"]["P"] == -14000
+    # Tape v2: niveles, bloque acumulado de piezas chicas, volumen > OI y liquidez
+    assert [p["agr"] for p in snap["prints"]] == ["V", "C"], snap["prints"]
+    assert nivel(1.25, 1.0, 1.2) == "C+" and nivel(0.95, 1.0, 1.2) == "V+" and nivel(1.1, 1.0, 1.2) == "M"
+    sy = s(7595, "P")
+    tp.update({"key": sy, "2": 2.0, "3": 2.1, "9": 400, "16": 50, "17": 10, "8": 0}, t0 + 20)
+    vol = 0
+    for i in range(4):                                   # 4 piezas de 90 al ask en 4 min → bloque de 360
+        vol += 90
+        tp.update({"key": sy, "4": 2.1, "8": vol}, t0 + 30 + 60 * i)
+    tp.update({"key": sy, "8": vol + 200, "4": 2.05}, t0 + 400)   # 200 al medio: print, no suma al bloque
+    snap = tp.snapshot(7598, 520)
+    assert len(snap["bloques"]) == 1 and snap["bloques"][0]["n"] == 360 and snap["bloques"][0]["piezas"] == 4, snap["bloques"]
+    assert snap["apertura"] and snap["apertura"][0]["k"] == 7595 and snap["apertura"][0]["vol"] == 560, snap["apertura"]
+    assert snap["liq"]["P"]["desb"] == round((50 - 10) / 60, 2) and snap["liq"]["P"]["ancho"] is not None, snap["liq"]
+    print(json.dumps({k: snap[k] for k in ("bloques", "apertura", "liq", "agr")}, ensure_ascii=False))
     print("\nOK prueba")
 
 
