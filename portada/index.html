@@ -213,7 +213,7 @@ function load(){
     $("odFacts").innerHTML=""; f.forEach(function(t){ var s=document.createElement("span"); s.textContent=t; $("odFacts").appendChild(s); });
     var b=$("odBadge");
     if(live){ b.textContent="En vivo · "+etTime(when); b.className="badge good"; }
-    else if(st==="open"){ b.textContent="Dato vencido"; b.className="badge warn"; }
+    else if(st==="open"){ b.textContent="Fuera de línea · "+etTime(when); b.className="badge bad"; }
     else { b.textContent="Cierre "+etDay(when); b.className="badge"; }
     /* próximo evento macro de hoy (minutos CDMX → ET) */
     var ag=d.day&&d.day.agenda||[], todayET=nyParts(new Date()).ymd, nowM=Date.now(), nxt=null;
@@ -257,7 +257,10 @@ document.addEventListener("visibilitychange",function(){ if(!document.hidden) lo
     document.getElementById("bpLead").textContent=(f===hoyET?"Hoy ":"Último día ")+usd(x.pnl)+" · "+x.ops+" cerradas"+(ab?" · "+ab+" abierta"+(ab>1?"s":""):"");
     document.getElementById("bpFacts").innerHTML="<span>Acumulado "+usd(tot)+" en "+n+" operaciones</span>"+(x.real?"<span>Día: "+x.real.tipo+"</span>":"");
     var hET=+new Date().toLocaleString("en-US",{timeZone:"America/New_York",hour:"numeric",hour12:false});
-    document.getElementById("bpBadge").textContent=ab?"Posición abierta":(f===hoyET&&hET>=9&&hET<16?"En vivo":"Al cierre");
+    var bb=document.getElementById("bpBadge"), edad=(Date.now()-new Date(d.actualizado).getTime())/60000, wd=new Date().toLocaleDateString("en-US",{timeZone:"America/New_York",weekday:"short"}), mET=hET*60+(+new Date().toLocaleString("en-US",{timeZone:"America/New_York",minute:"numeric"}));
+    var abierto=wd!=="Sat"&&wd!=="Sun"&&mET>=575&&mET<960;
+    if(abierto&&edad>5){ bb.textContent="Fuera de línea"; bb.className="badge bad"; }
+    else bb.textContent=ab?"Posición abierta":(f===hoyET&&hET>=9&&hET<16?"En vivo":"Al cierre");
   }).catch(function(){});
 })();
 </script>

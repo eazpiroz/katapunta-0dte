@@ -1,0 +1,60 @@
+# Vigilante externo de Katapunta: corre en GitHub (no en la PC) y avisa al celular si el recolector
+# o el bot dejan de publicar en horario de mercado. Necesita el secreto NTFY_TOPIC (tu tema privado de ntfy).
+name: vigilante
+on:
+  schedule:
+    - cron: "*/10 13-21 * * 1-5"   # cada 10 min, 13:00–21:59 UTC (cubre 9:30–16:00 ET todo el año)
+  workflow_dispatch: {}
+permissions:
+  contents: read
+jobs:
+  revisar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Revisar recolector y bot
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        run: |
+          python3 - <<'PY'
+          import datetime as dt, json, os, urllib.request
+          from zoneinfo import ZoneInfo
+          tema = os.environ.get("NTFY_TOPIC")
+          if not tema:
+              print("Falta el secreto NTFY_TOPIC: no aviso nada."); raise SystemExit
+          et = dt.datetime.now(ZoneInfo("America/New_York"))
+          hoy, m = et.date().isoformat(), et.hour * 60 + et.minute
+          HOLI = {"2026-11-26","2026-12-25","2027-01-01","2027-01-18","2027-02-15","2027-03-26","2027-05-31","2027-06-18","2027-07-05","2027-09-06","2027-11-25","2027-12-24"}
+          EARLY = {"2026-11-27","2026-12-24","2027-11-26"}
+          cierre = 780 if hoy in EARLY else 960
+          if et.weekday() >= 5 or hoy in HOLI or not (575 <= m < cierre):
+              print("Fuera de horario."); raise SystemExit
+          raw = "https://raw.githubusercontent.com/eazpiroz/katapunta-0dte/live/"
+          def leer(p):
+              return json.loads(urllib.request.urlopen(raw + p + "?t=%d" % et.timestamp(), timeout=20).read())
+          ahora = dt.datetime.now(dt.timezone.utc)
+          fallas = []
+          try:
+              a = leer("auto.json")
+              t = dt.datetime.fromisoformat(a["date"] + "T" + a["ts"]).replace(tzinfo=dt.timezone(dt.timedelta(hours=-6)))
+              fallas.append(("Recolector", (ahora - t).total_seconds() / 60))
+          except Exception as e:
+              fallas.append(("Recolector", 999))
+          try:
+              p = leer("papel.json")
+              t = dt.datetime.fromisoformat(p["actualizado"].replace("Z", "+00:00"))
+              fallas.append(("Bot de papel", (ahora - t).total_seconds() / 60))
+          except Exception:
+              fallas.append(("Bot de papel", 999))
+          for nombre, edad in fallas:
+              print(nombre, round(edad), "min")
+          # avisa al detectarlo (10–20 min sin publicar) y luego una vez por hora, sin guardar estado
+          malos = [(n, e) for n, e in fallas if e >= 10 and (e < 20 or (e % 60) < 10)]
+          if malos:
+              txt = "\n".join(f"{n}: sin publicar hace {e:.0f} min" if e < 999 else f"{n}: no pude leer su estado" for n, e in malos)
+              body = json.dumps({"topic": tema, "title": "KATAPUNTA · FUERA DE LÍNEA", "priority": 5, "tags": ["rotating_light"],
+                                 "message": txt + "\nRevisa la PC: puede estar apagada, sin internet o pidiendo el login de Schwab.",
+                                 "click": "https://www.katapunta.com/privado/"}).encode()
+              urllib.request.urlopen(urllib.request.Request("https://ntfy.sh", data=body, headers={"Content-Type": "application/json"}), timeout=15)
+              print("Aviso enviado.")
+          PY

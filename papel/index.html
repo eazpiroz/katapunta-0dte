@@ -28,6 +28,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-b);font-
 h1{font-family:var(--f-d);font-size:28px;font-weight:800;margin:2px 0 0}
 .sub{color:var(--muted);font-size:14px;margin:0}
 .banner{border-radius:12px;padding:10px 14px;font-size:13px;background:var(--sunk);color:var(--muted)}
+.banner.offline{background:var(--bad-bg);color:var(--bad);font-size:14px;border:1px solid var(--bad)}
 .seg{display:flex;gap:6px;flex-wrap:wrap}
 .chip{font:inherit;font-size:14px;font-weight:600;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--ink);padding:7px 13px;min-height:38px;cursor:pointer}
 .chip[aria-pressed="true"]{background:var(--chipbg);border-color:var(--chipbg);color:var(--chipfg)}
@@ -179,6 +180,12 @@ function fila(nom,arr,acierto){const p=arr.reduce((s,o)=>s+o.pnl,0),w=arr.filter
   const abHoy=(d.dias[dias[dias.length-1]]||{}).abiertas||[];
   const bpHoy=(d.dias[dias[dias.length-1]]||{}).bp_uso||0;
   $("banner").textContent=(abHoy.length?`${abHoy.length} posición${abHoy.length>1?"es":""} abierta${abHoy.length>1?"s":""} ahora · buying power en uso $${bpHoy.toLocaleString("en-US")} · `:"")+`Actualizado ${act.toLocaleString("es-MX",{timeZone:"America/New_York",dateStyle:"medium",timeStyle:"short"})} ET · ${dias.length} días · último modo: ${d.modo==="vivo"?"en vivo":"repetición del historial"}`;
+  {const HOLI=["2026-11-26","2026-12-25","2027-01-01","2027-01-18","2027-02-15","2027-03-26","2027-05-31","2027-06-18","2027-07-05","2027-09-06","2027-11-25","2027-12-24"],EARLY=["2026-11-27","2026-12-24","2027-11-26"];
+   const p={};new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false,weekday:"short"}).formatToParts(new Date()).forEach(x=>p[x.type]=x.value);
+   const ymd=p.year+"-"+p.month+"-"+p.day, m=(+p.hour%24)*60+(+p.minute), cl=EARLY.includes(ymd)?780:960;
+   const abierto=!["Sat","Sun"].includes(p.weekday)&&!HOLI.includes(ymd)&&m>=575&&m<cl, edad=Math.round((Date.now()-act.getTime())/60000);
+   if(abierto&&edad>5){const b=$("banner");b.className="banner offline";b.innerHTML=`<b>FUERA DE LÍNEA</b> · el bot no publica desde las ${act.toLocaleTimeString("es-MX",{timeZone:"America/New_York",hour:"2-digit",minute:"2-digit"})} ET (hace ${edad} min). Las posiciones y el P&amp;L pueden estar desactualizados.`;}
+   if(abierto) setTimeout(()=>location.reload(),60000);}
   const tot=ops.reduce((s,o)=>s+o.pnl,0), win=ops.filter(o=>o.pnl>0), gan=win.reduce((s,o)=>s+o.pnl,0), per=-ops.filter(o=>o.pnl<0).reduce((s,o)=>s+o.pnl,0);
   $("kPnl").textContent=usd(tot); $("kPnl").className="v "+cls(tot); const cap=(d.playbook||{}).capital||3500;
   $("kPnlD").textContent=ops.length+" operaciones · "+(tot>=0?"+":"")+(100*tot/cap).toFixed(1)+"% sobre capital de $"+cap.toLocaleString("en-US");
