@@ -269,8 +269,15 @@ def occ(day, t, k):
     return f"SPXW  {day[2:4]}{day[5:7]}{day[8:10]}{t}{int(round(k * 1000)):08d}"
 
 
-def strikes(c, day):
-    spot = float(R.sget(c, "/quotes", symbols="$SPX")["$SPX"]["quote"]["lastPrice"])
+def strikes(c, day, respaldo=None):
+    """Strikes alrededor del precio. 23-nov: si /quotes falla (Schwab 500), usa el SPX del streaming o el último conocido."""
+    try:
+        spot = float(R.sget(c, "/quotes", symbols="$SPX")["$SPX"]["quote"]["lastPrice"])
+    except Exception as e:
+        if not respaldo:
+            raise
+        print(f"  /quotes falló ({e}); centro los strikes en {respaldo:.0f} (respaldo)")
+        spot = float(respaldo)
     base = round(spot / 5) * 5
     ks = [base + 5 * i for i in range(-N_STR, N_STR + 1)]
     # calls desde 60 pts abajo del precio y puts hasta 60 pts arriba: lo cercano en ambos lados, lo lejano solo OTM
@@ -335,10 +342,31 @@ def vence():
     return d.isoformat(), dt.datetime.fromisoformat(d.isoformat()).replace(hour=15, minute=1, tzinfo=R.MX)
 
 
+def leer_spx(sp, msg):
+    """SPX del streaming (LEVELONE_EQUITIES, campo 3 = último precio)."""
+    for d in msg.get("data", []):
+        if d.get("service") == "LEVELONE_EQUITIES":
+            for x in d.get("content", []):
+                if x.get("key") == "$SPX" and x.get("3"):
+                    sp.update(px=float(x["3"]), t=time.time(), ult=float(x["3"]))
+
+
+def guardar_spx(sp):
+    """Escritura atómica del SPX del streaming: el recolector lo usa de respaldo si /quotes cae."""
+    try:
+        R.HIST.mkdir(exist_ok=True)
+        tmp = R.SPOT_STREAM.with_suffix(".tmp")
+        tmp.write_text(json.dumps({"px": sp["px"], "epoch": sp["t"], "ts": R.now().strftime("%H:%M:%S")}))
+        os.replace(tmp, R.SPOT_STREAM)
+    except Exception as e:
+        print("  spot_stream:", e)
+
+
 def run():
     c = R.jload(R.SCHWAB)
     tok = R.gh_token()
     tape, sha = Tape(), {"v": None}
+    sp = {"px": None, "t": 0.0, "ult": None}            # SPX del streaming (LEVELONE_EQUITIES, campo 3 = último)
     day, fin = vence()
     print(f"Tape SPXW vencimiento {day} · prints de +{MIN} contratos · se apaga {fin:%d-%b %H:%M} CDMX")
 
@@ -369,6 +397,7 @@ def run():
             for q in tape.q.values():
                 q["vol"] = None
             tape.pend.clear()
+            sp["px"] = None
             info = streamer(c)
             ws = WS(info["streamerSocketUrl"])
             ids = {"SchwabClientCustomerId": info["schwabClientCustomerId"], "SchwabClientCorrelId": info["schwabClientCorrelId"]}
@@ -381,13 +410,27 @@ def run():
             cmd("ADMIN", "LOGIN", {"Authorization": R.access(c), "SchwabClientChannel": info["schwabClientChannel"],
                                    "SchwabClientFunctionId": info["schwabClientFunctionId"]})
             print("login:", ws.recv()[:160])
-            spot, syms = strikes(c, day)
+            # 23-nov: SPX por el streaming, de respaldo para los strikes y para el recolector si /quotes cae
+            cmd("LEVELONE_EQUITIES", "SUBS", {"keys": "$SPX", "fields": "0,1,2,3"})
+            try:
+                spot, syms = strikes(c, day)
+            except Exception as e:
+                print(f"  /quotes falló al suscribir ({e}); espero el SPX del streaming…")
+                t_esp = time.time()
+                while sp["px"] is None and time.time() - t_esp < 15:
+                    leer_spx(sp, json.loads(ws.recv()))
+                ult = sp["px"] or sp["ult"] or (R.ultima_del_historial(R.now().date().isoformat()) or {}).get("read", {}).get("px")
+                spot, syms = strikes(c, day, ult)
             cmd("LEVELONE_OPTIONS", "SUBS", {"keys": ",".join(syms), "fields": CAMPOS})
             print(f"suscrito a {len(syms)} contratos alrededor de {spot:.0f}")
             t_pub = t_sub = t_dat = time.time()
             n_dat = n_pr = 0
             while True:
+                if R.now() >= fin:                     # N1 (22-nov): antes el tape seguía corriendo después de las 15:01
+                    print("15:01 · fin del tape.")
+                    return
                 msg = json.loads(ws.recv())
+                leer_spx(sp, msg)
                 for d in msg.get("data", []):
                     if d.get("service") == "LEVELONE_OPTIONS":
                         t_dat = time.time()
@@ -407,7 +450,9 @@ def run():
                         print("notify:", r)
                 now_ = time.time()
                 if now_ - t_pub >= PUB_S:
-                    publicar(spot)
+                    if sp["px"] and now_ - sp["t"] < 60:
+                        guardar_spx(sp)
+                    publicar(sp["px"] if sp["px"] and now_ - sp["t"] < 60 else spot)
                     t_pub = now_
                     if R.now().second < 30:   # una línea por minuto: cuántas actualizaciones y prints llegaron
                         print(f"{R.now():%H:%M} · {n_dat} actualizaciones · {n_pr} prints · spot {spot:.0f} · {len(syms)} contratos")
@@ -417,10 +462,8 @@ def run():
                 hm = R.now().hour * 60 + R.now().minute
                 if 510 <= hm < 900 and now_ - t_dat > 180:
                     raise ConnectionError("3 min sin datos de LEVELONE_OPTIONS: reconecto y vuelvo a suscribir")
-                    if R.now() >= fin:
-                        return
                 if now_ - t_sub >= RESUB_S:
-                    spot, syms = strikes(c, day)
+                    spot, syms = strikes(c, day, (sp["px"] if now_ - sp["t"] < 120 else None) or spot)
                     cmd("LEVELONE_OPTIONS", "ADD", {"keys": ",".join(syms), "fields": CAMPOS})
                     t_sub = now_
         except KeyboardInterrupt:

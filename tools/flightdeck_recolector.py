@@ -36,6 +36,8 @@ WING = {"SPX": 10, "SPY": 1, "QQQ": 1}               # ancho de alas del IC de r
 GTOL = {"SPX": 3, "SPY": 0.3, "QQQ": 0.3}             # banda del zero γ para decir positiva/negativa
 SKEW = (1.6, 0.9)                                     # IC ajustado: lado débil 1.6× straddle, lado fuerte 0.9× (backtest 2-nov)
 HIST = Path(__file__).resolve().parent / "historial"  # una línea por minuto, para backtest (sin llaves)
+SPOT_STREAM = HIST / "spot_stream.json"            # SPX del streaming (lo escribe tape_schwab): respaldo si /quotes cae
+ULT = {}                                            # última salida buena por ticker (para el modo degradado)
 DIAS = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
 MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
 
@@ -95,11 +97,21 @@ def access(c):
     return c["access"]
 
 
+REINTENTOS = (2, 5)          # 23-nov: la API de datos de Schwab respondió 500 desde la apertura; reintenta 2 veces
+
+
 def sget(c, path, **params):
     url = API + path + "?" + urllib.parse.urlencode(params)
-    req = urllib.request.Request(url, headers={"Authorization": "Bearer " + access(c), "Accept": "application/json"})
-    with urllib.request.urlopen(req, timeout=25) as r:
-        return json.loads(r.read())
+    for i, espera in enumerate((0,) + REINTENTOS):
+        if espera:
+            time.sleep(espera)
+        req = urllib.request.Request(url, headers={"Authorization": "Bearer " + access(c), "Accept": "application/json"})
+        try:
+            with urllib.request.urlopen(req, timeout=25) as r:
+                return json.loads(r.read())
+        except urllib.error.HTTPError as e:
+            if (e.code < 500 and e.code != 429) or i == len(REINTENTOS):   # 4xx no se reintenta
+                raise
 
 
 # ---------------------------------------------------------------- GitHub
@@ -770,9 +782,14 @@ def cycle(c, tok, state):
         try:
             out[tk], prev[tk] = build_ticker(c, tk, q, manual, today, state, vi, macro)
             out[tk]["read"]["t10"] = t10
+            ULT[tk] = out[tk]
         except Exception as e:
             import traceback
             print(f"  {tk}: error {e!r}\n" + "".join(traceback.format_exc().splitlines(True)[-6:]))
+            px_q = (q.get(TICKERS[tk], {}).get("quote") or {}).get("lastPrice")
+            if tk == "SPX" and px_q and ULT.get("SPX"):   # cotización sí, cadena no: degradado con el precio de /quotes
+                out[tk] = lectura_degradada(ULT["SPX"], float(px_q), getattr(e, "code", type(e).__name__), tok, t)
+                print(f"  SPX: modo degradado con el precio de /quotes")
     d = t.date()
     out["day"] = {"title": f"Lectura del {DIAS[d.weekday()]} {d.day} de {MESES[d.month - 1]}",
                   "prev": {k: round(v, 2) for k, v in prev.items() if v}}
@@ -786,6 +803,72 @@ def cycle(c, tok, state):
     s = out.get("SPX", {}).get("read", {})
     print(f"{out['ts']}  SPX {s.get('px')}  rango {s.get('rem')}  techo {s.get('techo')}  piso {s.get('piso')}  "
           f"zgE {s.get('zge')} γ0 {s.get('gex',{}).get('d0',{}).get('gex')}  IC {s.get('ic2')}  tend {s.get('tf')}/{s.get('tf2')}  velas hoy {len(out.get('SPX', {}).get('c', []))} (última {state.get('_ultima_SPX')})  {'publicado' if ok else 'NO publicado'}")
+
+
+# ---------------------------------------------------------------- modo degradado (23-nov)
+def spot_respaldo(max_s=120):
+    """SPX del streaming de Schwab que guarda tape_schwab, si tiene menos de max_s segundos."""
+    try:
+        j = json.loads(SPOT_STREAM.read_text())
+        if j.get("px") and time.time() - float(j.get("epoch", 0)) <= max_s:
+            return float(j["px"])
+    except Exception:
+        pass
+    return None
+
+
+def ultima_del_historial(today):
+    """Si el recolector se reinició durante la falla: última lectura de SPX del historial de hoy."""
+    try:
+        for ln in reversed((HIST / f"{today}.jsonl").read_text(encoding="utf-8").splitlines()):
+            r = json.loads(ln).get("SPX")
+            if r and r.get("px"):
+                return {"o": [], "h": [], "l": [], "c": [], "v": [], "pre": [], "rows": [], "read": r}
+    except Exception:
+        pass
+    return None
+
+
+def lectura_degradada(base, px, err, tok, t):
+    """Copia de la última lectura buena con el precio nuevo. Sin cadena: la escalera queda vacía,
+    así que el bot no abre nada nuevo, pero sigue gestionando lo abierto con este precio."""
+    today = t.date().isoformat()
+    r = dict(base["read"])
+    r.update(px=round(px, 2), t=f"{t.hour}:{t.minute:02d}", auto=True, lad={"v": [], "c": []},
+             degradado=f"Schwab {err}: niveles, cadena y velas de la última lectura buena")
+    if r.get("strad"):
+        r["rem"] = [round(px - r["strad"], 1), round(px + r["strad"], 1)]
+    try:   # la lectura manual del perfil γ sí se actualiza (viene de GitHub, no de Schwab)
+        m = gh_manual(tok)
+        if m.get("date") == today and m.get("SPX", {}).get("reads"):
+            mr = m["SPX"]["reads"][-1]
+            r.update(zg=mr["zg"], mp=mr["mp"], mn=mr["mn"], gt=mr["t"])
+    except Exception:
+        pass
+    return dict(base, read=r)
+
+
+def degradado(tok, err):
+    """La API de datos de Schwab no responde: publica SPX con el precio del streaming sobre la última lectura buena."""
+    t = now()
+    today = t.date().isoformat()
+    px = spot_respaldo()
+    base = ULT.get("SPX") or ultima_del_historial(today)
+    if px is None or not base:
+        print(t.strftime("%H:%M:%S"), f"Schwab {err} · sin respaldo del streaming: no se publica")
+        return False
+    out = {"date": today, "ts": t.strftime("%H:%M:%S"),
+           "day": {"title": f"Lectura del {DIAS[t.weekday()]} {t.day} de {MESES[t.month - 1]} · modo degradado"},
+           "SPX": lectura_degradada(base, px, f"{err} · precio del streaming", tok, t)}
+    ok = gh_put(tok, json.dumps(out, separators=(",", ":"), ensure_ascii=False))
+    try:
+        HIST.mkdir(exist_ok=True)
+        with open(HIST / f"{today}.jsonl", "a", encoding="utf-8") as f:
+            f.write(json.dumps({"ts": out["ts"], "SPX": out["SPX"]["read"]}, ensure_ascii=False) + "\n")
+    except Exception as e:
+        print("  historial:", e)
+    print(f"{out['ts']}  SPX {px} (DEGRADADO: precio del streaming; Schwab {err})  {'publicado' if ok else 'NO publicado'}")
+    return True
 
 
 # ---------------------------------------------------------------- posiciones (pendiente #15, solo lectura)
@@ -847,6 +930,11 @@ def main():
             cycle(c, tok, state)
         except urllib.error.HTTPError as e:
             print(now().strftime("%H:%M:%S"), "Schwab", e.code, e.read()[:200])
+            if e.code >= 500 or e.code == 429:
+                try:
+                    degradado(tok, e.code)
+                except Exception:
+                    traceback.print_exc()
         except Exception:
             traceback.print_exc()
         try:  # posiciones: aparte, para que una falla no frene el recolector
