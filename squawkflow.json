@@ -104,6 +104,14 @@
    "put_wall": 7100,
    "net_gex_mmm": -113.29,
    "url": "https://squawkflow.com/session/2026-11-20"
+  },
+  "2026-11-23": {
+   "regimen": "positiva",
+   "flip": 7214.68,
+   "call_wall": 8100,
+   "put_wall": 7000,
+   "net_gex_mmm": null,
+   "url": "https://squawkflow.com/session/2026-11-23"
   }
  }
 }
