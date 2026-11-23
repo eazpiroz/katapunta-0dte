@@ -243,5 +243,10 @@ if hoy_t and any("liq" in t for t in hoy_t):
     print(f"\nHoy: {bl} bloques acumulados · liquidez: spread {'máx ' + str(peor['x']) + '× la base' if peor else 'sin base'}"
           f" · volumen > OI al cierre: {', '.join(str(int(a['k'])) + a['t'] for a in (hoy_t[-1].get('apertura') or [])) or '—'}")
 
+# 8. Fase 0 (auditoría 22-nov): cuánto infla el papel y el peor momento posible contra el stop del día
+import fase0_reporte as F0
+print("\n## Fase 0 · Papel con costos reales y peor momento posible\n")
+F0.main()
+
 print("\nNota: la repetición marca con Black-Scholes; en vivo el bot marca con la cadena real de Schwab. "
       "Muestra chica: una variante solo es candidata si mejora el acumulado sin depender de un solo día.")

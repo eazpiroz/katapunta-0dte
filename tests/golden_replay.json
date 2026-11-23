@@ -1,0 +1,620 @@
+{
+ "playbook": "v1 · 15-nov-2026",
+ "dias": {
+  "2026-11-03": {
+   "pnl": 386.0,
+   "ops": [
+    {
+     "clave": "09:16|p7520+1,p7530-1",
+     "tipo": "venta",
+     "entra": "10:16",
+     "sale": "10:52",
+     "entrada": -1.66,
+     "salida": -0.83,
+     "n": 1,
+     "pnl": 83.0,
+     "motivo": "TP: recompra al 50% del crédito"
+    },
+    {
+     "clave": "09:52|p7535+1,p7545-1",
+     "tipo": "venta",
+     "entra": "10:52",
+     "sale": "12:29",
+     "entrada": -1.52,
+     "salida": -0.68,
+     "n": 1,
+     "pnl": 84.0,
+     "motivo": "TP: recompra al 50% del crédito"
+    },
+    {
+     "clave": "11:30|p7545+1,p7555-1",
+     "tipo": "venta",
+     "entra": "12:30",
+     "sale": "13:05",
+     "entrada": -1.49,
+     "salida": -0.76,
+     "n": 1,
+     "pnl": 73.0,
+     "motivo": "TP: recompra al 50% del crédito"
+    },
+    {
+     "clave": "12:05|p7555+1,p7565-1",
+     "tipo": "venta",
+     "entra": "13:05",
+     "sale": "13:31",
+     "entrada": -1.52,
+     "salida": -0.8,
+     "n": 1,
+     "pnl": 72.0,
+     "motivo": "TP: recompra al 50% del crédito"
+    },
+    {
+     "clave": "09:08|c7605-1,c7615+1",
+     "tipo": "venta",
+     "entra": "10:08",
+     "sale": "14:04",
+     "entrada": -1.58,
+     "salida": -0.84,
+     "n": 1,
+     "pnl": 74.0,
+     "motivo": "TP: recompra al 50% del crédito"
+    }
+   ]
+  },
+  "2026-11-04": {
+   "pnl": -320.0,
+   "ops": [
+    {
+     "clave": "09:02|p7655+1,p7665-1",
+     "tipo": "venta",
+     "entra": "10:02",
+     "sale": "10:27",
+     "entrada": -1.77,
+     "salida": -3.19,
+     "n": 1,
+     "pnl": -142.0,
+     "motivo": "Stop por nivel: el precio rompió 7690.0 dos minutos seguidos"
+    },
+    {
+     "clave": "09:26|c7720-1,c7730+1",
+     "tipo": "venta",
+     "entra": "10:26",
+     "sale": "10:39",
+     "entrada": -1.64,
+     "salida": -2.55,
+     "n": 1,
+     "pnl": -91.0,
+     "motivo": "Stop por nivel: el precio rompió 7690.0 dos minutos seguidos"
+    },
+    {
+     "clave": "09:55|c7715-1,c7725+1",
+     "tipo": "venta",
+     "entra": "10:55",
+     "sale": "11:28",
+     "entrada": -1.76,
+     "salida": -0.92,
+     "n": 1,
+     "pnl": 84.0,
+     "motivo": "TP: recompra al 50% del crédito"
+    },
+    {
+     "clave": "09:54|p7635+1,p7645-1",
+     "tipo": "venta",
+     "entra": "10:54",
+     "sale": "11:44",
+     "entrada": -1.8,
+     "salida": -0.93,
+     "n": 1,
+     "pnl": 87.0,
+     "motivo": "TP: recompra al 50% del crédito"
+    },
+    {
+     "clave": "10:28|c7700-1,c7710+1",
+     "tipo": "venta",
+     "entra": "11:28",
+     "sale": "11:46",
+     "entrada": -1.53,
+     "salida": -4.11,
+     "n": 1,
+     "pnl": -258.0,
+     "motivo": "Stop de catástrofe: el spread vale 2.5× el crédito"
+    }
+   ]
+  },
+  "2026-11-05": {
+   "pnl": 1208.0,
+   "ops": [
+    {
+     "clave": "09:00|p7520-1,p7530+1",
+     "tipo": "tend",
+     "entra": "10:00",
+     "sale": "10:04",
+     "entrada": 2.76,
+     "salida": 3.66,
+     "n": 3,
+     "pnl": 271.0,
+     "motivo": "TP: el precio llegó al nivel objetivo 7550.0"
+    },
+    {
+     "clave": "09:04|p7505-1,p7515+1",
+     "tipo": "tend",
+     "entra": "10:04",
+     "sale": "10:25",
+     "entrada": 2.91,
+     "salida": 5.65,
+     "n": 3,
+     "pnl": 823.0,
+     "motivo": "TP: el precio llegó al nivel objetivo 7500.0"
+    },
+    {
+     "clave": "09:25|p7450-1,p7460+1",
+     "tipo": "tend",
+     "entra": "10:25",
+     "sale": "10:52",
+     "entrada": 2.91,
+     "salida": 6.63,
+     "n": 3,
+     "pnl": 1115.0,
+     "motivo": "TP: capturó 50% de la ganancia máxima"
+    },
+    {
+     "clave": "09:52|p7345-1,p7355+1",
+     "tipo": "tend",
+     "entra": "10:52",
+     "sale": "11:13",
+     "entrada": 2.96,
+     "salida": 1.2,
+     "n": 3,
+     "pnl": -528.0,
+     "motivo": "SL: el spread perdió 50% del débito"
+    },
+    {
+     "clave": "12:05|p7330-1,p7340+1",
+     "tipo": "tend",
+     "entra": "13:05",
+     "sale": "14:14",
+     "entrada": 2.91,
+     "salida": 1.33,
+     "n": 3,
+     "pnl": -473.0,
+     "motivo": "SL: el spread perdió 50% del débito"
+    }
+   ]
+  },
+  "2026-11-06": {
+   "pnl": -805.0,
+   "ops": [
+    {
+     "clave": "09:00|p7355+1,p7365-1",
+     "tipo": "venta",
+     "entra": "10:00",
+     "sale": "11:53",
+     "entrada": -1.83,
+     "salida": -0.9,
+     "n": 1,
+     "pnl": 93.0,
+     "motivo": "TP: recompra al 50% del crédito"
+    },
+    {
+     "clave": "10:08|c7470-1,c7480+1",
+     "tipo": "venta",
+     "entra": "11:08",
+     "sale": "12:20",
+     "entrada": -1.7,
+     "salida": -0.89,
+     "n": 1,
+     "pnl": 81.0,
+     "motivo": "TP: recompra al 50% del crédito"
+    },
+    {
+     "clave": "11:23|c7460-1,c7470+1",
+     "tipo": "venta",
+     "entra": "12:23",
+     "sale": "12:37",
+     "entrada": -1.48,
+     "salida": -0.73,
+     "n": 1,
+     "pnl": 75.0,
+     "motivo": "TP: recompra al 50% del crédito"
+    },
+    {
+     "clave": "11:50|p7340-1,p7350+1",
+     "tipo": "tend",
+     "entra": "12:50",
+     "sale": "13:08",
+     "entrada": 2.4,
+     "salida": 1.11,
+     "n": 4,
+     "pnl": -517.0,
+     "motivo": "SL: el spread perdió 50% del débito"
+    },
+    {
+     "clave": "12:23|p7350-1,p7360+1",
+     "tipo": "tend",
+     "entra": "13:23",
+     "sale": "13:31",
+     "entrada": 2.0,
+     "salida": 0.93,
+     "n": 5,
+     "pnl": -537.0,
+     "motivo": "SL: el spread perdió 50% del débito"
+    }
+   ]
+  },
+  "2026-11-09": {
+   "pnl": 70.0,
+   "ops": [
+    {
+     "clave": "10:10|p7485+1,p7495-1",
+     "tipo": "venta",
+     "entra": "11:10",
+     "sale": "11:48",
+     "entrada": -1.5,
+     "salida": -0.8,
+     "n": 1,
+     "pnl": 70.0,
+     "motivo": "TP: recompra al 50% del crédito"
+    }
+   ]
+  },
+  "2026-11-11": {
+   "pnl": 10.0,
+   "ops": [
+    {
+     "clave": "09:06|c7610-1,c7620+1",
+     "tipo": "venta",
+     "entra": "10:06",
+     "sale": "10:57",
+     "entrada": -1.62,
+     "salida": -3.52,
+     "n": 1,
+     "pnl": -190.0,
+     "motivo": "Stop por nivel: el precio rompió 7600.0 dos minutos seguidos"
+    },
+    {
+     "clave": "14:13|c7635-1,c7640+1,p7610+1,p7615-1",
+     "tipo": "pin",
+     "entra": "15:13",
+     "sale": "15:59",
+     "entrada": -1.0,
+     "salida": 0.0,
+     "n": 2,
+     "pnl": 200.0,
+     "motivo": "Vencimiento: SPX liquidó en 7619.38"
+    }
+   ]
+  },
+  "2026-11-12": {
+   "pnl": 2215.0,
+   "ops": [
+    {
+     "clave": "09:00|c7635-1,c7645+1",
+     "tipo": "venta",
+     "entra": "10:00",
+     "sale": "10:59",
+     "entrada": -1.75,
+     "salida": -3.76,
+     "n": 1,
+     "pnl": -201.0,
+     "motivo": "Stop por nivel: el precio rompió 7620 dos minutos seguidos"
+    },
+    {
+     "clave": "10:33|c7655-1,c7665+1",
+     "tipo": "venta",
+     "entra": "11:33",
+     "sale": "12:21",
+     "entrada": -1.7,
+     "salida": -0.89,
+     "n": 1,
+     "pnl": 81.0,
+     "motivo": "TP: recompra al 50% del crédito"
+    },
+    {
+     "clave": "11:27|c7655-1,c7665+1",
+     "tipo": "venta",
+     "entra": "12:27",
+     "sale": "13:07",
+     "entrada": -1.47,
+     "salida": -0.63,
+     "n": 1,
+     "pnl": 84.0,
+     "motivo": "TP: recompra al 50% del crédito"
+    },
+    {
+     "clave": "13:03|p7580-1,p7590+1",
+     "tipo": "tend",
+     "entra": "14:03",
+     "sale": "14:10",
+     "entrada": 1.57,
+     "salida": 0.32,
+     "n": 5,
+     "pnl": -624.0,
+     "motivo": "SL: el spread perdió 50% del débito"
+    },
+    {
+     "clave": "13:25|p7590-1,p7600+1",
+     "tipo": "tend",
+     "entra": "14:25",
+     "sale": "15:59",
+     "entrada": 1.85,
+     "salida": 7.6,
+     "n": 5,
+     "pnl": 2875.0,
+     "motivo": "Vencimiento: SPX liquidó en 7592.40"
+    }
+   ]
+  },
+  "2026-11-13": {
+   "pnl": -63.0,
+   "ops": [
+    {
+     "clave": "09:00|p7525-1,p7535+1",
+     "tipo": "tend",
+     "entra": "10:00",
+     "sale": "10:03",
+     "entrada": 2.15,
+     "salida": 3.35,
+     "n": 4,
+     "pnl": 479.0,
+     "motivo": "TP: el precio llegó al nivel objetivo 7547.82"
+    },
+    {
+     "clave": "09:03|p7510-1,p7520+1",
+     "tipo": "tend",
+     "entra": "10:03",
+     "sale": "13:53",
+     "entrada": 2.45,
+     "salida": 0.48,
+     "n": 4,
+     "pnl": -786.0,
+     "motivo": "SL: el spread perdió 50% del débito"
+    },
+    {
+     "clave": "14:00|c7570-1,c7575+1,p7535+1,p7540-1",
+     "tipo": "pin",
+     "entra": "15:00",
+     "sale": "15:59",
+     "entrada": -1.22,
+     "salida": 0.0,
+     "n": 2,
+     "pnl": 244.0,
+     "motivo": "Vencimiento: SPX liquidó en 7562.57"
+    }
+   ]
+  },
+  "2026-11-16": {
+   "pnl": 2450.0,
+   "ops": [
+    {
+     "clave": "09:00|p7440-1,p7450+1",
+     "tipo": "tend",
+     "entra": "10:00",
+     "sale": "13:12",
+     "entrada": 2.85,
+     "salida": 5.62,
+     "n": 3,
+     "pnl": 830.0,
+     "motivo": "TP: el precio llegó al nivel objetivo 7440.08"
+    },
+    {
+     "clave": "12:12|p7415-1,p7425+1",
+     "tipo": "tend",
+     "entra": "13:12",
+     "sale": "14:41",
+     "entrada": 2.3,
+     "salida": 6.35,
+     "n": 4,
+     "pnl": 1620.0,
+     "motivo": "TP: capturó 50% de la ganancia máxima"
+    }
+   ]
+  },
+  "2026-11-17": {
+   "pnl": 886.0,
+   "ops": [
+    {
+     "clave": "09:00|p7355+1,p7365-1",
+     "tipo": "venta",
+     "entra": "10:00",
+     "sale": "10:10",
+     "entrada": -1.45,
+     "salida": -3.06,
+     "n": 1,
+     "pnl": -161.0,
+     "motivo": "Stop por nivel: el precio rompió 7395 dos minutos seguidos"
+    },
+    {
+     "clave": "09:06|p7355-1,p7365+1",
+     "tipo": "tend",
+     "entra": "10:06",
+     "sale": "10:41",
+     "entrada": 2.55,
+     "salida": 5.73,
+     "n": 3,
+     "pnl": 955.0,
+     "motivo": "TP: el precio llegó al nivel objetivo 7350.0"
+    },
+    {
+     "clave": "09:41|p7305-1,p7315+1",
+     "tipo": "tend",
+     "entra": "10:41",
+     "sale": "10:53",
+     "entrada": 2.5,
+     "salida": 5.5,
+     "n": 4,
+     "pnl": 1199.0,
+     "motivo": "TP: el precio llegó al nivel objetivo 7300.0"
+    },
+    {
+     "clave": "09:53|p7245-1,p7255+1",
+     "tipo": "tend",
+     "entra": "10:53",
+     "sale": "10:58",
+     "entrada": 2.35,
+     "salida": 0.8,
+     "n": 4,
+     "pnl": -621.0,
+     "motivo": "SL: el spread perdió 50% del débito"
+    },
+    {
+     "clave": "10:21|p7290-1,p7300+1",
+     "tipo": "tend",
+     "entra": "11:21",
+     "sale": "12:18",
+     "entrada": 2.1,
+     "salida": 0.89,
+     "n": 4,
+     "pnl": -486.0,
+     "motivo": "SL: el spread perdió 50% del débito"
+    }
+   ]
+  },
+  "2026-11-18": {
+   "pnl": -327.0,
+   "ops": [
+    {
+     "clave": "09:00|p7285+1,p7295-1",
+     "tipo": "venta",
+     "entra": "10:00",
+     "sale": "10:41",
+     "entrada": -1.45,
+     "salida": -3.78,
+     "n": 1,
+     "pnl": -233.0,
+     "motivo": "Stop de catástrofe: el spread vale 2.5× el crédito"
+    },
+    {
+     "clave": "09:36|p7270-1,p7280+1",
+     "tipo": "tend",
+     "entra": "10:36",
+     "sale": "11:18",
+     "entrada": 2.45,
+     "salida": 3.2,
+     "n": 4,
+     "pnl": 299.0,
+     "motivo": "TP: el precio llegó al nivel objetivo 7300"
+    },
+    {
+     "clave": "10:18|p7255-1,p7265+1",
+     "tipo": "tend",
+     "entra": "11:18",
+     "sale": "12:04",
+     "entrada": 2.35,
+     "salida": 0.98,
+     "n": 4,
+     "pnl": -550.0,
+     "motivo": "SL: el spread perdió 50% del débito"
+    },
+    {
+     "clave": "11:42|c7370-1,c7380+1",
+     "tipo": "venta",
+     "entra": "12:42",
+     "sale": "13:12",
+     "entrada": -1.6,
+     "salida": -0.79,
+     "n": 1,
+     "pnl": 81.0,
+     "motivo": "TP: recompra al 50% del crédito"
+    },
+    {
+     "clave": "11:24|p7290+1,p7300-1",
+     "tipo": "venta",
+     "entra": "12:24",
+     "sale": "15:26",
+     "entrada": -1.45,
+     "salida": -0.69,
+     "n": 1,
+     "pnl": 76.0,
+     "motivo": "TP: recompra al 50% del crédito"
+    }
+   ]
+  },
+  "2026-11-19": {
+   "pnl": -856.0,
+   "ops": [
+    {
+     "clave": "09:35|p7245-1,p7255+1",
+     "tipo": "tend",
+     "entra": "10:35",
+     "sale": "11:37",
+     "entrada": 2.65,
+     "salida": 1.14,
+     "n": 3,
+     "pnl": -454.0,
+     "motivo": "SL: el spread perdió 50% del débito"
+    },
+    {
+     "clave": "10:52|p7235-1,p7245+1",
+     "tipo": "tend",
+     "entra": "11:52",
+     "sale": "12:02",
+     "entrada": 3.1,
+     "salida": 4.75,
+     "n": 3,
+     "pnl": 494.0,
+     "motivo": "TP: el precio llegó al nivel objetivo 7250.0"
+    },
+    {
+     "clave": "11:02|p7190-1,p7200+1",
+     "tipo": "tend",
+     "entra": "12:02",
+     "sale": "12:26",
+     "entrada": 2.75,
+     "salida": 1.25,
+     "n": 3,
+     "pnl": -450.0,
+     "motivo": "SL: el spread perdió 50% del débito"
+    },
+    {
+     "clave": "12:08|p7175-1,p7185+1",
+     "tipo": "tend",
+     "entra": "13:08",
+     "sale": "13:34",
+     "entrada": 2.55,
+     "salida": 1.06,
+     "n": 3,
+     "pnl": -446.0,
+     "motivo": "SL: el spread perdió 50% del débito"
+    }
+   ]
+  },
+  "2026-11-20": {
+   "pnl": 2838.0,
+   "ops": [
+    {
+     "clave": "10:25|p7025-1,p7035+1",
+     "tipo": "tend",
+     "entra": "11:25",
+     "sale": "11:42",
+     "entrada": 2.7,
+     "salida": 3.79,
+     "n": 3,
+     "pnl": 328.0,
+     "motivo": "TP: el precio llegó al nivel objetivo 7050"
+    },
+    {
+     "clave": "10:42|p7000-1,p7010+1",
+     "tipo": "tend",
+     "entra": "11:42",
+     "sale": "14:13",
+     "entrada": 2.55,
+     "salida": 5.62,
+     "n": 3,
+     "pnl": 922.0,
+     "motivo": "TP: el precio llegó al nivel objetivo 7000.0"
+    },
+    {
+     "clave": "13:15|p6955-1,p6965+1",
+     "tipo": "tend",
+     "entra": "14:15",
+     "sale": "15:27",
+     "entrada": 2.45,
+     "salida": 6.42,
+     "n": 4,
+     "pnl": 1588.0,
+     "motivo": "TP: capturó 50% de la ganancia máxima"
+    }
+   ]
+  }
+ }
+}

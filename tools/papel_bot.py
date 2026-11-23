@@ -62,6 +62,10 @@ PB = {
 }
 
 
+# Fase 0 (22-nov): solo medición, no cambia ninguna decisión del bot.
+COM_PATA = 1.22    # $ por contrato por pata (comisión + cargos), mediana de tus 78 operaciones SPX 0DTE reales en bitacora_auto
+
+
 def mins(ts):
     h, m = ts.split(":")[:2]
     return int(h) * 60 + int(m)
@@ -641,6 +645,7 @@ class Bot:
         self.previo = {}                # clave → {ia, ctx} de operaciones ya publicadas hoy (para reanudar)
         self.tape_hist = {}             # "HH:MM" → resumen del tape guardado ese minuto
         self.ult_min = None             # último minuto procesado (ignora lecturas repetidas)
+        self.peor = 0.0                 # Fase 0: mínimo del día de (P&L cerrado − pérdida máxima de lo abierto)
 
     # -- contexto ------------------------------------------------------
     def ctx(self, r):
@@ -694,7 +699,7 @@ class Bot:
         return max(1, min(self.pb["max_ctr"], int(self.pb["riesgo"] // max(1.0, riesgo_spread * 100))))
 
     # -- entradas ------------------------------------------------------
-    def abrir(self, ts, r, c, tipo, dire, legs, precio, ancho, regla, ancla=None, objetivo=None):
+    def abrir(self, ts, r, c, tipo, dire, legs, precio, ancho, regla, ancla=None, objetivo=None, natural=None):
         credito = precio < 0
         riesgo = ancho + precio if credito else precio          # precio <0 = crédito
         n = self.ctr(riesgo)
@@ -709,6 +714,7 @@ class Bot:
         iv = iv_de(r, ts, self.pb["cierre"])
         p["ajuste"] = precio - valor_bs(legs, r["px"], ts, iv, self.pb["cierre"])   # skew/spread real vs BS al entrar
         p["m_in"] = mins(ts)
+        p["natural"] = None if p["estimado"] else natural   # Fase 0: precio natural (bid/ask) al entrar, con signo como "entrada"
         prev = self.previo.get(self.clave(p))          # al reanudar: conserva la opinión de Claude y el tape originales
         if prev and not self.avisar:
             if prev.get("ia"):
@@ -786,7 +792,7 @@ class Bot:
                 self.abrir(ts, r, c, "tend", c["T"], [(sd, x[2], 1), (sd, x[3], -1)], deb, pb["deb_ancho"],
                            f"A · gamma negativa ({c['px']:.0f} < zero γ {c['zg']:.0f}) y tendencia "
                            f"{'alcista' if c['T'] > 0 else 'bajista'} en 5 y 15 min con momentum → débito a favor; objetivo {obj}",
-                           objetivo=obj)
+                           objetivo=obj, natural=x[4])
                 return
         # B · gamma positiva → venta anclada a un nivel (soporte abajo / resistencia arriba)
         tend_dia = pb["b_sin_tendencia"] and self.clasif and self.clasif[-1]["reglas"]["tipo"] == "tendencia"
@@ -815,7 +821,7 @@ class Bot:
                     self.abrir(ts, r, c, "venta", dire, [(sd, x[2], -1), (sd, x[3], 1)], -cred, pb["ven_ancho"],
                                f"B · gamma positiva ({c['px']:.0f} > zero γ {c['zg']:.0f}) → vender "
                                f"{'debajo del soporte' if dire > 0 else 'arriba de la resistencia'} {ancla:.0f} "
-                               f"(corto {x[2]:.0f}, δ {x[1]:.2f}); stop solo si se rompe {ancla:.0f}", ancla=ancla)
+                               f"(corto {x[2]:.0f}, δ {x[1]:.2f}); stop solo si se rompe {ancla:.0f}", ancla=ancla, natural=-x[4])
                     return
         # C · IC de pin al final del día
         a, b = pb["pin"]
@@ -838,19 +844,31 @@ class Bot:
                            (f"C · pin por quietud: SPX a {abs(c['px'] - pin_t):.0f} pts del PIN {pin_t:.0f} y rango de 30 min de "
                             f"{max(ult) - min(ult):.0f} pts → IC δ0.20 al vencimiento; stop solo si sale del corto") if (quieto and not clasico) else
                            f"C · pin: gamma positiva y precio a {abs(c['px'] - c['mp']):.0f} pts del major + {c['mp']:.0f} → "
-                           f"IC δ0.20 al vencimiento; stop solo si sale del corto")
+                           f"IC δ0.20 al vencimiento; stop solo si sale del corto", natural=-(xc[4] + xp[4]))
 
     # -- gestión -------------------------------------------------------
     def valor(self, p, ts, r, cad):
         """Valor del spread (positivo = vale a favor de un largo). Real (cadena) o Black-Scholes con ajuste."""
         if cad:
             try:
-                return sum(q * cad[(sd, K)] for sd, K, q in p["legs"])
+                v = sum(q * cad[(sd, K)] for sd, K, q in p["legs"])
+                p["marca"] = "cadena"
+                return v
             except KeyError:
                 pass
+        p["marca"] = "modelo"                      # Fase 0: queda registrado que este valor es Black-Scholes, no cotización
         iv = iv_de(r, ts, self.pb["cierre"])
         frac = max(0.0, (self.pb["cierre"] - mins(ts)) / max(1, self.pb["cierre"] - p["m_in"]))
         return valor_bs(p["legs"], r["px"], ts, iv, self.pb["cierre"]) + p["ajuste"] * frac
+
+    def medir(self, p, pnl, motivo):
+        """Fase 0: P&L con comisiones y con entrada al precio natural. Solo informa; nada lo usa para decidir."""
+        vence = motivo.startswith("Venc")
+        com = round(len(p["legs"]) * p["n"] * COM_PATA * (1 if vence else 2), 2)
+        nat = p.get("natural")
+        pnl_nat = round(pnl + (p["entrada"] - nat) * 100 * p["n"], 0) if nat is not None else None
+        return {"com": com, "pnl_neto": round(pnl - com, 2), "pnl_entrada_nat": pnl_nat,
+                "marca_salida": "liquidación" if vence else p.get("marca", "modelo")}
 
     def cerrar(self, p, ts, precio, motivo):
         pnl = round((precio - p["entrada"]) * 100 * p["n"], 0)
@@ -862,7 +880,8 @@ class Bot:
         self.ops.append({"id": p["id"], "fecha": self.f, "estructura": self.estructura(p), "tipo": p["tipo"],
                          "entra": et(p["t_in"]), "sale": et(ts), "entrada": p["entrada"], "salida": round(precio, 2),
                          "n": p["n"], "pnl": pnl, "regla": p["regla"], "estimado": p.get("estimado", False), "motivo": motivo, "ctx": p["ctx"], "ia": p.get("ia"), "clave": self.clave(p),
-                         "mejor": round((p["max"]) * 100 * p["n"], 0), "peor": round(p["min"] * 100 * p["n"], 0)})
+                         "mejor": round((p["max"]) * 100 * p["n"], 0), "peor": round(p["min"] * 100 * p["n"], 0),
+                         **self.medir(p, pnl, motivo)})
         if self.avisar:
             mandar(f"PAPEL · Cerrar {self.estructura(p)} · {'+' if pnl >= 0 else '−'}${abs(pnl):,.0f}",
                    f"{et(ts)} ET\n" + (patas(p, False) + "\n" + orden_tos(p, self.f, False, precio) if not motivo.startswith("Venc") else "Expira: no hay que mandar orden")
@@ -935,12 +954,16 @@ class Bot:
             return
         self.gestionar(ts, r, c, cad)
         self.buscar(ts, r, c)
+        self.peor = min(self.peor, self.pnl_dia() - self.bp_uso())
 
     def resumen(self):
         n = len(self.ops)
         g = sum(1 for o in self.ops if o["pnl"] > 0)
         return {"fecha": self.f, "pnl": self.pnl_dia(), "ops": n, "ganadoras": g, "nota": self.nota, "vetadas": self.vetadas,
                 "capital": self.pb["capital"], "bp_uso": round(self.bp_uso()),
+                "fase0": {"peor_posible": round(self.peor), "pnl_neto": round(sum(o["pnl_neto"] for o in self.ops), 2),
+                          "comisiones": round(sum(o["com"] for o in self.ops), 2),
+                          "salidas_modelo": sum(1 for o in self.ops if o["marca_salida"] == "modelo")},
                 "clasif": [{k: v for k, v in c.items() if k != "m"} for c in self.clasif],
                 "real": self.real or (etiquetar_dia(self.dia) if self.dia and (not self.avisar or mins(self.dia[-1][0]) >= self.pb["cierre"] - 5) else None),
                 "abiertas": [{"estructura": self.estructura(p), "entra": et(p["t_in"]), "entrada": p["entrada"], "regla": p["regla"],
