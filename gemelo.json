@@ -2,12 +2,12 @@
   "bot": "SPX Super Agent",
   "constructor": "GPT",
   "contrato": "gemelo v2",
-  "commit": "540137e43f61306cb7e48dcac4af3d54ee3123f7",
-  "actualizado": "2026-11-24T16:19:15Z",
+  "commit": "dd7ec6d863ec1bcd7dd0e45019b8cc575105623a",
+  "actualizado": "2026-11-24T16:21:36Z",
   "estado": "en vivo",
   "salud": {
-    "ultimo_dato_et": "11:19",
-    "edad_gamma_min": 19,
+    "ultimo_dato_et": "11:21",
+    "edad_gamma_min": 21,
     "motivo_espera": null
   },
   "carriles": {
