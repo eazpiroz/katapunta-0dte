@@ -238,10 +238,10 @@
       ],
       "dias": {
         "2026-11-24": {
-          "pnl_medio": -572.05,
-          "pnl_natural": -742.05,
-          "comisiones": 29.28,
-          "pnl_neto": -771.33,
+          "pnl_medio": -491.58,
+          "pnl_natural": -671.58,
+          "comisiones": 34.16,
+          "pnl_neto": -705.74,
           "ops": 5,
           "operaciones": [
             {
@@ -369,13 +369,13 @@
               },
               "mejor": 81.78,
               "peor": -173.32
-            }
-          ],
-          "abiertas": [
+            },
             {
               "id": "2026-11-24-4",
               "regla": "B",
-              "n": 1,
+              "entra": "13:08",
+              "sale": "13:52",
+              "estructura": "Call spread vendido 7235/7245 ×1",
               "patas": [
                 [
                   "c",
@@ -388,9 +388,32 @@
                   1
                 ]
               ],
-              "entra": "13:08",
-              "riesgo": 835.0
-            },
+              "n": 1,
+              "entrada_medio": -1.65,
+              "entrada_natural": -1.6,
+              "salida_medio": -0.8452527,
+              "salida_natural": -0.8952527,
+              "pnl_medio": 80.47,
+              "pnl_natural": 70.47,
+              "comisiones": 4.88,
+              "pnl_neto": 65.59,
+              "motivo_salida": "TP 50%",
+              "marca_salida": "modelo · h de entrada",
+              "ctx": {
+                "px": 7200.08,
+                "zg": 7192.5,
+                "g": 1,
+                "T": 0,
+                "mom": 1,
+                "edad_gamma": 3,
+                "ancla": 7220.0,
+                "objetivo": null
+              },
+              "mejor": 85.47,
+              "peor": -25.0
+            }
+          ],
+          "abiertas": [
             {
               "id": "2026-11-24-5",
               "regla": "B",
@@ -423,7 +446,7 @@
     "nota": "Arranque tardío: sin operaciones inventadas anteriores al inicio."
   },
   "evento": {
-    "carril": "control",
+    "carril": "gpt",
     "tipo": "cierre",
     "dato_et": "13:52"
   }
