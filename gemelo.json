@@ -260,10 +260,10 @@
       ],
       "dias": {
         "2026-11-24": {
-          "pnl_medio": -491.58,
-          "pnl_natural": -671.58,
-          "comisiones": 34.16,
-          "pnl_neto": -705.74,
+          "pnl_medio": -561.58,
+          "pnl_natural": -751.58,
+          "comisiones": 39.04,
+          "pnl_neto": -790.62,
           "ops": 5,
           "operaciones": [
             {
@@ -433,13 +433,13 @@
               },
               "mejor": 85.47,
               "peor": -25.0
-            }
-          ],
-          "abiertas": [
+            },
             {
               "id": "2026-11-24-5",
               "regla": "B",
-              "n": 1,
+              "entra": "13:25",
+              "sale": "14:00",
+              "estructura": "Put spread vendido 7170/7160 ×1",
               "patas": [
                 [
                   "p",
@@ -452,10 +452,32 @@
                   1
                 ]
               ],
-              "entra": "13:25",
-              "riesgo": 855.0
+              "n": 1,
+              "entrada_medio": -1.45,
+              "entrada_natural": -1.4,
+              "salida_medio": -2.15,
+              "salida_natural": -2.2,
+              "pnl_medio": -70.0,
+              "pnl_natural": -80.0,
+              "comisiones": 4.88,
+              "pnl_neto": -84.88,
+              "motivo_salida": "nivel",
+              "marca_salida": "cadena · h de entrada",
+              "ctx": {
+                "px": 7202.96,
+                "zg": 7192.5,
+                "g": 1,
+                "T": 1,
+                "mom": 0,
+                "edad_gamma": 20,
+                "ancla": 7192.5,
+                "objetivo": null
+              },
+              "mejor": 42.15,
+              "peor": -85.0
             }
-          ]
+          ],
+          "abiertas": []
         }
       }
     }
@@ -468,7 +490,7 @@
     "nota": "Arranque tardío: sin operaciones inventadas anteriores al inicio."
   },
   "evento": {
-    "carril": "control",
+    "carril": "gpt",
     "tipo": "cierre",
     "dato_et": "14:00"
   }
