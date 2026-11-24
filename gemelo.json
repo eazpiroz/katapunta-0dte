@@ -3,11 +3,11 @@
   "constructor": "GPT",
   "contrato": "gemelo v2",
   "commit": "dd7ec6d863ec1bcd7dd0e45019b8cc575105623a",
-  "actualizado": "2026-11-24T17:36:16Z",
+  "actualizado": "2026-11-24T17:41:14Z",
   "estado": "en vivo",
   "salud": {
-    "ultimo_dato_et": "12:36",
-    "edad_gamma_min": 30,
+    "ultimo_dato_et": "12:41",
+    "edad_gamma_min": 35,
     "motivo_espera": null
   },
   "carriles": {
@@ -16,10 +16,10 @@
       "marco": "R2 · 24-nov-2026",
       "dias": {
         "2026-11-24": {
-          "pnl_medio": -648.83,
-          "pnl_natural": -788.83,
-          "comisiones": 24.4,
-          "pnl_neto": -813.23,
+          "pnl_medio": -572.05,
+          "pnl_natural": -742.05,
+          "comisiones": 29.28,
+          "pnl_neto": -771.33,
           "ops": 3,
           "operaciones": [
             {
@@ -105,13 +105,13 @@
               },
               "mejor": 10.0,
               "peor": -150.56
-            }
-          ],
-          "abiertas": [
+            },
             {
               "id": "2026-11-24-3",
               "regla": "B",
-              "n": 1,
+              "entra": "12:11",
+              "sale": "12:41",
+              "estructura": "Put spread vendido 7150/7140 ×1",
               "patas": [
                 [
                   "p",
@@ -124,10 +124,32 @@
                   1
                 ]
               ],
-              "entra": "12:11",
-              "riesgo": 845.0
+              "n": 1,
+              "entrada_medio": -1.55,
+              "entrada_natural": -1.4,
+              "salida_medio": -0.78223198,
+              "salida_natural": -0.93223198,
+              "pnl_medio": 76.78,
+              "pnl_natural": 46.78,
+              "comisiones": 4.88,
+              "pnl_neto": 41.9,
+              "motivo_salida": "TP 50%",
+              "marca_salida": "modelo · h de entrada",
+              "ctx": {
+                "px": 7199.89,
+                "zg": 7173.39,
+                "g": 1,
+                "T": 0,
+                "mom": 1,
+                "edad_gamma": 5,
+                "ancla": 7173.39,
+                "objetivo": null
+              },
+              "mejor": 81.78,
+              "peor": -173.32
             }
-          ]
+          ],
+          "abiertas": []
         }
       }
     },
@@ -276,5 +298,10 @@
     "g1_activo": true,
     "aprobacion_g1": "d6fe3bbfb687cfc6607f272cefd7baa38914edc8",
     "nota": "Arranque tardío: sin operaciones inventadas anteriores al inicio."
+  },
+  "evento": {
+    "carril": "control",
+    "tipo": "cierre",
+    "dato_et": "12:41"
   }
 }
