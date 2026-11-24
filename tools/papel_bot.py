@@ -61,6 +61,17 @@ PB = {
     "c_quietud": 0,            # C ampliada: con SPX a ≤10 pts del PIN del tablero y rango de 30 min ≤ N pts, IC sin exigir gamma + (0 = apagado)          # min: con la lectura γ (perfil manual) más vieja que esto, no abre B ni C (A sí, va por tendencia)
 }
 
+# Torneo de bots (23-nov-2026): el PB de arriba es el CONTROL congelado (v1). Este es el carril propio de Claude.
+# Solo cambia los viernes, con aprobación del socio. Mismos límites de riesgo que el control.
+PB_CLAUDE = {**PB,
+    "version": "Claude C1 · 24-nov-2026",
+    "deb_tp": 0.65,            # A: TP al 65% de la ganancia máxima (v1: 50%)
+    "a_recorrido": 15,         # A: no comprar si al objetivo le quedan menos de 15 pts
+    "ven_min": 0.155,          # B: medio ≥ 1.55, para que el crédito cobrado (−0.05) sea ≥ 1.50
+}
+
+EPS = 1e-9   # tolerancia de los umbrales: el −50% exacto sí dispara (corrección del 19-nov, aplica a todos los carriles)
+
 
 # Fase 0 (22-nov): solo medición, no cambia ninguna decisión del bot.
 COM_PATA = 1.22    # $ por contrato por pata (comisión + cargos), mediana de tus 78 operaciones SPX 0DTE reales en bitacora_auto
@@ -867,11 +878,19 @@ class Bot:
         com = round(len(p["legs"]) * p["n"] * COM_PATA * (1 if vence else 2), 2)
         nat = p.get("natural")
         pnl_nat = round(pnl + (p["entrada"] - nat) * 100 * p["n"], 0) if nat is not None else None
+        # Torneo (23-nov): natural también a la salida. Sin bid/ask guardado, se usa el medio spread h visto al entrar.
+        pnl_natural = None
+        if nat is not None:
+            h = abs(nat - (p["entrada"] - self.pb["slip"]))
+            sale_nat = p["_salida"] if vence else (p["_salida"] + self.pb["slip"]) - h
+            pnl_natural = round((sale_nat - nat) * 100 * p["n"], 2)
         return {"com": com, "pnl_neto": round(pnl - com, 2), "pnl_entrada_nat": pnl_nat,
+                "pnl_natural": pnl_natural, "pnl_neto_nat": round(pnl_natural - com, 2) if pnl_natural is not None else None,
                 "marca_salida": "liquidación" if vence else p.get("marca", "modelo")}
 
     def cerrar(self, p, ts, precio, motivo):
         pnl = round((precio - p["entrada"]) * 100 * p["n"], 0)
+        p["_salida"] = precio
         self.abiertas.remove(p)
         m = mins(ts)
         self.ult_cierre[p["dir"]] = m
@@ -896,19 +915,19 @@ class Bot:
             p["max"], p["min"] = max(p["max"], g), min(p["min"], g)
             if p["tipo"] == "tend":
                 deb = p["entrada"]
-                if v >= deb + pb["deb_tp"] * (p["ancho"] - deb):
+                if v >= deb + pb["deb_tp"] * (p["ancho"] - deb) - EPS:
                     self.cerrar(p, ts, v - pb["slip"], f"TP: capturó {pb['deb_tp']:.0%} de la ganancia máxima"); continue
                 if p["obj"] and ((p["dir"] > 0 and c["px"] >= p["obj"]) or (p["dir"] < 0 and c["px"] <= p["obj"])):
                     self.cerrar(p, ts, v - pb["slip"], f"TP: el precio llegó al nivel objetivo {p['obj']}"); continue
-                if v <= deb * (1 - pb["deb_sl"]):
+                if v <= deb * (1 - pb["deb_sl"]) + EPS:
                     self.cerrar(p, ts, v - pb["slip"], f"SL: el spread perdió {pb['deb_sl']:.0%} del débito"); continue
                 if c["tf2"][0] == -p["dir"] and c["tf2"][1] == -p["dir"]:
                     self.cerrar(p, ts, v - pb["slip"], "SL: la tendencia de 5 y 15 min se volteó"); continue
             else:
                 cred = -p["entrada"]
-                if p["tipo"] == "venta" and -v <= cred * (1 - pb["ven_tp"]):
+                if p["tipo"] == "venta" and -v <= cred * (1 - pb["ven_tp"]) + EPS:
                     self.cerrar(p, ts, v - pb["slip"], f"TP: recompra al {1 - pb['ven_tp']:.0%} del crédito"); continue
-                if -v >= cred * pb["ven_cat"]:
+                if -v >= cred * pb["ven_cat"] - EPS:
                     self.cerrar(p, ts, v - pb["slip"], f"Stop de catástrofe: el spread vale {pb['ven_cat']}× el crédito"); continue
                 # stop por nivel: el ancla (venta) o el corto (pin) roto 2 minutos seguidos
                 if p["tipo"] == "venta":
@@ -963,7 +982,10 @@ class Bot:
                 "capital": self.pb["capital"], "bp_uso": round(self.bp_uso()),
                 "fase0": {"peor_posible": round(self.peor), "pnl_neto": round(sum(o["pnl_neto"] for o in self.ops), 2),
                           "comisiones": round(sum(o["com"] for o in self.ops), 2),
-                          "salidas_modelo": sum(1 for o in self.ops if o["marca_salida"] == "modelo")},
+                          "salidas_modelo": sum(1 for o in self.ops if o["marca_salida"] == "modelo"),
+                          "pnl_natural": round(sum(o.get("pnl_natural") or 0 for o in self.ops), 2),
+                          "pnl_neto_nat": round(sum(o.get("pnl_neto_nat") or 0 for o in self.ops), 2),
+                          "sin_natural": sum(1 for o in self.ops if o.get("pnl_natural") is None)},
                 "clasif": [{k: v for k, v in c.items() if k != "m"} for c in self.clasif],
                 "real": self.real or (etiquetar_dia(self.dia) if self.dia and (not self.avisar or mins(self.dia[-1][0]) >= self.pb["cierre"] - 5) else None),
                 "abiertas": [{"estructura": self.estructura(p), "entra": et(p["t_in"]), "entrada": p["entrada"], "regla": p["regla"],
@@ -1030,7 +1052,8 @@ def correr_dia(fecha, pb=None):
 
 
 # ------------------------------------------------------------------ publicación
-def armar(dias_bots, modo):
+def armar(dias_bots, modo, carril=None):
+    """papel.json: "dias" es el CONTROL (Playbook v1). "carril_claude" es el carril propio de Claude (torneo)."""
     try:
         prev = json.loads(OUT.read_text(encoding="utf-8")) if OUT.exists() else {}
     except ValueError:
@@ -1038,8 +1061,29 @@ def armar(dias_bots, modo):
     dias = prev.get("dias", {})
     for b in dias_bots:
         dias[b.f] = {**b.resumen(), "modo": modo, "operaciones": b.ops}
-    return {"actualizado": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "modo": modo,
-            "playbook": {k: v for k, v in PB.items()}, "dias": dict(sorted(dias.items()))}
+    cc = prev.get("carril_claude") or {}
+    cdias = cc.get("dias", {})
+    for b in carril or []:
+        cdias[b.f] = {**b.resumen(), "modo": modo, "operaciones": b.ops,
+                      "abiertas": [{"estructura": b.estructura(p), "entra": et(p["t_in"]), "entrada": p["entrada"], "regla": p["regla"]}
+                                   for p in b.abiertas]}
+    out = {"actualizado": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "modo": modo,
+           "playbook": {k: v for k, v in PB.items()}, "dias": dict(sorted(dias.items()))}
+    if cdias:
+        out["carril_claude"] = {"version": PB_CLAUDE["version"], "playbook": dict(PB_CLAUDE),
+                                "cambios": cc.get("cambios") or CAMBIOS_CLAUDE, "dias": dict(sorted(cdias.items()))}
+    return out
+
+
+# Bitácora de cambios del carril Claude (se publica en la página del torneo)
+CAMBIOS_CLAUDE = [
+    {"fecha": "2026-11-24", "version": "Claude C1",
+     "cambios": ["A: TP al 65% de la ganancia máxima (v1: 50%)",
+                 "A: no compra si al objetivo le quedan menos de 15 pts",
+                 "B: crédito cobrado ≥ 1.50 ya con el deslizamiento (medio ≥ 1.55)"],
+     "hipotesis": "A deja correr las ganadoras y evita entradas sin recorrido; B deja de vender por debajo de su propio mínimo.",
+     "evidencia": "Repetición de 13 días (3 al 23-nov): +$11,237 contra +$7,839 del v1; 8 días mejores y 1 peor. Con deslizamiento de 0.15: +$9,305 contra +$5,779, 0 peores. Dentro de muestra: solo cuenta lo que haga de aquí en adelante."}
+]
 
 
 def publicar(data):
@@ -1131,6 +1175,9 @@ def vivo():
                 b.previo[o["clave"]] = {"ia": o.get("ia"), "ctx": o.get("ctx")}
     except Exception:
         pass
+    b2 = Bot(hoy, PB_CLAUDE)               # torneo: carril propio de Claude, en silencio (sin alertas ni consulta a la IA)
+    b2.avisar = False
+    b2.tape_hist = b.tape_hist
     mk = Marcador()
     tl = TapeLog(hoy)
     b.veto = Veto()
@@ -1166,11 +1213,12 @@ def vivo():
           if 8 * 60 + 30 <= ahora_m.hour * 60 + ahora_m.minute <= PB["cierre"]:
               tl.tick()
               b.tape = tl.ult
+              b2.tape = tl.ult
           for i, (ts, r) in enumerate(filas):
               if mins(ts) < 8 * 60 + 30:
                   continue
               cad = None
-              if b.abiertas and i == len(filas) - 1:
+              if (b.abiertas or b2.abiertas) and i == len(filas) - 1:
                   try:
                       cad = mk.cadena(hoy)
                   except Exception as e:
@@ -1179,6 +1227,11 @@ def vivo():
               b.avisar = (ahora.hour * 60 + ahora.minute) - mins(ts) <= 3     # al reanudar, no avisa lo ya pasado
               antes = len(b.ops) + len(b.abiertas)
               b.paso(ts, r, cad)
+              try:
+                  b2.paso(ts, r, cad)          # un error del carril Claude nunca detiene al control
+              except Exception:
+                  traceback.print_exc()
+                  print("⚠ Error en el carril Claude; el control sigue.")
               if len(b.ops) + len(b.abiertas) != antes or i == len(filas) - 1:
                   print(f"{et(ts)} ET  SPX {r['px']}  abiertas {len(b.abiertas)}  cerradas {len(b.ops)}  P&L ${b.pnl_dia():,.0f}")
           if filas and primera:
@@ -1191,12 +1244,15 @@ def vivo():
                          ["arrows_counterclockwise"], 3)
           if filas:
               STATE.write_text(json.dumps({"fecha": hoy}), encoding="utf-8")
-              publicar(armar([b], "vivo"))
+              publicar(armar([b], "vivo", [b2]))
           t = dt.datetime.now(dt.timezone(dt.timedelta(hours=-6)))
           if t.hour * 60 + t.minute >= PB["cierre"] + 2:
               if b.abiertas and filas:
                   b.liquidar(*[(filas[-1][0], filas[-1][1]["px"])][0])
-              publicar(armar([b], "vivo"))
+              if b2.abiertas and filas:
+                  b2.liquidar(*[(filas[-1][0], filas[-1][1]["px"])][0])
+              publicar(armar([b], "vivo", [b2]))
+              print(f"Carril Claude: P&L ${b2.pnl_dia():,.0f} ({len(b2.ops)} ops)")
               imprimir(b)
               mandar(f"PAPEL · Cierre del día {'+' if b.pnl_dia() >= 0 else '−'}${abs(b.pnl_dia()):,.0f}",
                      f"{len(b.ops)} operaciones · {sum(1 for o in b.ops if o['pnl'] > 0)} ganadoras", ["checkered_flag"], 3)
@@ -1243,20 +1299,22 @@ def main():
             fechas = [q]
         if "--local" not in sys.argv:
             traer_remoto()
-        bots = []
+        bots, bots2 = [], []
         for f in fechas:
             try:
                 b = correr_dia(f)
+                b2 = correr_dia(f, PB_CLAUDE)
             except Exception as e:
                 print(f, "sin historial:", e)
                 continue
             imprimir(b)
-            bots.append(b)
+            print(f"  carril Claude: ${b2.pnl_dia():,.0f} ({len(b2.ops)} ops)")
+            bots.append(b); bots2.append(b2)
         tot = sum(b.pnl_dia() for b in bots)
         n = sum(len(b.ops) for b in bots)
         g = sum(1 for b in bots for o in b.ops if o["pnl"] > 0)
         print(f"\nTOTAL {len(bots)} días · {n} operaciones · {g} ganadoras · P&L ${tot:,.0f}")
-        publicar(armar(bots, "replay"))
+        publicar(armar(bots, "replay", bots2))
         return
     vivo()
 
