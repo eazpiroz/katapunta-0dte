@@ -1,0 +1,1084 @@
+{
+  "bot": "SPX Super Agent",
+  "constructor": "GPT",
+  "playbook": "v1 · 15-nov-2026",
+  "contrato": "gemelo v1.1",
+  "commit": "16789240fa6b7618ab8842696eecf9c16b74685d",
+  "actualizado": "2026-11-24T01:21:57Z",
+  "estado": "cerrado",
+  "salud": {
+    "ultimo_dato_et": "16:01",
+    "edad_gamma_min": 6,
+    "motivo_espera": null
+  },
+  "dias": {
+    "2026-11-16": {
+      "pnl_medio": 2449.96,
+      "pnl_natural": 2159.96,
+      "comisiones": 34.16,
+      "pnl_neto": 2125.8,
+      "ops": 2,
+      "operaciones": [
+        {
+          "id": "2026-11-16-1",
+          "regla": "A",
+          "entra": "10:00",
+          "sale": "13:12",
+          "estructura": "Put spread comprado 7450/7440 ×3",
+          "patas": [
+            [
+              "p",
+              7450.0,
+              1
+            ],
+            [
+              "p",
+              7440.0,
+              -1
+            ]
+          ],
+          "n": 3,
+          "entrada_medio": 2.85,
+          "entrada_natural": 3.2,
+          "salida_medio": 5.61686505,
+          "salida_natural": 5.26686505,
+          "pnl_medio": 830.06,
+          "pnl_natural": 620.06,
+          "comisiones": 14.64,
+          "pnl_neto": 605.42,
+          "motivo_salida": "objetivo",
+          "marca_salida": "modelo · h de entrada",
+          "ctx": {
+            "px": 7480.48,
+            "zg": 7504.74,
+            "g": -1,
+            "T": -1,
+            "mom": -1,
+            "edad_gamma": 25,
+            "ancla": null,
+            "objetivo": 7440.08
+          },
+          "mejor": 845.06,
+          "peor": -395.28
+        },
+        {
+          "id": "2026-11-16-2",
+          "regla": "A",
+          "entra": "13:12",
+          "sale": "14:41",
+          "estructura": "Put spread comprado 7425/7415 ×4",
+          "patas": [
+            [
+              "p",
+              7425.0,
+              1
+            ],
+            [
+              "p",
+              7415.0,
+              -1
+            ]
+          ],
+          "n": 4,
+          "entrada_medio": 2.3,
+          "entrada_natural": 2.4,
+          "salida_medio": 6.34974029,
+          "salida_natural": 6.24974029,
+          "pnl_medio": 1619.9,
+          "pnl_natural": 1539.9,
+          "comisiones": 19.52,
+          "pnl_neto": 1520.38,
+          "motivo_salida": "TP 50%",
+          "marca_salida": "modelo · h de entrada",
+          "ctx": {
+            "px": 7439.67,
+            "zg": 7475.51,
+            "g": -1,
+            "T": -1,
+            "mom": -1,
+            "edad_gamma": 17,
+            "ancla": null,
+            "objetivo": 7320.0
+          },
+          "mejor": 1639.9,
+          "peor": -107.67
+        }
+      ],
+      "abiertas": []
+    },
+    "2026-11-17": {
+      "pnl_medio": 885.59,
+      "pnl_natural": 565.59,
+      "comisiones": 78.08,
+      "pnl_neto": 487.51,
+      "ops": 5,
+      "operaciones": [
+        {
+          "id": "2026-11-17-1",
+          "regla": "B",
+          "entra": "10:00",
+          "sale": "10:10",
+          "estructura": "Put spread vendido 7365/7355 ×1",
+          "patas": [
+            [
+              "p",
+              7365.0,
+              -1
+            ],
+            [
+              "p",
+              7355.0,
+              1
+            ]
+          ],
+          "n": 1,
+          "entrada_medio": -1.45,
+          "entrada_natural": -1.4,
+          "salida_medio": -3.0642838,
+          "salida_natural": -3.1142838,
+          "pnl_medio": -161.43,
+          "pnl_natural": -171.43,
+          "comisiones": 4.88,
+          "pnl_neto": -176.31,
+          "motivo_salida": "nivel",
+          "marca_salida": "modelo · h de entrada",
+          "ctx": {
+            "px": 7411.85,
+            "zg": 7403.39,
+            "g": 1,
+            "T": 0,
+            "mom": 0,
+            "edad_gamma": 2,
+            "ancla": 7395,
+            "objetivo": null
+          },
+          "mejor": 0,
+          "peor": -156.43
+        },
+        {
+          "id": "2026-11-17-2",
+          "regla": "A",
+          "entra": "10:06",
+          "sale": "10:41",
+          "estructura": "Put spread comprado 7365/7355 ×3",
+          "patas": [
+            [
+              "p",
+              7365.0,
+              1
+            ],
+            [
+              "p",
+              7355.0,
+              -1
+            ]
+          ],
+          "n": 3,
+          "entrada_medio": 2.55,
+          "entrada_natural": 2.6,
+          "salida_medio": 5.73225666,
+          "salida_natural": 5.68225666,
+          "pnl_medio": 954.68,
+          "pnl_natural": 924.68,
+          "comisiones": 14.64,
+          "pnl_neto": 910.04,
+          "motivo_salida": "objetivo",
+          "marca_salida": "modelo · h de entrada",
+          "ctx": {
+            "px": 7391.28,
+            "zg": 7403.39,
+            "g": -1,
+            "T": -1,
+            "mom": -1,
+            "edad_gamma": 8,
+            "ancla": null,
+            "objetivo": 7350.0
+          },
+          "mejor": 969.68,
+          "peor": -56.35
+        },
+        {
+          "id": "2026-11-17-3",
+          "regla": "A",
+          "entra": "10:41",
+          "sale": "10:53",
+          "estructura": "Put spread comprado 7315/7305 ×4",
+          "patas": [
+            [
+              "p",
+              7315.0,
+              1
+            ],
+            [
+              "p",
+              7305.0,
+              -1
+            ]
+          ],
+          "n": 4,
+          "entrada_medio": 2.5,
+          "entrada_natural": 2.6,
+          "salida_medio": 5.49703085,
+          "salida_natural": 5.39703085,
+          "pnl_medio": 1198.81,
+          "pnl_natural": 1118.81,
+          "comisiones": 19.52,
+          "pnl_neto": 1099.29,
+          "motivo_salida": "objetivo",
+          "marca_salida": "modelo · h de entrada",
+          "ctx": {
+            "px": 7344.59,
+            "zg": 7402.5,
+            "g": -1,
+            "T": -1,
+            "mom": -1,
+            "edad_gamma": 16,
+            "ancla": null,
+            "objetivo": 7300.0
+          },
+          "mejor": 1218.81,
+          "peor": 0
+        },
+        {
+          "id": "2026-11-17-4",
+          "regla": "A",
+          "entra": "10:53",
+          "sale": "10:58",
+          "estructura": "Put spread comprado 7255/7245 ×4",
+          "patas": [
+            [
+              "p",
+              7255.0,
+              1
+            ],
+            [
+              "p",
+              7245.0,
+              -1
+            ]
+          ],
+          "n": 4,
+          "entrada_medio": 2.35,
+          "entrada_natural": 2.5,
+          "salida_medio": 0.7981693,
+          "salida_natural": 0.6481693,
+          "pnl_medio": -620.73,
+          "pnl_natural": -740.73,
+          "comisiones": 19.52,
+          "pnl_neto": -760.25,
+          "motivo_salida": "SL",
+          "marca_salida": "modelo · h de entrada",
+          "ctx": {
+            "px": 7295.52,
+            "zg": 7397.05,
+            "g": -1,
+            "T": -1,
+            "mom": -1,
+            "edad_gamma": 3,
+            "ancla": null,
+            "objetivo": 7200.0
+          },
+          "mejor": 130.14,
+          "peor": -600.73
+        },
+        {
+          "id": "2026-11-17-5",
+          "regla": "A",
+          "entra": "11:21",
+          "sale": "12:18",
+          "estructura": "Put spread comprado 7300/7290 ×4",
+          "patas": [
+            [
+              "p",
+              7300.0,
+              1
+            ],
+            [
+              "p",
+              7290.0,
+              -1
+            ]
+          ],
+          "n": 4,
+          "entrada_medio": 2.1,
+          "entrada_natural": 2.2,
+          "salida_medio": 0.8856441,
+          "salida_natural": 0.7856441,
+          "pnl_medio": -485.74,
+          "pnl_natural": -565.74,
+          "comisiones": 19.52,
+          "pnl_neto": -585.26,
+          "motivo_salida": "SL",
+          "marca_salida": "modelo · h de entrada",
+          "ctx": {
+            "px": 7334.78,
+            "zg": 7396.2,
+            "g": -1,
+            "T": -1,
+            "mom": -1,
+            "edad_gamma": 4,
+            "ancla": null,
+            "objetivo": 7300
+          },
+          "mejor": 782.76,
+          "peor": -465.74
+        }
+      ],
+      "abiertas": []
+    },
+    "2026-11-18": {
+      "pnl_medio": -326.82,
+      "pnl_natural": -566.82,
+      "comisiones": 53.68,
+      "pnl_neto": -620.5,
+      "ops": 5,
+      "operaciones": [
+        {
+          "id": "2026-11-18-1",
+          "regla": "B",
+          "entra": "10:00",
+          "sale": "10:41",
+          "estructura": "Put spread vendido 7295/7285 ×1",
+          "patas": [
+            [
+              "p",
+              7295.0,
+              -1
+            ],
+            [
+              "p",
+              7285.0,
+              1
+            ]
+          ],
+          "n": 1,
+          "entrada_medio": -1.45,
+          "entrada_natural": -1.2,
+          "salida_medio": -3.77998512,
+          "salida_natural": -4.02998512,
+          "pnl_medio": -233.0,
+          "pnl_natural": -283.0,
+          "comisiones": 4.88,
+          "pnl_neto": -287.88,
+          "motivo_salida": "catástrofe",
+          "marca_salida": "modelo · h de entrada",
+          "ctx": {
+            "px": 7360.16,
+            "zg": 7344.49,
+            "g": 1,
+            "T": 1,
+            "mom": 1,
+            "edad_gamma": 4,
+            "ancla": 7300,
+            "objetivo": null
+          },
+          "mejor": 0,
+          "peor": -228.0
+        },
+        {
+          "id": "2026-11-18-2",
+          "regla": "A",
+          "entra": "10:36",
+          "sale": "11:18",
+          "estructura": "Put spread comprado 7280/7270 ×4",
+          "patas": [
+            [
+              "p",
+              7280.0,
+              1
+            ],
+            [
+              "p",
+              7270.0,
+              -1
+            ]
+          ],
+          "n": 4,
+          "entrada_medio": 2.45,
+          "entrada_natural": 2.6,
+          "salida_medio": 3.1984075,
+          "salida_natural": 3.0484075,
+          "pnl_medio": 299.36,
+          "pnl_natural": 179.36,
+          "comisiones": 19.52,
+          "pnl_neto": 159.84,
+          "motivo_salida": "objetivo",
+          "marca_salida": "modelo · h de entrada",
+          "ctx": {
+            "px": 7316.41,
+            "zg": 7343.8,
+            "g": -1,
+            "T": -1,
+            "mom": -1,
+            "edad_gamma": 11,
+            "ancla": null,
+            "objetivo": 7300
+          },
+          "mejor": 319.36,
+          "peor": -314.77
+        },
+        {
+          "id": "2026-11-18-3",
+          "regla": "A",
+          "entra": "11:18",
+          "sale": "12:04",
+          "estructura": "Put spread comprado 7265/7255 ×4",
+          "patas": [
+            [
+              "p",
+              7265.0,
+              1
+            ],
+            [
+              "p",
+              7255.0,
+              -1
+            ]
+          ],
+          "n": 4,
+          "entrada_medio": 2.35,
+          "entrada_natural": 2.4,
+          "salida_medio": 0.97523316,
+          "salida_natural": 0.92523316,
+          "pnl_medio": -549.91,
+          "pnl_natural": -589.91,
+          "comisiones": 19.52,
+          "pnl_neto": -609.43,
+          "motivo_salida": "SL",
+          "marca_salida": "modelo · h de entrada",
+          "ctx": {
+            "px": 7298.6,
+            "zg": 7336.2,
+            "g": -1,
+            "T": -1,
+            "mom": -1,
+            "edad_gamma": 1,
+            "ancla": null,
+            "objetivo": 7150.0
+          },
+          "mejor": 279.89,
+          "peor": -529.91
+        },
+        {
+          "id": "2026-11-18-5",
+          "regla": "B",
+          "entra": "12:42",
+          "sale": "13:12",
+          "estructura": "Call spread vendido 7370/7380 ×1",
+          "patas": [
+            [
+              "c",
+              7370.0,
+              -1
+            ],
+            [
+              "c",
+              7380.0,
+              1
+            ]
+          ],
+          "n": 1,
+          "entrada_medio": -1.6,
+          "entrada_natural": -1.5,
+          "salida_medio": -0.78977848,
+          "salida_natural": -0.88977848,
+          "pnl_medio": 81.02,
+          "pnl_natural": 61.02,
+          "comisiones": 4.88,
+          "pnl_neto": 56.14,
+          "motivo_salida": "TP 50%",
+          "marca_salida": "modelo · h de entrada",
+          "ctx": {
+            "px": 7332.6,
+            "zg": 7328.8,
+            "g": 1,
+            "T": 0,
+            "mom": 1,
+            "edad_gamma": 11,
+            "ancla": 7350,
+            "objetivo": null
+          },
+          "mejor": 86.02,
+          "peor": -19.54
+        },
+        {
+          "id": "2026-11-18-4",
+          "regla": "B",
+          "entra": "12:24",
+          "sale": "15:26",
+          "estructura": "Put spread vendido 7300/7290 ×1",
+          "patas": [
+            [
+              "p",
+              7300.0,
+              -1
+            ],
+            [
+              "p",
+              7290.0,
+              1
+            ]
+          ],
+          "n": 1,
+          "entrada_medio": -1.45,
+          "entrada_natural": -1.4,
+          "salida_medio": -0.69292025,
+          "salida_natural": -0.74292025,
+          "pnl_medio": 75.71,
+          "pnl_natural": 65.71,
+          "comisiones": 4.88,
+          "pnl_neto": 60.83,
+          "motivo_salida": "TP 50%",
+          "marca_salida": "modelo · h de entrada",
+          "ctx": {
+            "px": 7341.92,
+            "zg": 7331.61,
+            "g": 1,
+            "T": 0,
+            "mom": 1,
+            "edad_gamma": 21,
+            "ancla": 7310.0,
+            "objetivo": null
+          },
+          "mejor": 80.71,
+          "peor": -146.59
+        }
+      ],
+      "abiertas": []
+    },
+    "2026-11-19": {
+      "pnl_medio": -855.93,
+      "pnl_natural": -1185.93,
+      "comisiones": 58.56,
+      "pnl_neto": -1244.49,
+      "ops": 4,
+      "operaciones": [
+        {
+          "id": "2026-11-19-1",
+          "regla": "A",
+          "entra": "10:35",
+          "sale": "11:37",
+          "estructura": "Put spread comprado 7255/7245 ×3",
+          "patas": [
+            [
+              "p",
+              7255.0,
+              1
+            ],
+            [
+              "p",
+              7245.0,
+              -1
+            ]
+          ],
+          "n": 3,
+          "entrada_medio": 2.65,
+          "entrada_natural": 2.8,
+          "salida_medio": 1.13812351,
+          "salida_natural": 0.98812351,
+          "pnl_medio": -453.56,
+          "pnl_natural": -543.56,
+          "comisiones": 14.64,
+          "pnl_neto": -558.2,
+          "motivo_salida": "SL",
+          "marca_salida": "modelo · h de entrada",
+          "ctx": {
+            "px": 7299.32,
+            "zg": 7389,
+            "g": -1,
+            "T": -1,
+            "mom": -1,
+            "edad_gamma": 10,
+            "ancla": null,
+            "objetivo": 7150.0
+          },
+          "mejor": 205.17,
+          "peor": -438.56
+        },
+        {
+          "id": "2026-11-19-2",
+          "regla": "A",
+          "entra": "11:52",
+          "sale": "12:02",
+          "estructura": "Put spread comprado 7245/7235 ×3",
+          "patas": [
+            [
+              "p",
+              7245.0,
+              1
+            ],
+            [
+              "p",
+              7235.0,
+              -1
+            ]
+          ],
+          "n": 3,
+          "entrada_medio": 3.1,
+          "entrada_natural": 3.2,
+          "salida_medio": 4.7477975,
+          "salida_natural": 4.6477975,
+          "pnl_medio": 494.34,
+          "pnl_natural": 434.34,
+          "comisiones": 14.64,
+          "pnl_neto": 419.7,
+          "motivo_salida": "objetivo",
+          "marca_salida": "modelo · h de entrada",
+          "ctx": {
+            "px": 7273.01,
+            "zg": 7338,
+            "g": -1,
+            "T": -1,
+            "mom": -1,
+            "edad_gamma": 12,
+            "ancla": null,
+            "objetivo": 7250.0
+          },
+          "mejor": 509.34,
+          "peor": -187.98
+        },
+        {
+          "id": "2026-11-19-3",
+          "regla": "A",
+          "entra": "12:02",
+          "sale": "12:26",
+          "estructura": "Put spread comprado 7200/7190 ×3",
+          "patas": [
+            [
+              "p",
+              7200.0,
+              1
+            ],
+            [
+              "p",
+              7190.0,
+              -1
+            ]
+          ],
+          "n": 3,
+          "entrada_medio": 2.75,
+          "entrada_natural": 2.9,
+          "salida_medio": 1.2485743,
+          "salida_natural": 1.0985743,
+          "pnl_medio": -450.43,
+          "pnl_natural": -540.43,
+          "comisiones": 14.64,
+          "pnl_neto": -555.07,
+          "motivo_salida": "SL",
+          "marca_salida": "modelo · h de entrada",
+          "ctx": {
+            "px": 7239.66,
+            "zg": 7338,
+            "g": -1,
+            "T": -1,
+            "mom": -1,
+            "edad_gamma": 22,
+            "ancla": null,
+            "objetivo": 7150.0
+          },
+          "mejor": 612.51,
+          "peor": -435.43
+        },
+        {
+          "id": "2026-11-19-4",
+          "regla": "A",
+          "entra": "13:08",
+          "sale": "13:34",
+          "estructura": "Put spread comprado 7185/7175 ×3",
+          "patas": [
+            [
+              "p",
+              7185.0,
+              1
+            ],
+            [
+              "p",
+              7175.0,
+              -1
+            ]
+          ],
+          "n": 3,
+          "entrada_medio": 2.55,
+          "entrada_natural": 2.7,
+          "salida_medio": 1.06238972,
+          "salida_natural": 0.91238972,
+          "pnl_medio": -446.28,
+          "pnl_natural": -536.28,
+          "comisiones": 14.64,
+          "pnl_neto": -550.92,
+          "motivo_salida": "SL",
+          "marca_salida": "modelo · h de entrada",
+          "ctx": {
+            "px": 7219.24,
+            "zg": 7310,
+            "g": -1,
+            "T": -1,
+            "mom": -1,
+            "edad_gamma": 13,
+            "ancla": null,
+            "objetivo": 7200.0
+          },
+          "mejor": 253.9,
+          "peor": -431.28
+        }
+      ],
+      "abiertas": []
+    },
+    "2026-11-20": {
+      "pnl_medio": 2837.31,
+      "pnl_natural": 2567.31,
+      "comisiones": 48.8,
+      "pnl_neto": 2518.51,
+      "ops": 3,
+      "operaciones": [
+        {
+          "id": "2026-11-20-1",
+          "regla": "A",
+          "entra": "11:25",
+          "sale": "11:42",
+          "estructura": "Put spread comprado 7035/7025 ×3",
+          "patas": [
+            [
+              "p",
+              7035.0,
+              1
+            ],
+            [
+              "p",
+              7025.0,
+              -1
+            ]
+          ],
+          "n": 3,
+          "entrada_medio": 2.7,
+          "entrada_natural": 2.8,
+          "salida_medio": 3.79361823,
+          "salida_natural": 3.69361823,
+          "pnl_medio": 328.09,
+          "pnl_natural": 268.09,
+          "comisiones": 14.64,
+          "pnl_neto": 253.45,
+          "motivo_salida": "objetivo",
+          "marca_salida": "modelo · h de entrada",
+          "ctx": {
+            "px": 7075.48,
+            "zg": 7139,
+            "g": -1,
+            "T": -1,
+            "mom": -1,
+            "edad_gamma": 1,
+            "ancla": null,
+            "objetivo": 7050
+          },
+          "mejor": 343.09,
+          "peor": 0
+        },
+        {
+          "id": "2026-11-20-2",
+          "regla": "A",
+          "entra": "11:42",
+          "sale": "14:13",
+          "estructura": "Put spread comprado 7010/7000 ×3",
+          "patas": [
+            [
+              "p",
+              7010.0,
+              1
+            ],
+            [
+              "p",
+              7000.0,
+              -1
+            ]
+          ],
+          "n": 3,
+          "entrada_medio": 2.55,
+          "entrada_natural": 2.7,
+          "salida_medio": 5.62182934,
+          "salida_natural": 5.47182934,
+          "pnl_medio": 921.55,
+          "pnl_natural": 831.55,
+          "comisiones": 14.64,
+          "pnl_neto": 816.91,
+          "motivo_salida": "objetivo",
+          "marca_salida": "modelo · h de entrada",
+          "ctx": {
+            "px": 7049.68,
+            "zg": 7139,
+            "g": -1,
+            "T": -1,
+            "mom": -1,
+            "edad_gamma": 18,
+            "ancla": null,
+            "objetivo": 7000.0
+          },
+          "mejor": 936.55,
+          "peor": -193.89
+        },
+        {
+          "id": "2026-11-20-3",
+          "regla": "A",
+          "entra": "14:15",
+          "sale": "15:27",
+          "estructura": "Put spread comprado 6965/6955 ×4",
+          "patas": [
+            [
+              "p",
+              6965.0,
+              1
+            ],
+            [
+              "p",
+              6955.0,
+              -1
+            ]
+          ],
+          "n": 4,
+          "entrada_medio": 2.45,
+          "entrada_natural": 2.6,
+          "salida_medio": 6.41917256,
+          "salida_natural": 6.26917256,
+          "pnl_medio": 1587.67,
+          "pnl_natural": 1467.67,
+          "comisiones": 19.52,
+          "pnl_neto": 1448.15,
+          "motivo_salida": "TP 50%",
+          "marca_salida": "modelo · h de entrada",
+          "ctx": {
+            "px": 6993.37,
+            "zg": 7112,
+            "g": -1,
+            "T": -1,
+            "mom": -1,
+            "edad_gamma": 120,
+            "ancla": null,
+            "objetivo": 6900.0
+          },
+          "mejor": 1607.67,
+          "peor": -246.94
+        }
+      ],
+      "abiertas": []
+    },
+    "2026-11-23": {
+      "pnl_medio": 84.76,
+      "pnl_natural": -75.24,
+      "comisiones": 24.4,
+      "pnl_neto": -99.64,
+      "ops": 5,
+      "operaciones": [
+        {
+          "id": "2026-11-23-1",
+          "regla": "B",
+          "entra": "10:01",
+          "sale": "10:16",
+          "estructura": "Put spread vendido 7135/7125 ×1",
+          "patas": [
+            [
+              "p",
+              7135.0,
+              -1
+            ],
+            [
+              "p",
+              7125.0,
+              1
+            ]
+          ],
+          "n": 1,
+          "entrada_medio": -1.45,
+          "entrada_natural": -1.2,
+          "salida_medio": -0.76545887,
+          "salida_natural": -1.01545887,
+          "pnl_medio": 68.45,
+          "pnl_natural": 18.45,
+          "comisiones": 4.88,
+          "pnl_neto": 13.57,
+          "motivo_salida": "TP 50%",
+          "marca_salida": "modelo · h de entrada",
+          "ctx": {
+            "px": 7231.52,
+            "zg": 7195,
+            "g": 1,
+            "T": 1,
+            "mom": 1,
+            "edad_gamma": 15,
+            "ancla": 7195,
+            "objetivo": null
+          },
+          "mejor": 73.45,
+          "peor": -9.69
+        },
+        {
+          "id": "2026-11-23-2",
+          "regla": "B",
+          "entra": "10:16",
+          "sale": "10:21",
+          "estructura": "Put spread vendido 7170/7160 ×1",
+          "patas": [
+            [
+              "p",
+              7170.0,
+              -1
+            ],
+            [
+              "p",
+              7160.0,
+              1
+            ]
+          ],
+          "n": 1,
+          "entrada_medio": -1.45,
+          "entrada_natural": -1.3,
+          "salida_medio": -0.7630234,
+          "salida_natural": -0.9130234,
+          "pnl_medio": 68.7,
+          "pnl_natural": 38.7,
+          "comisiones": 4.88,
+          "pnl_neto": 33.82,
+          "motivo_salida": "TP 50%",
+          "marca_salida": "modelo · h de entrada",
+          "ctx": {
+            "px": 7247.99,
+            "zg": 7222,
+            "g": 1,
+            "T": 1,
+            "mom": 1,
+            "edad_gamma": 2,
+            "ancla": 7222,
+            "objetivo": null
+          },
+          "mejor": 73.7,
+          "peor": 0
+        },
+        {
+          "id": "2026-11-23-4",
+          "regla": "B",
+          "entra": "10:56",
+          "sale": "11:40",
+          "estructura": "Call spread vendido 7315/7325 ×1",
+          "patas": [
+            [
+              "c",
+              7315.0,
+              -1
+            ],
+            [
+              "c",
+              7325.0,
+              1
+            ]
+          ],
+          "n": 1,
+          "entrada_medio": -1.75,
+          "entrada_natural": -1.6,
+          "salida_medio": -0.7894073,
+          "salida_natural": -0.9394073,
+          "pnl_medio": 96.06,
+          "pnl_natural": 66.06,
+          "comisiones": 4.88,
+          "pnl_neto": 61.18,
+          "motivo_salida": "TP 50%",
+          "marca_salida": "modelo · h de entrada",
+          "ctx": {
+            "px": 7249.95,
+            "zg": 7210,
+            "g": 1,
+            "T": 0,
+            "mom": 0,
+            "edad_gamma": 21,
+            "ancla": 7300,
+            "objetivo": null
+          },
+          "mejor": 101.06,
+          "peor": -32.82
+        },
+        {
+          "id": "2026-11-23-3",
+          "regla": "B",
+          "entra": "10:22",
+          "sale": "11:41",
+          "estructura": "Put spread vendido 7200/7190 ×1",
+          "patas": [
+            [
+              "p",
+              7200.0,
+              -1
+            ],
+            [
+              "p",
+              7190.0,
+              1
+            ]
+          ],
+          "n": 1,
+          "entrada_medio": -1.45,
+          "entrada_natural": -1.3,
+          "salida_medio": -3.74854394,
+          "salida_natural": -3.89854394,
+          "pnl_medio": -229.85,
+          "pnl_natural": -259.85,
+          "comisiones": 4.88,
+          "pnl_neto": -264.73,
+          "motivo_salida": "catástrofe",
+          "marca_salida": "modelo · h de entrada",
+          "ctx": {
+            "px": 7275.34,
+            "zg": 7222,
+            "g": 1,
+            "T": 1,
+            "mom": 1,
+            "edad_gamma": 8,
+            "ancla": 7222,
+            "objetivo": null
+          },
+          "mejor": 61.98,
+          "peor": -224.85
+        },
+        {
+          "id": "2026-11-23-5",
+          "regla": "B",
+          "entra": "12:00",
+          "sale": "12:42",
+          "estructura": "Call spread vendido 7305/7315 ×1",
+          "patas": [
+            [
+              "c",
+              7305.0,
+              -1
+            ],
+            [
+              "c",
+              7315.0,
+              1
+            ]
+          ],
+          "n": 1,
+          "entrada_medio": -1.6,
+          "entrada_natural": -1.5,
+          "salida_medio": -0.7860098,
+          "salida_natural": -0.8860098,
+          "pnl_medio": 81.4,
+          "pnl_natural": 61.4,
+          "comisiones": 4.88,
+          "pnl_neto": 56.52,
+          "motivo_salida": "TP 50%",
+          "marca_salida": "modelo · h de entrada",
+          "ctx": {
+            "px": 7252.73,
+            "zg": 7237,
+            "g": 1,
+            "T": 0,
+            "mom": 0,
+            "edad_gamma": 9,
+            "ancla": 7300,
+            "objetivo": null
+          },
+          "mejor": 86.4,
+          "peor": -12.42
+        }
+      ],
+      "abiertas": []
+    }
+  }
+}
