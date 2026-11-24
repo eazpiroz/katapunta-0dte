@@ -1,5 +1,5 @@
 {
- "actualizado": "2026-11-23T21:08:31Z",
+ "actualizado": "2026-11-24T15:09:51Z",
  "fuente": "TradingView",
  "rows": [
   {
@@ -24,6 +24,7 @@
    "estructura": "Call cubierto",
    "etapa": "abierta",
    "instrumento": "opcion",
+   "mejor": 453.46,
    "motor": "wheel",
    "primaActual": 21.86,
    "primaEntrada": 21.86,
@@ -115,6 +116,7 @@
    "estructura": "Call cubierto",
    "etapa": "abierta",
    "instrumento": "opcion",
+   "mejor": 333.02,
    "motor": "wheel",
    "primaActual": 3.5,
    "primaEntrada": 3.5,
@@ -293,6 +295,7 @@
    "estructura": "Call spread comprado",
    "etapa": "abierta",
    "instrumento": "opcion",
+   "mejor": 165.05,
    "motor": "swing",
    "plan": "TP/SL por definir",
    "primaActual": null,
@@ -379,58 +382,58 @@
  ],
  "quotes": {
   "GLD": {
-   "p": 333.04,
-   "chg": 3.149874562517427,
+   "p": 330.68,
+   "chg": -0.7026605008708111,
    "sym": "AMEX:GLD"
   },
   "AMD": {
-   "p": 453.46,
-   "chg": 6.8498315228916775,
+   "p": 412.26,
+   "chg": -9.085696643584878,
    "sym": "NASDAQ:AMD"
   },
   "CRWV": {
-   "p": 48.33,
-   "chg": 22.32346241457859,
+   "p": 43.875,
+   "chg": -9.217877094972064,
    "sym": "NASDAQ:CRWV"
   },
   "GRAB": {
-   "p": 2.81,
-   "chg": 2.181818181818184,
+   "p": 2.84,
+   "chg": 1.0676156583629823,
    "sym": "NASDAQ:GRAB"
   },
   "IBIT": {
-   "p": 34.62,
-   "chg": 4.845548152634748,
+   "p": 33.975,
+   "chg": -1.8630849220103873,
    "sym": "NASDAQ:IBIT"
   },
-  "MSTX": {
-   "p": 4.79,
-   "chg": 16.262135922330096,
-   "sym": "NASDAQ:MSTX"
-  },
-  "NVDA": {
-   "p": 165.05,
-   "chg": 31.482514140046213,
-   "sym": "NASDAQ:NVDA"
-  },
   "JOBY": {
-   "p": 3.85,
-   "chg": 6.648199445983385,
+   "p": 3.63,
+   "chg": -5.714285714285719,
    "sym": "NYSE:JOBY"
   },
   "MP": {
-   "p": 35.54,
-   "chg": 4.683357879234157,
+   "p": 36.52,
+   "chg": 2.757456387169398,
    "sym": "NYSE:MP"
   },
+  "MSTX": {
+   "p": 4.2647,
+   "chg": -10.966597077244252,
+   "sym": "NASDAQ:MSTX"
+  },
+  "NVDA": {
+   "p": 154.36,
+   "chg": -6.476825204483489,
+   "sym": "NASDAQ:NVDA"
+  },
   "TSM": {
-   "p": 363.6,
-   "chg": 13.929405129329941,
+   "p": 348.36,
+   "chg": -4.191419141914194,
    "sym": "NYSE:TSM"
   },
   "VST": {
-   "p": 123.87,
-   "chg": 7.479392624728855,
+   "p": 120.94,
+   "chg": -2.3653830628885175,
    "sym": "NYSE:VST"
   }
  }
