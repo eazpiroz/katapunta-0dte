@@ -1,0 +1,95 @@
+{
+  "bot": "SPX Super Agent",
+  "constructor": "GPT",
+  "contrato": "gemelo v2",
+  "commit": "540137e43f61306cb7e48dcac4af3d54ee3123f7",
+  "actualizado": "2026-11-24T16:18:48Z",
+  "estado": "en vivo",
+  "salud": {
+    "ultimo_dato_et": "11:18",
+    "edad_gamma_min": 18,
+    "motivo_espera": null
+  },
+  "carriles": {
+    "control": {
+      "version": "v1 · 15-nov-2026",
+      "marco": "R2 · 24-nov-2026",
+      "dias": {
+        "2026-11-24": {
+          "pnl_medio": 0,
+          "pnl_natural": 0,
+          "comisiones": 0,
+          "pnl_neto": 0,
+          "ops": 1,
+          "operaciones": [],
+          "abiertas": [
+            {
+              "id": "2026-11-24-1",
+              "regla": "A",
+              "n": 4,
+              "patas": [
+                [
+                  "p",
+                  7120.0,
+                  1
+                ],
+                [
+                  "p",
+                  7110.0,
+                  -1
+                ]
+              ],
+              "entra": "11:18",
+              "riesgo": 980.0
+            }
+          ]
+        }
+      }
+    },
+    "gpt": {
+      "version": "GPT G1 · 24-nov-2026",
+      "marco": "R2 · 24-nov-2026",
+      "playbook": {
+        "base": "v1 · 15-nov-2026",
+        "activo": true,
+        "regla_B": "Regla B: omitir la entrada si |natural − medio bruto| supera el 15% del crédito bruto."
+      },
+      "cambios": [
+        {
+          "fecha": "2026-11-24",
+          "version": "GPT G1",
+          "cambios": [
+            "Regla B: omitir la entrada si |natural − medio bruto| supera el 15% del crédito bruto."
+          ],
+          "hipotesis": "Una horquilla alta respecto a la prima erosiona el neto de las ventas de crédito.",
+          "evidencia": "Recalculada el 24-nov con historiales 16–23 nov, R2, 22 operaciones por carril: neto control 4512.70 USD, G1 4557.20 USD. Deslizamiento TOTAL 0.15 por llenado (repetición completa, con decisiones y tamaño recalculados): control 4179.04 USD, G1 4295.60 USD. Peor día base: ambos -1244.49; caída máxima neta realizada: control 1864.99, G1 1839.51. Neto/riesgo base: 0.237949 y 0.240485. Muestra de seis sesiones; sin evidencia prospectiva.",
+          "estado": "aprobado para el 24-nov antes de la apertura",
+          "aprobacion_commit": "d6fe3bbfb687cfc6607f272cefd7baa38914edc8"
+        }
+      ],
+      "dias": {
+        "2026-11-24": {
+          "pnl_medio": 0,
+          "pnl_natural": 0,
+          "comisiones": 0,
+          "pnl_neto": 0,
+          "ops": 0,
+          "operaciones": [],
+          "abiertas": []
+        }
+      }
+    }
+  },
+  "seguimiento": {
+    "inicio_utc": "2026-11-24T16:18:48.690884+00:00",
+    "inicio_et": "2026-11-24T11:18:48.690884-05:00",
+    "g1_activo": true,
+    "aprobacion_g1": "d6fe3bbfb687cfc6607f272cefd7baa38914edc8",
+    "nota": "Arranque tardío: sin operaciones inventadas anteriores al inicio."
+  },
+  "evento": {
+    "carril": "control",
+    "tipo": "apertura",
+    "dato_et": "11:18"
+  }
+}
