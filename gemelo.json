@@ -3,11 +3,11 @@
   "constructor": "GPT",
   "contrato": "gemelo v2",
   "commit": "dd7ec6d863ec1bcd7dd0e45019b8cc575105623a",
-  "actualizado": "2026-11-24T18:45:45Z",
+  "actualizado": "2026-11-24T18:50:46Z",
   "estado": "en vivo",
   "salud": {
-    "ultimo_dato_et": "13:45",
-    "edad_gamma_min": 40,
+    "ultimo_dato_et": "13:50",
+    "edad_gamma_min": 45,
     "motivo_espera": null
   },
   "carriles": {
