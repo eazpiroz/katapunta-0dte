@@ -90,6 +90,8 @@ h1{letter-spacing:-.02em}
 .cmb{border-left:3px solid var(--line);padding:4px 0 4px 12px;font-size:13px} .cmb b{font-weight:600}
 .cmb ul{margin:4px 0 0;padding-left:18px} .cmb p{margin:4px 0;color:var(--muted)}
 .ok{color:var(--good)} .ko{color:var(--bad)}
+tr.sep td{font-size:12px;color:var(--muted);background:var(--sunk);text-align:left;white-space:normal}
+tr.pre td{color:var(--muted)} tr.pre td.pos{color:var(--good)} tr.pre td.neg{color:var(--bad)}
 @media (max-width:640px){.lanes{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 </head>
@@ -118,6 +120,7 @@ h1{letter-spacing:-.02em}
       <tbody id="tDia"></tbody><tfoot id="fDia"></tfoot>
     </table></div>
     <p class="tip">“Controles” = operaciones idénticas (misma hora, estructura y contratos) entre los dos controles.</p>
+    <p class="tip" id="hist"></p>
   </section>
 
   <section class="panel" aria-labelledby="hMet">
@@ -137,7 +140,7 @@ h1{letter-spacing:-.02em}
 </div>
 <script>
 (function(){
-const INICIO="2026-11-24";
+const INICIO="2026-11-24", HIST="2026-11-16";   // HIST: primer día en vivo del bot de Claude
 const $=id=>document.getElementById(id);
 const usd=v=>v==null||isNaN(v)?"—":(v<0?"−":"")+"$"+Math.abs(Math.round(v)).toLocaleString("en-US");
 const cls=v=>v>0?"pos":v<0?"neg":"";
@@ -162,7 +165,7 @@ function diaGPT(x){if(!x) return null;const ops=(x.operaciones||[]).map(o=>({ent
     medio:o.pnl_medio,neto:o.pnl_neto,riesgo:riesgo(o)}));
   return {medio:x.pnl_medio,neto:x.pnl_neto,ops,abiertas:(x.abiertas||[]).length};}
 (async()=>{
-  const [P,G]=await Promise.all([live("papel.json"),live("gemelo.json")]);
+  const [P,G,GR]=await Promise.all([live("papel.json"),live("gemelo.json"),live("gemelo_repeticion.json")]);
   const cg=(G&&G.carriles)||{};
   const L=[
     {id:"cc",nom:"Control · Claude",tag:'<span class="badge">v1</span>',ctl:true,ver:(P&&P.playbook&&P.playbook.version)||"v1",dias:(P&&P.dias)||{},norm:diaClaude},
@@ -195,9 +198,18 @@ function diaGPT(x){if(!x) return null;const ops=(x.operaciones||[]).map(o=>({ent
     return t===0?'<span class="ok">0/0</span>':`<span class="${c===t&&sa.size===sb.size?"ok":"ko"}">${c}/${t}</span>`;};
   const celda=(l,f)=>{const x=l.d[f];if(!x) return '<td class="num">—</td>';const v=x.neto;
     return `<td class="num ${cls(v)}" title="a medio ${usd(x.medio)}">${v==null?usd(x.medio)+"*":usd(v)}${x.abiertas?" ⏳":""}</td>`;};
-  $("tDia").innerHTML=fechas.slice().reverse().map(f=>`<tr><td>${fdia(f)}</td>${celda(L[0],f)}${celda(L[1],f)}<td class="num">${coinc(f)}</td>${celda(L[2],f)}${celda(L[3],f)}</tr>`).join("")
-    ||'<tr><td colspan="6">Sin días todavía.</td></tr>';
-  if(fechas.length) $("fDia").innerHTML=`<tr><td>Total</td><td class="num ${cls(L[0].neto)}">${usd(L[0].neto)}</td><td class="num ${cls(L[1].neto)}">${usd(L[1].neto)}</td><td></td><td class="num ${cls(L[2].neto)}">${usd(L[2].neto)}</td><td class="num ${cls(L[3].neto)}">${usd(L[3].neto)}</td></tr>`;
+  // Historial previo al torneo: el bot de Claude en vivo (bruto a medio) y GPT solo donde ya hay resultado de ambos
+  const GDIAS=(GR&&GR.dias)||{}, PD=(P&&P.dias)||{};
+  const prev=Object.keys(PD).filter(f=>f>=HIST&&f<INICIO).sort();
+  const filaPrev=f=>{const c=PD[f], g=(f===prev[prev.length-1])?GDIAS[f]:null;
+    const cel=v=>v==null?'<td class="num">—</td>':`<td class="num ${cls(v)}">${usd(v)}</td>`;
+    return `<tr class="pre"><td>${fdia(f)}</td>${cel(c.pnl)}${cel(g?g.pnl_medio:null)}<td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>`;};
+  const filasT=fechas.slice().reverse().map(f=>`<tr><td>${fdia(f)}</td>${celda(L[0],f)}${celda(L[1],f)}<td class="num">${coinc(f)}</td>${celda(L[2],f)}${celda(L[3],f)}</tr>`).join("");
+  const sep=prev.length?`<tr class="sep"><td colspan="6">Antes del torneo · bot de Claude en vivo desde el 16-nov (bruto a medio, sin comisiones) · GPT: su repetición del ${fdia(prev[prev.length-1])}</td></tr>`:"";
+  $("tDia").innerHTML=(filasT+sep+prev.slice().reverse().map(filaPrev).join(""))||'<tr><td colspan="6">Sin días todavía.</td></tr>';
+  const hc=prev.reduce((t,f)=>t+(PD[f].pnl||0),0);
+  if(prev.length) $("hist").textContent=`Historial del bot de Claude antes del torneo: ${usd(hc)} bruto en ${prev.length} días (${prev.reduce((t,f)=>t+(PD[f].ops||0),0)} operaciones). No cuenta para el torneo.`;
+  if(fechas.length) $("fDia").innerHTML=`<tr><td>Total del torneo</td><td class="num ${cls(L[0].neto)}">${usd(L[0].neto)}</td><td class="num ${cls(L[1].neto)}">${usd(L[1].neto)}</td><td></td><td class="num ${cls(L[2].neto)}">${usd(L[2].neto)}</td><td class="num ${cls(L[3].neto)}">${usd(L[3].neto)}</td></tr>`;
   $("cmb").innerHTML=[L[2],L[3]].map(l=>`<div class="cmb"><b>${esc(l.nom)}</b> · ${esc(l.ver)}${(l.cambios||[]).length?"":'<p>Sin versión publicada todavía.</p>'}
     ${(l.cambios||[]).slice().reverse().map(c=>`<p><b>${esc(c.version)}</b> · ${esc(c.fecha)}</p><ul>${(c.cambios||[]).map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
       ${c.hipotesis?`<p><b>Hipótesis:</b> ${esc(c.hipotesis)}</p>`:""}${c.evidencia?`<p><b>Evidencia:</b> ${esc(c.evidencia)}</p>`:""}`).join("")}</div>`).join("");
