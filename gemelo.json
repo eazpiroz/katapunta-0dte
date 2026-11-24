@@ -3,11 +3,11 @@
   "constructor": "GPT",
   "contrato": "gemelo v2",
   "commit": "dd7ec6d863ec1bcd7dd0e45019b8cc575105623a",
-  "actualizado": "2026-11-24T17:09:15Z",
+  "actualizado": "2026-11-24T17:11:12Z",
   "estado": "en vivo",
   "salud": {
-    "ultimo_dato_et": "12:09",
-    "edad_gamma_min": 3,
+    "ultimo_dato_et": "12:11",
+    "edad_gamma_min": 5,
     "motivo_espera": null
   },
   "carriles": {
@@ -20,7 +20,7 @@
           "pnl_natural": -651.22,
           "comisiones": 19.52,
           "pnl_neto": -670.74,
-          "ops": 2,
+          "ops": 3,
           "operaciones": [
             {
               "id": "2026-11-24-1",
@@ -84,6 +84,25 @@
               ],
               "entra": "12:09",
               "riesgo": 840.0
+            },
+            {
+              "id": "2026-11-24-3",
+              "regla": "B",
+              "n": 1,
+              "patas": [
+                [
+                  "p",
+                  7150.0,
+                  -1
+                ],
+                [
+                  "p",
+                  7140.0,
+                  1
+                ]
+              ],
+              "entra": "12:11",
+              "riesgo": 845.0
             }
           ]
         }
@@ -194,8 +213,8 @@
     "nota": "Arranque tardío: sin operaciones inventadas anteriores al inicio."
   },
   "evento": {
-    "carril": "gpt",
+    "carril": "control",
     "tipo": "apertura",
-    "dato_et": "12:09"
+    "dato_et": "12:11"
   }
 }
