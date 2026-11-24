@@ -37,7 +37,10 @@ PB = {
     "cierre": 15 * 60,         # liquidación
     "gtol": 3.0,               # banda del zero γ para llamar positiva / negativa
     "riesgo": 1000.0,          # $ máximos en riesgo por operación
-    "capital": 3500.0,         # capital del bot: el riesgo abierto (buying power en uso) nunca pasa de aquí
+    "capital": 10000.0,        # buying power del bot (= tu operativa, 24-nov): el riesgo abierto nunca pasa de aquí
+    "meta_dia": 1500.0,        # al llegar a +$1,500 realizados no abre más ese día (lo abierto sigue)
+    "corte": 14 * 60 + 30,     # CDMX 14:30 = 15:30 ET: ventas/IC con el corto dentro del movimiento esperado se cierran; fuera, vencen
+    "marco": "R2 · 24-nov-2026 ($10K, $1,000 por operación, stop −$1,500, meta +$1,500, corte 15:30 ET)",
     "max_ctr": 5,
     "max_ops": 5,              # entradas por día
     "stop_dia": -1500.0,       # si el día llega aquí, no abre más
@@ -697,6 +700,8 @@ class Bot:
         pb = self.pb
         if self.n_ent >= pb["max_ops"] or self.pnl_dia() <= pb["stop_dia"]:
             return False
+        if pb.get("meta_dia") and self.pnl_dia() >= pb["meta_dia"]:
+            return False
         if m - self.ult_perdida < pb["enfriar"]:
             return False
         if m - self.ult_cierre.get(-dire, -999) < pb["contra"]:
@@ -846,7 +851,7 @@ class Bot:
         clasico = c["g"] == 1 and c["mp"] and not gamma_vieja and abs(c["px"] - c["mp"]) <= pb["pin_dist"]
         if a <= m <= b and (clasico or quieto) \
                 and not any(p["tipo"] == "pin" for p in self.abiertas) and self.n_ent < pb["max_ops"] \
-                and self.pnl_dia() > pb["stop_dia"]:
+                and self.pnl_dia() > pb["stop_dia"] and not (pb.get("meta_dia") and self.pnl_dia() >= pb["meta_dia"]):
             def pick(sd):
                 cs = [x for x in lad.get("v", []) if x[0] == sd and abs(x[1] - 0.20) < 1e-6 and abs(x[3] - x[2]) == 5]
                 return cs[0] if cs else None
@@ -928,6 +933,14 @@ class Bot:
                     self.cerrar(p, ts, v - pb["slip"], "SL: la tendencia de 5 y 15 min se volteó"); continue
             else:
                 cred = -p["entrada"]
+                if pb.get("corte") and m >= pb["corte"] and not p.get("corte_ok"):
+                    p["corte_ok"] = True                 # se evalúa una sola vez, en la primera lectura de las 15:30 ET
+                    rem = r.get("rem") or [c["px"] - 15, c["px"] + 15]
+                    cortos = [(sd, K) for sd, K, q in p["legs"] if q < 0]
+                    peligro = [K for sd, K in cortos if (sd == "p" and K >= rem[0]) or (sd == "c" and K <= rem[1])]
+                    if peligro:
+                        self.cerrar(p, ts, v - pb["slip"], f"Corte 15:30 ET: el corto {peligro[0]:.0f} está dentro del movimiento "
+                                    f"esperado ({rem[0]:.0f}–{rem[1]:.0f})"); continue
                 if p["tipo"] == "venta" and -v <= cred * (1 - pb["ven_tp"]) + EPS:
                     self.cerrar(p, ts, v - pb["slip"], f"TP: recompra al {1 - pb['ven_tp']:.0%} del crédito"); continue
                 if -v >= cred * pb["ven_cat"] - EPS:
