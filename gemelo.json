@@ -3,11 +3,11 @@
   "constructor": "GPT",
   "contrato": "gemelo v2",
   "commit": "dd7ec6d863ec1bcd7dd0e45019b8cc575105623a",
-  "actualizado": "2026-11-24T17:31:14Z",
+  "actualizado": "2026-11-24T17:36:16Z",
   "estado": "en vivo",
   "salud": {
-    "ultimo_dato_et": "12:31",
-    "edad_gamma_min": 25,
+    "ultimo_dato_et": "12:36",
+    "edad_gamma_min": 30,
     "motivo_espera": null
   },
   "carriles": {
@@ -276,10 +276,5 @@
     "g1_activo": true,
     "aprobacion_g1": "d6fe3bbfb687cfc6607f272cefd7baa38914edc8",
     "nota": "Arranque tardío: sin operaciones inventadas anteriores al inicio."
-  },
-  "evento": {
-    "carril": "gpt",
-    "tipo": "cierre",
-    "dato_et": "12:31"
   }
 }
