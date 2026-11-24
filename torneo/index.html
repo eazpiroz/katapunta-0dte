@@ -90,6 +90,8 @@ h1{letter-spacing:-.02em}
 .cmb{border-left:3px solid var(--line);padding:4px 0 4px 12px;font-size:13px} .cmb b{font-weight:600}
 .cmb ul{margin:4px 0 0;padding-left:18px} .cmb p{margin:4px 0;color:var(--muted)}
 .ok{color:var(--good)} .ko{color:var(--bad)}
+.badge.abierta{background:var(--warn-bg,#2E2711);color:var(--warn,#E6B655)}
+#tFeed td:first-child{white-space:nowrap}
 tr.sep td{font-size:12px;color:var(--muted);background:var(--sunk);text-align:left;white-space:normal}
 tr.pre td{color:var(--muted)} tr.pre td.pos{color:var(--good)} tr.pre td.neg{color:var(--bad)}
 @media (max-width:640px){.lanes{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -112,6 +114,15 @@ tr.pre td{color:var(--muted)} tr.pre td.pos{color:var(--good)} tr.pre td.neg{col
   </section>
 
   <section class="lanes" id="lanes" aria-label="Carriles"></section>
+
+  <section class="panel" aria-labelledby="hFeed">
+    <h2 id="hFeed">Operaciones de hoy <small id="feedDia"></small></h2>
+    <div class="scroll"><table>
+      <thead><tr><th>Hora</th><th>Carril</th><th>Regla</th><th>Estructura</th><th>Riesgo</th><th>P&amp;L neto</th><th>Motivo</th></tr></thead>
+      <tbody id="tFeed"></tbody>
+    </table></div>
+    <p class="tip">Cada apertura y cierre de los cuatro carriles, según se va publicando. “Abierta” = sigue corriendo; su P&amp;L se conoce al cerrar.</p>
+  </section>
 
   <section class="panel" aria-labelledby="hDia">
     <h2 id="hDia">Por día <small>neto · natural + comisiones</small></h2>
@@ -164,6 +175,20 @@ function diaClaude(x){if(!x) return null;const ops=(x.operaciones||[]).map(o=>({
 function diaGPT(x){if(!x) return null;const ops=(x.operaciones||[]).map(o=>({entra:o.entra,estructura:o.estructura,n:o.n,
     medio:o.pnl_medio,neto:o.pnl_neto,riesgo:riesgo(o)}));
   return {medio:x.pnl_medio,neto:x.pnl_neto,ops,abiertas:(x.abiertas||[]).length};}
+// Feed de operaciones: une cerradas y abiertas de los 4 carriles para un solo día
+function regla3(s){if(!s) return "—";const m=/^([ABC])\b/.exec(s);return m?m[1]:String(s).slice(0,14);}
+function contratos(s){const m=/×\s*(\d+)/.exec(s||"");return m?+m[1]:1;}
+function estructuraPatas(o){const legs=o.patas||[];if(!legs.length) return "—";
+  const strikes=legs.map(l=>{const k=+l[1];return Number.isInteger(k)?String(k):String(k);}).join("/");
+  const tipo=o.regla==="C"?"Iron condor":((legs[0][0]==="c"?"Call":"Put")+(o.regla==="A"?" spread comprado":" spread vendido"));
+  return `${tipo} ${strikes} ×${o.n||1}`;}
+function filasFeed(lane,badge,x){if(!x) return [];const out=[];
+  (x.operaciones||[]).forEach(o=>out.push({lane,badge,entra:o.entra,sale:o.sale||"",estructura:o.estructura||"—",
+    regla:regla3(o.regla),pnl:(o.pnl_neto_nat!=null?o.pnl_neto_nat:o.pnl_neto),motivo:o.motivo||o.motivo_salida||"",open:false}));
+  (x.abiertas||[]).forEach(o=>{const estructura=o.estructura||estructuraPatas(o);
+    const r=o.riesgo!=null?o.riesgo:riesgo({estructura,entrada:o.entrada,n:o.n||contratos(estructura)});
+    out.push({lane,badge,entra:o.entra,sale:"",estructura,regla:regla3(o.regla),riesgo:r,motivo:"",open:true});});
+  return out;}
 (async()=>{
   const [P,G,GR]=await Promise.all([live("papel.json"),live("gemelo.json"),live("gemelo_repeticion.json")]);
   const cg=(G&&G.carriles)||{};
@@ -213,6 +238,19 @@ function diaGPT(x){if(!x) return null;const ops=(x.operaciones||[]).map(o=>({ent
   $("cmb").innerHTML=[L[2],L[3]].map(l=>`<div class="cmb"><b>${esc(l.nom)}</b> · ${esc(l.ver)}${(l.cambios||[]).length?"":'<p>Sin versión publicada todavía.</p>'}
     ${(l.cambios||[]).slice().reverse().map(c=>`<p><b>${esc(c.version)}</b> · ${esc(c.fecha)}</p><ul>${(c.cambios||[]).map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
       ${c.hipotesis?`<p><b>Hipótesis:</b> ${esc(c.hipotesis)}</p>`:""}${c.evidencia?`<p><b>Evidencia:</b> ${esc(c.evidencia)}</p>`:""}`).join("")}</div>`).join("");
+  // Feed de operaciones de hoy (las 4 filas de L ya traen su dato crudo por día)
+  const hoy=fechas.length?fechas[fechas.length-1]:null;
+  $("feedDia").textContent=hoy?"· "+fdia(hoy):"";
+  const feed=hoy?[
+    ...filasFeed(L[0].nom,L[0].tag,L[0].dias[hoy]),
+    ...filasFeed(L[1].nom,L[1].tag,(cg.control&&cg.control.dias)?cg.control.dias[hoy]:null),
+    ...filasFeed(L[2].nom,L[2].tag,L[2].dias[hoy]),
+    ...filasFeed(L[3].nom,L[3].tag,(cg.gpt&&cg.gpt.dias)?cg.gpt.dias[hoy]:null),
+  ].sort((a,b)=>(a.entra||"").localeCompare(b.entra||"")).reverse():[];
+  $("tFeed").innerHTML=feed.length?feed.map(r=>`<tr><td>${esc(r.entra)}${r.sale?"→"+esc(r.sale):""}${r.open?' <span class="badge abierta">abierta</span>':""}</td>
+    <td>${esc(r.lane)} ${r.badge}</td><td>${esc(r.regla)}</td><td>${esc(r.estructura)}</td>
+    <td class="num">${r.open?usd(r.riesgo):"—"}</td><td class="num ${r.open?"":cls(r.pnl)}">${r.open?"—":usd(r.pnl)}</td>
+    <td>${esc(r.motivo)}</td></tr>`).join(""):'<tr><td colspan="7">Sin operaciones todavía hoy.</td></tr>';
 })();
 })();
 </script>
