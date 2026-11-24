@@ -219,7 +219,7 @@
           "pnl_natural": -742.05,
           "comisiones": 29.28,
           "pnl_neto": -771.33,
-          "ops": 4,
+          "ops": 5,
           "operaciones": [
             {
               "id": "2026-11-24-1",
@@ -367,6 +367,25 @@
               ],
               "entra": "13:08",
               "riesgo": 835.0
+            },
+            {
+              "id": "2026-11-24-5",
+              "regla": "B",
+              "n": 1,
+              "patas": [
+                [
+                  "p",
+                  7170.0,
+                  -1
+                ],
+                [
+                  "p",
+                  7160.0,
+                  1
+                ]
+              ],
+              "entra": "13:25",
+              "riesgo": 855.0
             }
           ]
         }
@@ -381,7 +400,7 @@
     "nota": "Arranque tardío: sin operaciones inventadas anteriores al inicio."
   },
   "evento": {
-    "carril": "control",
+    "carril": "gpt",
     "tipo": "apertura",
     "dato_et": "13:25"
   }
