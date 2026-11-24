@@ -70,6 +70,8 @@ PB_CLAUDE = {**PB,
     "ven_min": 0.155,          # B: medio ≥ 1.55, para que el crédito cobrado (−0.05) sea ≥ 1.50
 }
 
+URL_BOT = "https://0dte.katapunta.com/bot-mesa/"     # página del bot con el comparativo real (no se anuncia; enlazada desde /privado)
+URL_TORNEO = "https://0dte.katapunta.com/torneo/"  # página pública
 EPS = 1e-9   # tolerancia de los umbrales: el −50% exacto sí dispara (corrección del 19-nov, aplica a todos los carriles)
 
 
@@ -247,7 +249,8 @@ def mandar(titulo, texto, tags, prioridad=4, grupo=True):
     for tema in [t for t in temas if t]:
         try:
             body = json.dumps({"topic": tema, "title": titulo, "message": texto, "tags": tags,
-                               "priority": prioridad, "click": "https://0dte.katapunta.com/papel/"}).encode()
+                               "priority": prioridad,
+                               "click": URL_BOT if tema == cfg.get("ntfy") else URL_TORNEO}).encode()   # el grupo va al torneo
             urllib.request.urlopen(urllib.request.Request(cfg.get("servidor", "https://ntfy.sh"), data=body,
                                    headers={"Content-Type": "application/json"}), timeout=10)
         except Exception as e:
