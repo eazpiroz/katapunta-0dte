@@ -1,5 +1,5 @@
 {
- "actualizado": "2026-11-24T21:08:45Z",
+ "actualizado": "2026-11-25T15:08:57Z",
  "fuente": "TradingView",
  "rows": [
   {
@@ -22,11 +22,14 @@
    "contratos": 1,
    "creado": "2026-11-14T22:20:00Z",
    "estructura": "Call cubierto",
-   "etapa": "abierta",
+   "etapa": "cerrada",
+   "fechaCierre": "2026-11-20",
    "instrumento": "opcion",
    "mejor": 453.46,
    "motor": "wheel",
-   "primaActual": 21.86,
+   "notaCierre": "Recomprado 20-nov 11:04 ET (10:04 ET) en 3.00 (vendido en 21.86). Las 100 acciones quedan sin call cubierto.",
+   "pnlRealizado": 1886,
+   "primaActual": 3,
    "primaEntrada": 21.86,
    "primaFecha": "2026-11-13",
    "simbolo": "NASDAQ:AMD",
@@ -71,11 +74,14 @@
    "contratos": 2,
    "creado": "2026-11-09T03:45:00Z",
    "estructura": "Compra de call",
-   "etapa": "abierta",
+   "etapa": "cerrada",
+   "fechaCierre": "2026-11-20",
    "instrumento": "opcion",
    "mejor": 56.6,
    "motor": "leaps",
+   "notaCierre": "Expiró sin valor el 20-nov, como se había planeado (9-nov).",
    "plan": "Expira sin valor el 20-nov",
+   "pnlRealizado": -4501.32,
    "primaActual": 0.004,
    "primaEntrada": 22.5066,
    "primaFecha": "2026-11-10",
@@ -95,12 +101,13 @@
    "id": "crwv-calls"
   },
   {
-   "cantidad": 300,
+   "cantidad": 200,
    "creado": "2026-11-09T03:45:00Z",
    "etapa": "abierta",
    "instrumento": "accion",
    "mejor": 379.53,
    "motor": "wheel",
+   "notaCierre": "Vendidas 100 acciones el 23-nov 08:54 ET (9:54 ET) a 336.0601 (costo 400.1255): pérdida realizada de esa porción ≈ −$6,407. Quedan 200 acciones sin call cubierto (el 375 C se recompró el 20-nov).",
    "precioEntrada": 400.1255,
    "simbolo": "AMEX:GLD",
    "sinSL": true,
@@ -114,11 +121,14 @@
    "contratos": 3,
    "creado": "2026-11-18T01:35:00Z",
    "estructura": "Call cubierto",
-   "etapa": "abierta",
+   "etapa": "cerrada",
+   "fechaCierre": "2026-11-20",
    "instrumento": "opcion",
    "mejor": 333.02,
    "motor": "wheel",
-   "primaActual": 3.5,
+   "notaCierre": "Recomprados los 3 contratos 20-nov 11:08 ET (10:08 ET) en .58 (vendidos en 3.50).",
+   "pnlRealizado": 876,
+   "primaActual": 0.58,
    "primaEntrada": 3.5,
    "primaFecha": "2026-11-17",
    "simbolo": "AMEX:GLD",
@@ -293,11 +303,14 @@
    "contratos": 5,
    "creado": "2026-11-14T22:20:00Z",
    "estructura": "Call spread comprado",
-   "etapa": "abierta",
+   "etapa": "cerrada",
+   "fechaCierre": "2026-11-20",
    "instrumento": "opcion",
    "mejor": 165.05,
    "motor": "swing",
+   "notaCierre": "Expiró sin valor el 20-nov; NVDA cerró por debajo de 160.",
    "plan": "TP/SL por definir",
+   "pnlRealizado": -1025,
    "primaActual": null,
    "primaEntrada": 2.05,
    "primaFecha": "2026-11-13",
@@ -309,6 +322,25 @@
    "tp": null,
    "vencimiento": "2026-11-20",
    "id": "nvda-call-spread-160"
+  },
+  {
+   "contratos": 1,
+   "creado": "2026-11-23T20:46:25Z",
+   "estructura": "Iron condor",
+   "etapa": "abierta",
+   "instrumento": "opcion",
+   "motor": "swing",
+   "primaEntrada": 23.1,
+   "primaFecha": "2026-11-23",
+   "simbolo": "CBOE:SPX",
+   "sl": null,
+   "strikes": "7300P/7325P/7325C/7350C",
+   "tesis": "Abierto 23-nov 14:46 ET: iron condor a crédito 23.10, vence 25-nov. Swing de pocos días, no 0DTE.",
+   "ticker": "SPX",
+   "tp": null,
+   "tpPct": null,
+   "vencimiento": "2026-11-25",
+   "id": "spx-ic-25nov"
   },
   {
    "contratos": 1,
@@ -344,11 +376,14 @@
    "contratos": 2,
    "creado": "2026-11-09T03:45:00Z",
    "estructura": "Call spread comprado",
-   "etapa": "abierta",
+   "etapa": "cerrada",
+   "fechaCierre": "2026-11-20",
    "instrumento": "opcion",
    "mejor": 134.51,
    "motor": "swing",
+   "notaCierre": "Expiró sin valor el 20-nov (venc. original); VST cerró por debajo de 140. Pérdida total del débito (2.7665 ×2).",
    "plan": "Reestructurar tras la reacción del 10-nov",
+   "pnlRealizado": -553.3,
    "primaActual": 0.67,
    "primaEntrada": 2.7665,
    "primaFecha": "2026-11-10",
@@ -382,59 +417,49 @@
  ],
  "quotes": {
   "GLD": {
-   "p": 325.45,
-   "chg": -2.273136748543629,
+   "p": 318.045,
+   "chg": -2.2753111076970267,
    "sym": "AMEX:GLD"
   },
   "AMD": {
-   "p": 413.27,
-   "chg": -8.862964759846513,
+   "p": 381.11,
+   "chg": -7.781837539622999,
    "sym": "NASDAQ:AMD"
   },
-  "CRWV": {
-   "p": 42.605,
-   "chg": -11.845644527208776,
-   "sym": "NASDAQ:CRWV"
-  },
   "GRAB": {
-   "p": 2.77,
-   "chg": -1.4234875444839872,
+   "p": 2.762,
+   "chg": -0.288808664259928,
    "sym": "NASDAQ:GRAB"
   },
   "IBIT": {
-   "p": 33.76,
-   "chg": -2.4841132293471966,
+   "p": 32.76,
+   "chg": -2.962085308056872,
    "sym": "NASDAQ:IBIT"
   },
   "MSTX": {
-   "p": 4.02,
-   "chg": -16.075156576200428,
+   "p": 3.49,
+   "chg": -13.184079601990033,
    "sym": "NASDAQ:MSTX"
   },
-  "NVDA": {
-   "p": 155.38,
-   "chg": -5.858830657376561,
-   "sym": "NASDAQ:NVDA"
-  },
   "JOBY": {
-   "p": 3.51,
-   "chg": -8.831168831168839,
+   "p": 3.475,
+   "chg": -0.9971509971509886,
    "sym": "NYSE:JOBY"
   },
   "MP": {
-   "p": 35.91,
-   "chg": 1.0410804727068022,
+   "p": 34.08,
+   "chg": -5.096073517126144,
    "sym": "NYSE:MP"
   },
   "TSM": {
-   "p": 349.2,
-   "chg": -3.9603960396039692,
+   "p": 327.87,
+   "chg": -6.108247422680408,
    "sym": "NYSE:TSM"
   },
-  "VST": {
-   "p": 120.72,
-   "chg": -2.5429886170985756,
-   "sym": "NYSE:VST"
+  "SPX": {
+   "p": 7047.61,
+   "chg": -2.1313440048659364,
+   "sym": "SP:SPX"
   }
  }
 }
