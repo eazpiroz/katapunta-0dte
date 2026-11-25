@@ -7,3 +7,7 @@
 ## 2026-11-24
 - 12–13 h: precio del momento (5.5 pts; strike más cercano 5.8) · 13–14 h: imán / major + propio (8.6) · 14–14:30: imán (1.7) · 14:30–15: imán (2.4).
 - Acumulado 12–15 h (14 días): sigue mejor el precio del momento (20.9); el imán ganó 3 franjas hoy pero acumula el peor error (67.4), así que hoy no cambia nada. Sin serie de perfil γ (gexbot) hoy: no había sesión de Chrome disponible en la corrida.
+
+## 2026-11-25
+- 12–13 h: centro γ vol (24.7 pts; precio del momento 30.4) · 13–14 h: precio del momento (7.2; centro γ vol 7.5) · 14–14:30: centro γ vol (2.6) · 14:30–15: centro γ vol (9.6).
+- Acumulado 12–15 h (15 días): precio del momento sigue primero (20.5), centro γ vol 21.2 casi empatado; el imán sigue último (63.4). Día de tendencia alcista (+136 pts), así que los errores de la franja 12–13 h son enormes para todos; el PIN del tablero erró 224–233 pts. Sin serie de perfil γ (gexbot) hoy: no había sesión de Chrome en la corrida.
