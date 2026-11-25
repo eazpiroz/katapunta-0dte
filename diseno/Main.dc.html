@@ -234,6 +234,12 @@ a{color:#5CC1BF}a:hover{color:#8ADBD7}
 <div style="position: relative; overflow: hidden; border-left: 1px solid #1E3739; border-bottom: 1px solid #1E3739">
 <sc-for list="{{chart.ticks}}" as="tk" hint-placeholder-count="4"><div style="{{tk.grid}}"></div></sc-for>
 <div style="{{chart.emStyle}}"></div>
+<div style="{{chart.em2Style}}"></div>
+<div style="{{chart.pzStyle}}"></div>
+<span style="{{chart.pzLabelStyle}}">{{chart.pzLabel}}</span>
+<div style="{{chart.openHiStyle}}"></div>
+<div style="{{chart.openLoStyle}}"></div>
+<span style="{{chart.openLabelStyle}}">{{chart.openLabel}}</span>
 <div style="{{chart.pinBand}}"></div>
 <div style="{{chart.zoneStyle}}"></div>
 <span style="{{chart.zoneLabelStyle}}">{{chart.zoneLabel}}</span>
@@ -243,12 +249,13 @@ a{color:#5CC1BF}a:hover{color:#8ADBD7}
 <path d="{{chart.cwDyn}}" fill="none" stroke="#5FD4A0" stroke-width="1.5" vector-effect="non-scaling-stroke" opacity="0.9"></path>
 <path d="{{chart.pwDyn}}" fill="none" stroke="#F07F74" stroke-width="1.5" vector-effect="non-scaling-stroke" opacity="0.9"></path>
 <path d="{{chart.zgDyn}}" fill="none" stroke="#F2EFE8" stroke-width="1.5" stroke-dasharray="2 3" vector-effect="non-scaling-stroke"></path>
+<path d="{{chart.cenDyn}}" fill="none" stroke="#D98BD0" stroke-width="1.3" stroke-dasharray="1 2" vector-effect="non-scaling-stroke" opacity="0.85"></path>
 <path d="{{chart.wickUp}}" fill="none" stroke="#5FD4A0" stroke-width="1" vector-effect="non-scaling-stroke"></path>
 <path d="{{chart.wickDn}}" fill="none" stroke="#F07F74" stroke-width="1" vector-effect="non-scaling-stroke"></path>
 <path d="{{chart.bodyUp}}" fill="#5FD4A0"></path>
 <path d="{{chart.bodyDn}}" fill="#F07F74"></path>
 <path d="{{chart.sma200}}" fill="none" stroke="#A78BFA" stroke-width="1.5" vector-effect="non-scaling-stroke"></path>
-<path d="{{chart.ema21}}" fill="none" stroke="#E6B655" stroke-width="1.5" vector-effect="non-scaling-stroke"></path>
+<path d="{{chart.ema21}}" fill="none" stroke="#E6B655" stroke-width="1.5" opacity="0.55" vector-effect="non-scaling-stroke"></path>
 <path d="{{chart.ema9}}" fill="none" stroke="#F07F74" stroke-width="1.5" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"></path>
 <path d="{{chart.vwap}}" fill="none" stroke="#8ADBD7" stroke-width="1.5" stroke-dasharray="7 4" vector-effect="non-scaling-stroke"></path>
 </svg>
@@ -875,8 +882,14 @@ class Component extends DCLogic {
       // PIN por lectura: punto lleno (certeza media o más) o hueco (baja)
       const pinDots = (cfg.pinPts || []).filter(q => q.v >= lo && q.v <= hi).map(q => ({ style: 'position: absolute; width: 9px; height: 9px; border-radius: 50%; box-sizing: border-box; left: calc(' + xp(q.i).toFixed(2) + '% - 4.5px); top: calc(' + P(q.v).toFixed(2) + '% - 4.5px); ' + (q.f ? 'background: #FFFFFF; border: 1px solid #0B1617' : 'background: transparent; border: 2px solid #F2EFE8'), title: q.title }));
       // pastillas del eje derecho (como TradingView)
+      // 24-nov (#21, aprobada 20-nov): etiquetas agrupadas a < 5 pts (SPX; proporcional en los otros símbolos)
+      const PT = { SPX: 5, SPY: 0.5, QQQ: 0.5, NDX: 25 };
+      const ptol = PT[sym] || 5;
+      const rawPills = (cfg.pills || []).filter(q => q.v >= lo && q.v <= hi).slice().sort((a, b) => a.v - b.v);
+      const groupedPills = [];
+      rawPills.forEach(q => { const last = groupedPills[groupedPills.length - 1]; if (last && Math.abs(q.v - last.v) < ptol) last.t = last.t + ' · ' + q.t; else groupedPills.push(Object.assign({}, q)); });
       let pl = -99;
-      const pills = (cfg.pills || []).filter(q => q.v >= lo && q.v <= hi).map(q => Object.assign({}, q, { p: P(q.v) })).sort((a, b) => a.p - b.p).map(q => { const pp = Math.max(q.p, pl + 4.6); pl = pp; return { t: q.t, style: 'position: absolute; left: 4px; top: calc(' + Math.min(pp, 97).toFixed(2) + '% - 9px); font-size: 12px; font-weight: 700; padding: 1px 6px; border-radius: 3px; white-space: nowrap; background: ' + q.bg + '; color: ' + q.fg + (q.bd ? '; border: 1px solid ' + q.bd : '') }; });
+      const pills = groupedPills.map(q => Object.assign({}, q, { p: P(q.v) })).sort((a, b) => a.p - b.p).map(q => { const pp = Math.max(q.p, pl + 4.6); pl = pp; return { t: q.t, style: 'position: absolute; left: 4px; top: calc(' + Math.min(pp, 97).toFixed(2) + '% - 9px); font-size: 12px; font-weight: 700; padding: 1px 6px; border-radius: 3px; white-space: nowrap; background: ' + q.bg + '; color: ' + q.fg + (q.bd ? '; border: 1px solid ' + q.bd : '') + (q.op != null ? '; opacity: ' + q.op : '') }; });
       const gx = GX[sym] || {};
       const s200 = sma(200);
       const sLast = s200[s200.length - 1];
@@ -888,6 +901,16 @@ class Component extends DCLogic {
       const MT = { SPX: 10, SPY: 1, QQQ: 1, NDX: 50 };
       const fv = x => x.toLocaleString('en-US', { maximumFractionDigits: x > 1000 ? 0 : 2 });
       const tAt = i => fmtET((cfg.start || 450) + 5 * (i + 1));
+      // 24-nov (#19, aprobada 20-nov): zona sombreada entre el precio y el zero gamma, con la distancia
+      const pz = (cfg.px != null && cfg.zg != null) ? (() => {
+        const y1 = P(cfg.px), y2 = P(cfg.zg), top = Math.min(y1, y2), bot = Math.max(y1, y2);
+        const col = cfg.gneg ? '244, 127, 116' : cfg.gpos ? '95, 212, 160' : '211, 220, 218';
+        return { top, bot, col };
+      })() : null;
+      // 24-nov (#20, aprobada 20-nov): banda del expected move 2× (1× ya existía) y rango de apertura (primeros 30 min)
+      const em2Top = cfg.em2 ? P(cfg.em2[1]) : null, em2Bot = cfg.em2 ? P(cfg.em2[0]) : null;
+      let openHi = null, openLo = null;
+      if (cfg.live && n >= 6) { openHi = Math.max(...h.slice(0, 6)); openLo = Math.min(...l.slice(0, 6)); }
       const events = [];
       if (cfg.live && cfg.events) cfg.events.forEach(e => events.push(e));
       if (!cfg.live && gx.c && gx.p && gx.z) {
@@ -939,7 +962,15 @@ class Component extends DCLogic {
       if (!cfg.live) xt.push({ label: fmtET(510) + ' lun', style: 'position: absolute; top: 2px; left: 80%; transform: translateX(-50%); white-space: nowrap; color: #D3DCDA' });
       return {
         wickUp: wu || 'M0 0', wickDn: wd || 'M0 0', bodyUp: bu || 'M0 0', bodyDn: bd || 'M0 0',
-        ema9: curve(ema(9)), vwap: cfg.live ? curve(vwA) : 'M0 0', semN: semP.n || 'M0 0', ema21: curve(sma(20)), sma200: cfg.cabina ? 'M0 0' : curve(s200), chFill: chF || 'M0 0', pinDots: pinDots, pills: pills, cabina: !!cfg.cabina, noCabina: !cfg.cabina, zgDyn: stepN(dyn.z), cwDyn: stepN(dyn.c), pwDyn: stepN(dyn.p), shPos: shP || 'M0 0', shNeg: shN || 'M0 0', semG: semP.g || 'M0 0', semA: semP.a || 'M0 0', semR: semP.r || 'M0 0', hasSem: !!(cfg.sem && cfg.sem.some(Boolean)),
+        ema9: curve(ema(9)), vwap: cfg.live ? curve(vwA) : 'M0 0', semN: semP.n || 'M0 0', ema21: curve(sma(20)), sma200: cfg.cabina ? 'M0 0' : curve(s200), chFill: chF || 'M0 0', pinDots: pinDots, pills: pills, cabina: !!cfg.cabina, noCabina: !cfg.cabina, zgDyn: stepN(dyn.z), cwDyn: stepN(dyn.c), pwDyn: stepN(dyn.p), cenDyn: stepN(dyn.cen), shPos: shP || 'M0 0', shNeg: shN || 'M0 0', semG: semP.g || 'M0 0', semA: semP.a || 'M0 0', semR: semP.r || 'M0 0', hasSem: !!(cfg.sem && cfg.sem.some(Boolean)),
+        pzStyle: pz ? ('position: absolute; left: 0; right: 0; top: ' + pz.top.toFixed(2) + '%; height: ' + (pz.bot - pz.top).toFixed(2) + '%; background: rgba(' + pz.col + ', 0.07); pointer-events: none') : 'display: none',
+        pzLabelStyle: pz ? ('position: absolute; left: 8px; top: calc(' + ((pz.top + pz.bot) / 2).toFixed(2) + '% - 7px); font-size: 10px; color: #93A9A9; white-space: nowrap; pointer-events: none') : 'display: none',
+        pzLabel: (pz && cfg.px != null && cfg.zg != null) ? ('Precio↔Zero γ · ' + fv(Math.abs(cfg.px - cfg.zg)) + ' pts') : '',
+        em2Style: cfg.em2 ? ('position: absolute; left: 0; right: 0; top: ' + em2Top.toFixed(2) + '%; height: ' + (em2Bot - em2Top).toFixed(2) + '%; background: rgba(230, 182, 85, 0.025); border-top: 1px dotted rgba(230, 182, 85, 0.3); border-bottom: 1px dotted rgba(230, 182, 85, 0.3)') : 'display: none',
+        openHiStyle: openHi != null ? ('position: absolute; left: 0; right: 0; top: ' + P(openHi).toFixed(2) + '%; border-top: 1px dashed rgba(138, 219, 215, 0.55)') : 'display: none',
+        openLoStyle: openLo != null ? ('position: absolute; left: 0; right: 0; top: ' + P(openLo).toFixed(2) + '%; border-top: 1px dashed rgba(138, 219, 215, 0.55)') : 'display: none',
+        openLabelStyle: openHi != null ? ('position: absolute; left: 8px; top: calc(' + P(openHi).toFixed(2) + '% + 2px); font-size: 10px; color: #8ADBD7; white-space: nowrap') : 'display: none',
+        openLabel: openHi != null ? ('Apertura (30 min) ' + fv(openLo) + ' – ' + fv(openHi)) : '',
         events: evMarks, evList: evList, evSummary: evSummary,
         emStyle: cfg.cabina ? 'display: none' : 'position: absolute; left: 0; right: 0; top: ' + emTop.toFixed(2) + '%; height: ' + (emBot - emTop).toFixed(2) + '%; background: rgba(242, 181, 68, 0.06); border-top: 1px dashed rgba(242, 181, 68, 0.45); border-bottom: 1px dashed rgba(242, 181, 68, 0.45)',
         pinBand: cfg.pinz ? 'position: absolute; left: 0; right: 0; top: ' + P(cfg.pinz[1]).toFixed(2) + '%; height: ' + (P(cfg.pinz[0]) - P(cfg.pinz[1])).toFixed(2) + '%; background: rgba(232, 210, 122, 0.10); border-top: 1px dashed rgba(232, 210, 122, 0.55); border-bottom: 1px dashed rgba(232, 210, 122, 0.55)' : 'display: none',
@@ -1118,14 +1149,15 @@ class Component extends DCLogic {
       const certCol = PN ? (PN.cert === 'ALTA' ? '#5BD69A' : PN.cert === 'MEDIA' ? '#E6B655' : '#93A9A9') : '#93A9A9';
       // series del perfil γ por vela de 5 min: historia de Gexbot (day.gx) o, si no hay, lecturas manuales
       const nC = L.c.length, gxs = (DAY.gx && DAY.gx[tk]) || null;
-      const gzS = [], gcS = [], gpS = [], gnS = [];
+      const gzS = [], gcS = [], gpS = [], gnS = [], gcenS = [];
       if (nC) {
-        const src = gxs ? gxs.map(r => ({ i: r[0], z: r[1], c: r[2], p: r[3], n: r[4] }))
-          : L.reads.filter(r => r.gt).map(r => ({ i: Math.max(0, Math.round((toMin(r.t) - 510) / 5) - 1), z: r.zg, c: r.cwv || r.mp, p: r.pwv || r.mn, n: r.nv }));
-        if (gxs && lr.gt && !gOld) src.push({ i: nC - 1, z: lr.zg, c: lr.cwv || lr.mp, p: lr.pwv || lr.mn, n: lr.nv });
+        const src = gxs ? gxs.map(r => ({ i: r[0], z: r[1], c: r[2], p: r[3], n: r[4], cen: null }))
+          : L.reads.filter(r => r.gt).map(r => ({ i: Math.max(0, Math.round((toMin(r.t) - 510) / 5) - 1), z: r.zg, c: r.cwv || r.mp, p: r.pwv || r.mn, n: r.nv, cen: (r.pinx && r.pinx.cen != null) ? r.pinx.cen : null }));
+        if (gxs && lr.gt && !gOld) src.push({ i: nC - 1, z: lr.zg, c: lr.cwv || lr.mp, p: lr.pwv || lr.mn, n: lr.nv, cen: (lr.pinx && lr.pinx.cen != null) ? lr.pinx.cen : null });
         src.sort((a, b) => a.i - b.i);
         let k = -1, cur = null;
-        for (let i = 0; i < nC; i++) { while (k + 1 < src.length && src[k + 1].i <= i) { k++; cur = src[k]; } const ok = cur && (gxs || i - cur.i <= 4); gzS.push(ok ? cur.z : null); gcS.push(ok ? cur.c : null); gpS.push(ok ? cur.p : null); gnS.push(ok && cur.n != null ? cur.n : null); }   // 21-nov (#13): sin lectura >20 min no se arrastra el nivel
+        for (let i = 0; i < nC; i++) { while (k + 1 < src.length && src[k + 1].i <= i) { k++; cur = src[k]; } const ok = cur && (gxs || i - cur.i <= 4); gzS.push(ok ? cur.z : null); gcS.push(ok ? cur.c : null); gpS.push(ok ? cur.p : null); gnS.push(ok && cur.n != null ? cur.n : null);
+          gcenS.push((ok && cur.cen != null && i >= 72) ? cur.cen : null); }   // 21-nov (#13): sin lectura >20 min no se arrastra el nivel · 24-nov (#18, aprobada 20-nov): centro γ vol solo desde 14:30 ET (candela 72 de 5 min)
       }
       // FILTRO DE ENTRADA (aprobado 4-nov): intensidad = GEX neto por volumen del perfil γ; límite = precio a < 5 pts del zero gamma;
       // tendencia = 3+ velas de 5 min seguidas fuera del canal de majors por volumen con GEX neto negativo
@@ -1172,12 +1204,15 @@ class Component extends DCLogic {
         lect: [
           noG ? { label: 'RÉGIMEN GAMMA', ic: '◐', pill: 'SIN LECTURA', pillCol: '#E6B655', value: 'Sin lectura', color: '#93A9A9', note: '⚠ Falta la lectura del perfil γ (más de 30 min). Sin ella no hay régimen.' }
               : { label: 'RÉGIMEN GAMMA', ic: '◐', pill: gOld ? 'VENCIDO' : tendencia ? 'TENDENCIA' : enLim ? 'LÍMITE' : gpos ? (intens === 'fuerte +' ? 'RANGO FUERTE' : 'RANGO') : gneg ? (intens === 'fuerte −' ? 'TENDENCIA FUERTE' : 'AMPLIFICA') : 'LÍMITE', pillCol: gpos ? '#5FD4A0' : gneg ? '#F07F74' : '#93A9A9', value: gpos ? 'Gamma +' : gneg ? 'Gamma −' : 'En el límite', color: gpos ? '#5FD4A0' : gneg ? '#F07F74' : '#D3DCDA', note: '• Zero Gamma ' + fv2(lr.zg) + '\n• Distancia al precio ' + (dz >= 0 ? '+' : '−') + (Math.round(Math.abs(dz) * 10) / 10).toFixed(1) + (intens ? '\n• Intensidad ' + nvTxt + ' (' + intens + ') · rango 15m típico ~' + (intens === 'fuerte +' ? 15 : intens === 'fuerte −' ? 22 : 15) + ' pts (auditoría acumulada al 24-nov, 14 días: γ+ 15.4 · límite 14.8 · γ− 22.4)' : '') + '\n• Canal (majors por volumen, se mueven con el precio) ' + fv2(lr.pwv || lr.mnv || lr.mn) + ' – ' + fv2(lr.cwv || lr.mpv || lr.mp) + '\n• ' + (gpos ? 'Amortigua → rango' : gneg ? 'Amplifica → tendencia' : 'Cualquier movimiento cambia el régimen') + (gneg ? '\n• Nivel de NO tocar (banda 2× sobre la apertura): ' + fv2(Math.round(band2.lo)) + ' – ' + fv2(Math.round(band2.hi)) : '') + '\n• ' + (lr.gt ? 'Lectura ' + fmtET(toMin(lr.gt)) + ' ET' + (gOld ? ' ⚠ vencida (hace ' + ageG + ' min)' : gAmb ? ' (hace ' + ageG + ' min)' : '') : 'Estimado') },
-          { label: 'MOMENTUM', ic: '➚', pill: momA ? (momAcc ? 'ACELERANDO' : 'ALINEADO') : mom.filter(v => v).length + '/3', pillCol: momA > 0 ? G : momA < 0 ? R : '#93A9A9', value: momA > 0 ? 'Alcista 3/3' : momA < 0 ? 'Bajista 3/3' : 'Sin alinear', color: momA > 0 ? G : momA < 0 ? R : '#D3DCDA', dots: ['5m', '15m', '1H'].map((t, i) => ({ tf: t, col: mom[i] > 0 ? G : mom[i] < 0 ? R : N })), note: (momA ? (momAcc ? 'Acelerando (MACD 5m creciendo). ' : 'Sin aceleración en 5m. ') : '') + 'Fuerte = EMA 9 sobre/bajo EMA 21 con ambas inclinadas, precio vs SMA 20 (media de Bollinger), RSI 14 vs 50, histograma MACD y precio vs VWAP, en 5m, 15m y 1H a la vez. Sirve para compras direccionales.' + (gpos && !momA ? ' Gamma positiva por volumen: día de rango.' : '') + (lr.fz ? ' ' + lr.fz : '') },
+          { label: 'MOMENTUM', ic: '➚', pill: momA ? (momAcc ? 'ACELERANDO' : 'ALINEADO') : mom.filter(v => v).length + '/3', pillCol: momA > 0 ? G : momA < 0 ? R : '#93A9A9', value: momA > 0 ? 'Alcista 3/3' : momA < 0 ? 'Bajista 3/3' : 'Sin alinear', color: momA > 0 ? G : momA < 0 ? R : '#D3DCDA', dots: ['5m', '15m', '1H'].map((t, i) => ({ tf: t, col: mom[i] > 0 ? G : mom[i] < 0 ? R : N })), note: (momA ? (momAcc ? 'Acelerando (MACD 5m creciendo). ' : 'Sin aceleración en 5m. ') : '') + 'Fuerte = EMA 9 sobre/bajo EMA 21 con ambas inclinadas, precio vs SMA 20 (media de Bollinger), RSI 14 vs 50, histograma MACD y precio vs VWAP, en 5m, 15m y 1H a la vez. Sirve para compras direccionales.' + (gpos && !momA ? ' Gamma positiva por volumen: día de rango.' : '') + (lr.fz ? ' ' + lr.fz : '') + '\n• 24-nov (#12, aprobada 20-nov): acierto medido 60% a 30 min (auditoría 16–20-nov, n=35) · ventaja chica, no es señal de entrada por sí sola (acumulado más reciente ~50%, aún sin información suficiente)' },
           { label: volName, ic: '∿', pill: lr.vix.nh ? 'MÁX. DEL DÍA' : '', pillCol: R, value: vixN.toFixed(2) + ' ' + (vt > 0 ? '▲' : vt < 0 ? '▼' : '►') + (vixChg != null ? ' (' + (vixChg >= 0 ? '+' : '') + vixChg.toFixed(1) + '% hoy)' : ''), color: vcol, spark: spark, note: (lr.vix.nh ? '⚠ Nuevo máximo del día · ' : '') + 'Velas de 15m · amarillo = SMA 20\n• Regla activa: ' + vixRule },
           { label: 'RANGO RESTANTE', ic: '↔', sub: '±' + fv2(Math.round((rr[1] - rr[0]) / 2)), value: fv2(rr[0]) + ' – ' + fv2(rr[1]), color: '#E6B655', rng: 1, rng_open: rng.open, rng_rem: rng.rem, rng_dA: rng.dA, rng_dB: rng.dB, rng_px: rng.px, rngL: fv2(rlo), rngR: fv2(rhi), note: (d15 ? 'Delta 15: ' + fv2(d15[0]) + ' / ' + fv2(d15[1]) + '\n' : '') + 'Apertura (fijo): ' + fv2(lr.em[0]) + ' – ' + fv2(lr.em[1]) + (lr.px > lr.em[1] ? '\n⚠ Apertura rota arriba · +' + fv2(Math.round(lr.px - lr.em[1])) : lr.px < lr.em[0] ? '\n⚠ Apertura rota abajo · −' + fv2(Math.round(lr.em[0] - lr.px)) : '') + (gneg ? '\n• Banda 2× (NO tocar): ' + fv2(Math.round(band2.lo)) + ' – ' + fv2(Math.round(band2.hi)) : '') },
           PN ? { label: pinOn ? 'PIN DE CIERRE' : 'PIN · IMÁN', ic: '◎', pill: 'CERTEZA ' + PN.cert, pillCol: certCol, value: PN.pinRange ? (fv2(PN.pinRange[0]) + ' – ' + fv2(PN.pinRange[1])) : fv2(PN.prim), sub: (PN.pinRange ? 'VIX > 30: se muestra como rango ±' + Math.round((PN.pinRange[1] - PN.pinRange[0]) / 2) : PN.alt ? 'alterno ' + fv2(PN.alt) : ''), color: '#E6B655', note: ((PN.gR || PN.gP) && PN.cp ? '• Canal por volumen ' + fv2(Math.round(PN.cn)) + ' – ' + fv2(Math.round(PN.cp)) + ' (3–4 nov: precio dentro 96–98% del día)' : '• Zona ' + fv2(Math.round(PN.z0)) + ' – ' + fv2(Math.round(PN.z1)) + (lr.iman ? ' · imán ' + fv2(lr.iman) : '') + ' · max pain ' + fv2(PN.mpV)) + '\n• Ancla: ' + fv2(PN.anc[0]) + ' tiene el mayor OI de la zona (' + fv2(PN.anc[1] + PN.anc[2]) + ')' + '\n• ' + (PN.gX ? 'Gamma + extrema (' + fv2(Math.round(PN.nvG)) + ') desde las ' + fmtET(870) + ' ET: PIN = major + (' + fv2(Math.round(PN.cp * 10) / 10) + ')' : PN.gP ? 'Gamma + fuerte (' + fv2(Math.round(PN.nvG)) + '): imán = major + por volumen (' + fv2(Math.round(PN.cp * 10) / 10) + ') hasta las ' + fmtET(870) + ' ET; desde ahí PIN = major − (' + fv2(Math.round(PN.cn)) + ')' : PN.gMid ? 'Gamma + débil (' + fv2(Math.round(PN.nvG)) + '): regla major − con certeza baja; alterno = major + (' + fv2(Math.round(PN.cp)) + ')' : PN.gR ? 'Regla: PIN = major − por volumen (' + fv2(Math.round(PN.cn * 10) / 10) + '); se mueve con el precio' : gneg ? 'Gamma negativa: PIN poco confiable' + (lr.mnv ? ' · nodo − ' + fv2(lr.mnv) : '') : 'Se rompe si 15m cierra abajo del Zero Gamma (' + fv2(lr.zg) + ')' + ((lr.pwv || lr.mnv) ? ' → ' + fv2(lr.pwv || lr.mnv) : '')) + (PN.pinWinTxt ? '\n• ' + PN.pinWinTxt : '') + '\n• Error vs. precio en vivo: ' + fv2(PN.errLive) + ' pts' + (vixN > 30 ? ' · VIX > 30: certeza forzada a BAJA' : '') + (lr.pinmov ? '\n⚠ ' + lr.pinmov : '') }
              : { label: 'PIN · IMÁN', ic: '◎', value: lr.iman ? 'Imán ' + fv2(lr.iman) : '—', color: '#E6B655', note: 'Sin cadena para estimar el PIN' },
-          lr.t10 ? { label: 'TOP 10 DEL S&P', ic: '◉', pill: gneg ? 'NO CONFIABLE' : lr.t10.sem > 0 ? 'VERDE' : lr.t10.sem < 0 ? 'ROJO' : 'ÁMBAR', pillCol: gneg ? '#93A9A9' : lr.t10.sem > 0 ? G : lr.t10.sem < 0 ? R : '#E6B655', value: (lr.t10.sem > 0 ? '● ' : lr.t10.sem < 0 ? '● ' : '● ') + (lr.t10.w >= 0 ? '+' : '−') + Math.abs(lr.t10.w).toFixed(2) + '%', color: gneg ? '#93A9A9' : lr.t10.sem > 0 ? G : lr.t10.sem < 0 ? R : '#E6B655', dots: lr.t10.s.map(x => ({ tf: x[0], col: x[1] > 0 ? G : x[1] < 0 ? R : N })), note: lr.t10.up + ' de ' + lr.t10.n + ' suben desde la apertura · promedio ponderado por peso en el índice (~40% del S&P)' + (gneg ? '\n• 24-nov (#4, aprobada 20-nov): semáforo apagado en γ− · no confiable como entrada' : '') } : null
+          lr.t10 ? { label: 'TOP 10 DEL S&P', ic: '◉', pill: gneg ? 'NO CONFIABLE' : lr.t10.sem > 0 ? 'VERDE' : lr.t10.sem < 0 ? 'ROJO' : 'ÁMBAR', pillCol: gneg ? '#93A9A9' : lr.t10.sem > 0 ? G : lr.t10.sem < 0 ? R : '#E6B655', value: (lr.t10.sem > 0 ? '● ' : lr.t10.sem < 0 ? '● ' : '● ') + (lr.t10.w >= 0 ? '+' : '−') + Math.abs(lr.t10.w).toFixed(2) + '%', color: gneg ? '#93A9A9' : lr.t10.sem > 0 ? G : lr.t10.sem < 0 ? R : '#E6B655', dots: lr.t10.s.map(x => ({ tf: x[0], col: x[1] > 0 ? G : x[1] < 0 ? R : N })), note: lr.t10.up + ' de ' + lr.t10.n + ' suben desde la apertura · promedio ponderado por peso en el índice (~40% del S&P)' + (gneg ? '\n• 24-nov (#4, aprobada 20-nov): semáforo apagado en γ− · no confiable como entrada' : '')
+            // 24-nov (#11, aprobada 20-nov): % por acción y brecha Top 10 vs SPX
+            + '\n• Por acción: ' + lr.t10.s.map(x => x[0] + ' ' + (x[1] >= 0 ? '+' : '') + x[1].toFixed(2) + '%').join(' · ')
+            + (() => { const spxChg = parseFloat(String(lr.chg).replace('−', '-').replace('%', '')); if (!isFinite(spxChg)) return ''; const gap = lr.t10.w - spxChg; return '\n• Brecha Top 10 vs SPX (' + (spxChg >= 0 ? '+' : '') + spxChg.toFixed(2) + '%): ' + (gap >= 0 ? '+' : '') + gap.toFixed(2) + ' pts %'; })() } : null
         ].filter(Boolean),
         est: (() => {
           const estRaw = [
@@ -1241,14 +1276,25 @@ class Component extends DCLogic {
         pinPts.push({ i, v, f: late && semS[i] !== 'r', title: fmtET(toMin(r.t)) + ' · PIN ' + fv2(v) });
       });
       const pinNow = PN ? PN.prim : null;
+      // 24-nov (#17, aprobada 20-nov): muros por Open Interest (estructurales, borde sólido) distintos de los muros por volumen (ya existían; ahora algo más tenues = "sombra").
+      // Mín. 15 min por nivel: con lecturas de Gexbot ~cada hora, comparar contra la lectura anterior ya cubre de sobra ese mínimo.
+      const prevRead = L.reads.length > 1 ? L.reads[L.reads.length - 2] : null;
+      const wallTol = tk === 'SPX' ? 5 : 0.5;
+      const wallStable = (cur, prevVal) => prevVal == null || Math.abs(cur - prevVal) < wallTol;
+      const oiCW = (lr.cw && lr.cw[0] != null && wallStable(lr.cw[0], prevRead && prevRead.cw && prevRead.cw[0])) ? lr.cw : null;
+      const oiPW = (lr.pw && lr.pw[0] != null && wallStable(lr.pw[0], prevRead && prevRead.pw && prevRead.pw[0])) ? lr.pw : null;
       const pills = [
-        (gOld ? lr.mpv : cwN) ? { v: gOld ? lr.mpv : cwN, t: fv2(Math.round(gOld ? lr.mpv : cwN)), bg: '#5FD4A0', fg: '#0B1617' } : null,   // 21-nov (#13): con perfil vencido, majors propios (Schwab)
-        (gOld ? lr.mnv : pwN) ? { v: gOld ? lr.mnv : pwN, t: fv2(Math.round(gOld ? lr.mnv : pwN)), bg: '#F07F74', fg: '#FFFFFF' } : null,
+        (gOld ? lr.mpv : cwN) ? { v: gOld ? lr.mpv : cwN, t: fv2(Math.round(gOld ? lr.mpv : cwN)), bg: '#5FD4A0', fg: '#0B1617', op: 0.75 } : null,   // 21-nov (#13): con perfil vencido, majors propios (Schwab) · 24-nov (#17): muro por volumen
+        (gOld ? lr.mnv : pwN) ? { v: gOld ? lr.mnv : pwN, t: fv2(Math.round(gOld ? lr.mnv : pwN)), bg: '#F07F74', fg: '#FFFFFF', op: 0.75 } : null,
+        oiCW ? { v: oiCW[0], t: 'OI ' + fv2(Math.round(oiCW[0])), bg: 'transparent', fg: '#5FD4A0', bd: '#5FD4A0' } : null,
+        oiPW ? { v: oiPW[0], t: 'OI ' + fv2(Math.round(oiPW[0])), bg: 'transparent', fg: '#F07F74', bd: '#F07F74' } : null,
         lr.zg ? { v: lr.zg, t: fv2(Math.round(lr.zg)) + (gOld ? ' · ' + fmtET(toMin(lr.gt)) : ''), bg: '#0B1617', fg: gOld ? '#6F8584' : '#F2EFE8', bd: gOld ? '#3A5254' : '#F2EFE8' } : null,
         pinNow && toMin(lr.t) >= 780 ? { v: pinNow, t: '◉ ' + fv2(pinNow), bg: '#FFFFFF', fg: '#0B1617' } : null,
         { v: lr.px, t: fv2(lr.px), bg: '#5FD4A0', fg: '#FFFFFF' }
       ].filter(Boolean);
-      liveCfg = { live: true, start: 510, lo, hi, ticks, em: lr.em, ohlc: { o: L.o, h: L.h, l: L.l, c: L.c, v: L.v }, pre: (L.pre && L.pre.length ? L.pre : (PRE[tk] || []).concat(CH[tk].ohlc.c)), off: [], events: [], dyn: { z: gzS, c: gcS, p: gpS }, sem: semS, pinz: null, cabina: true, pinPts: pinPts, pills: pills };
+      // 24-nov (#20, aprobada 20-nov): banda del expected move 2× centrada en la apertura (1× ya existía)
+      const emMid = (lr.em[0] + lr.em[1]) / 2;
+      liveCfg = { live: true, start: 510, lo, hi, ticks, em: lr.em, em2: [emMid - 2 * half, emMid + 2 * half], zg: lr.zg, px: lr.px, gpos, gneg, ohlc: { o: L.o, h: L.h, l: L.l, c: L.c, v: L.v }, pre: (L.pre && L.pre.length ? L.pre : (PRE[tk] || []).concat(CH[tk].ohlc.c)), off: [], events: [], dyn: { z: gzS, c: gcS, p: gpS, cen: gcenS }, sem: semS, pinz: null, cabina: true, pinPts: pinPts, pills: pills };
       if (L.rows.length) liveRows = L.rows[L.rows.length - 1];
       d.subtitle = d.sym + ' · vencimiento 0DTE de hoy · lecturas cada 15 min · lectura neutral, no es recomendación';
       if (lr.auto) { d.subtitle = d.sym + ' · vencimiento 0DTE de hoy · cadena Schwab cada minuto · lectura neutral, no es recomendación'; d.stripNote = 'Fuente: Schwab · cadena 0DTE en tiempo real · escala común a puts y calls'; }
@@ -1274,7 +1320,10 @@ class Component extends DCLogic {
     };
     const cfgP = liveCfg || CH[tk];
     const Pp = k => (cfgP.hi - k) / (cfgP.hi - cfgP.lo) * 100;
-    const pvals = (liveRows || d.raw).filter(r => r[0] >= cfgP.lo && r[0] <= cfgP.hi).map(r => {
+    // 24-nov (#16, aprobada 20-nov): 15 strikes alrededor del precio, escala raíz, valores en cada fila, línea de precio
+    const spotPx = lr ? lr.px : d.spot;
+    const nearRows = (liveRows || d.raw).slice().sort((a, b) => Math.abs(a[0] - spotPx) - Math.abs(b[0] - spotPx)).slice(0, 15).sort((a, b) => a[0] - b[0]);
+    const pvals = nearRows.map(r => {
       if (mode === 'gex' || mode === 'gexv') { const g = (liveRows ? (mode === 'gexv' && r.length > 6 ? r[6] : r[5]) : (GEXS[tk] || {})[r[0]]) || 0; return { k: r[0], L: g < 0 ? -g : 0, R: g > 0 ? g : 0 }; }
       return mode === 'oi' ? { k: r[0], L: r[2], R: r[1] } : { k: r[0], L: r[4], R: r[3] };
     });
@@ -1284,13 +1333,17 @@ class Component extends DCLogic {
     const topR = pvals.slice().sort((a, b) => b.R - a.R).slice(0, 3).filter(v => v.R > 0).map(v => v.k);
     const fmtP = x => (mode === 'gex' || mode === 'gexv') ? (x >= 1000 ? (x / 1000).toFixed(2) + 'B' : (x >= 10 ? x.toFixed(0) : x.toFixed(1)) + 'M') : (x >= 1000 ? (x / 1000).toFixed(1) + 'K' : String(x));
     const kfmt = k => k.toLocaleString('en-US');
-    const prof = pvals.map(v => ({
-      row: 'position: absolute; left: 0; right: 0; top: calc(' + Pp(v.k).toFixed(2) + '% - 5px); height: 10px; display: grid; grid-template-columns: 1fr 1fr',
-      lBar: 'height: 10px; flex: none; border-radius: 2px 0 0 2px; background: #F07F74; opacity: ' + (topL.includes(v.k) ? 1 : 0.5) + '; width: ' + (v.L > 0 ? Math.max(v.L / pmx * 45, 1.5) : 0).toFixed(1) + '%',
-      rBar: 'height: 10px; flex: none; border-radius: 0 2px 2px 0; background: #5FD4A0; opacity: ' + (topR.includes(v.k) ? 1 : 0.5) + '; width: ' + (v.R > 0 ? Math.max(v.R / pmx * 45, 1.5) : 0).toFixed(1) + '%',
-      lL: topL.includes(v.k) ? kfmt(v.k) + ' · ' + fmtP(v.L) : '',
-      rL: topR.includes(v.k) ? fmtP(v.R) + ' · ' + kfmt(v.k) : ''
-    }));
+    const nearK = pvals.reduce((b, v) => Math.abs(v.k - spotPx) < Math.abs(b - spotPx) ? v.k : b, pvals.length ? pvals[0].k : spotPx);
+    const prof = pvals.map(v => {
+      const isSpot = v.k === nearK;
+      return {
+        row: 'position: absolute; left: 0; right: 0; top: calc(' + Pp(v.k).toFixed(2) + '% - 6px); height: 12px; display: grid; grid-template-columns: 1fr 1fr; border-radius: 3px;' + (isSpot ? ' background: #10302A; outline: 1px solid #5CC1BF;' : ''),
+        lBar: 'height: 10px; flex: none; border-radius: 2px 0 0 2px; background: #F07F74; opacity: ' + (topL.includes(v.k) ? 1 : 0.6) + '; width: ' + (v.L > 0 ? Math.max(Math.sqrt(v.L) / Math.sqrt(pmx) * 45, 1.5) : 0).toFixed(1) + '%',
+        rBar: 'height: 10px; flex: none; border-radius: 0 2px 2px 0; background: #5FD4A0; opacity: ' + (topR.includes(v.k) ? 1 : 0.6) + '; width: ' + (v.R > 0 ? Math.max(Math.sqrt(v.R) / Math.sqrt(pmx) * 45, 1.5) : 0).toFixed(1) + '%',
+        lL: v.L > 0 ? kfmt(v.k) + ' · ' + fmtP(v.L) : (isSpot ? kfmt(v.k) : ''),
+        rL: v.R > 0 ? fmtP(v.R) + ' · ' + kfmt(v.k) : (isSpot ? kfmt(v.k) : '')
+      };
+    });
     const ci = mode === 'oi' ? 1 : 3;
     const pi = mode === 'oi' ? 2 : 4;
     let max = 1;
