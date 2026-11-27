@@ -181,7 +181,7 @@ def calificar():
         if not etiqueta:
             try:
                 import papel_bot as P
-                e = P.etiquetar_dia([(r["t"], r) for r in dia])
+                e = P.etiquetar_dia([(r["t"], r) for r in dia], cierre=P.pb_del_dia(fecha, P.PB)["cierre"])
                 etiqueta = e and e["tipo"]
             except Exception:
                 etiqueta = None

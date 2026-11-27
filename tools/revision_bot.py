@@ -131,6 +131,9 @@ variantes = {
     "A: objetivo pasa el largo": {"obj_pasa_largo": True},
     "B: apagada en tendencia": {"b_sin_tendencia": True},
     "65% + recorrido ≥15": {"deb_tp": 0.65, "a_recorrido": 15},
+    "A: exige γ fresca": {"a_gamma_fresca": True},
+    "B: ancla ≥20 pts": {"b_dist_min": 20},
+    "B: stop por nivel 5 min": {"nivel_min": 5},
 }
 fechas = sorted({f.name[:10] for f in carpeta.glob("20??-??-??.jsonl*")})
 por_dia = {}                                   # variante → {fecha: (pnl, ops, ganadoras)}
@@ -208,10 +211,10 @@ def correr_tape(f, filtrar):
         if P.mins(ts) < 8 * 60 + 30:
             continue
         b.paso(ts, r)
-        if P.mins(ts) >= P.PB["cierre"] - 1:
+        if P.mins(ts) >= b.pb["cierre"] - 1:
             break
     if b.abiertas and filas:
-        b.liquidar("14:59", filas[-1][1]["px"])
+        b.liquidar(P.hhmm(b.pb["cierre"] - 1), filas[-1][1]["px"])
     return b
 
 

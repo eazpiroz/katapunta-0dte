@@ -19,6 +19,13 @@ import base64, datetime as dt, getpass, json, math, os, sys, time, traceback
 import urllib.error, urllib.parse, urllib.request, webbrowser
 from pathlib import Path
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+try:
+    from calendario import cierre_cdmx
+except ImportError:                         # sin calendario.py: sesión completa, como antes
+    def cierre_cdmx(fecha):
+        return 15 * 60
+
 DIR = Path(os.environ.get("USERPROFILE", str(Path.home()))) / ".katapunta"
 SCHWAB = DIR / "schwab.json"
 GH = DIR / "github.json"
@@ -947,8 +954,9 @@ def main():
         if "--una" in sys.argv:
             break
         t = now()
-        if t.hour * 60 + t.minute >= 901:
-            print("15:01 · mercado cerrado. Fin del día.")
+        fin = cierre_cdmx(t.date()) + 1          # media sesión: 12:01 CDMX (si no, sigue grabando precio congelado)
+        if t.hour * 60 + t.minute >= fin:
+            print(f"{fin // 60}:{fin % 60:02d} · mercado cerrado. Fin del día.")
             try:
                 gh_put_hist(tok, t.date().isoformat())
             except Exception as e:

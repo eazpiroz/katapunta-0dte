@@ -54,15 +54,32 @@ PB = {
     "ven_tp": 0.50,            # TP venta: recomprar al 50% del crédito
     "ven_cat": 2.5,            # stop de catástrofe: el spread vale 2.5× el crédito
     "nivel_buf": 3.0,          # stop por nivel: cierra si el precio pasa el ancla por 3 pts dos minutos seguidos
+    "nivel_min": 2,            # minutos seguidos con el ancla rota para el stop por nivel (v1: 2)
     "pin_dist": 10.0,          # IC de pin: precio a ≤10 pts del major +
-    "gamma_edad": 30,
+    "gamma_edad": 30,          # min: con la lectura γ (perfil manual) más vieja que esto, no abre B ni C (A sí, va por tendencia)
     # --- candidatas en prueba (apagadas en v1; solo las usa el probador de variantes)
+    "a_gamma_fresca": False,   # A: tampoco abre con la lectura γ más vieja que gamma_edad
+    "b_dist_min": 0,           # B: no vender si el ancla del stop está a menos de N pts del precio (0 = apagado)
     "a_recorrido": 0,          # A: no comprar si el objetivo está a menos de N pts (0 = apagado)
     "obj_pasa_largo": False,   # A: el TP por nivel solo cuenta si el objetivo pasa el strike largo
     "b_sin_tendencia": False,  # B: no vender si el clasificador (reglas) dice tendencia
     "gamma_propia": False,     # sin lectura γ manual (o con más de gamma_edad min): usar el régimen del GEX propio (cadena de Schwab)
-    "c_quietud": 0,            # C ampliada: con SPX a ≤10 pts del PIN del tablero y rango de 30 min ≤ N pts, IC sin exigir gamma + (0 = apagado)          # min: con la lectura γ (perfil manual) más vieja que esto, no abre B ni C (A sí, va por tendencia)
+    "c_quietud": 0,            # C ampliada: con SPX a ≤10 pts del PIN del tablero y rango de 30 min ≤ N pts, IC sin exigir gamma + (0 = apagado)
 }
+
+
+def pb_del_dia(fecha, pb):
+    """En media sesión (cierre 13:00 ET) recorre 3 h todos los horarios de la tarde; el resto del Playbook no cambia."""
+    try:
+        from calendario import media_sesion
+    except ImportError:
+        return pb
+    if not media_sesion(fecha) or pb.get("_media"):
+        return pb
+    d = 3 * 60
+    return {**pb, "_media": True, "cierre": pb["cierre"] - d, "corte": pb["corte"] - d,
+            "ultima_tend": min(pb["ultima_tend"], pb["cierre"] - d - 90), "ultima_venta": min(pb["ultima_venta"], pb["cierre"] - d - 60),
+            "pin": (pb["pin"][0] - d, pb["pin"][1] - d)}
 
 # Torneo de bots (23-nov-2026): el PB de arriba es el CONTROL congelado (v1). Este es el carril propio de Claude.
 # Solo cambia los viernes, con aprobación del socio. Mismos límites de riesgo que el control.
@@ -85,6 +102,10 @@ COM_PATA = 1.22    # $ por contrato por pata (comisión + cargos), mediana de tu
 def mins(ts):
     h, m = ts.split(":")[:2]
     return int(h) * 60 + int(m)
+
+
+def hhmm(m):
+    return f"{m // 60}:{m % 60:02d}"
 
 
 def et(ts):
@@ -300,8 +321,10 @@ usando el régimen de gamma (precio vs zero γ), los niveles GEX (major +/−, t
 el momentum, el tape (flujo de opciones grandes), el pre-market del día y las lecciones de la bitácora.
 Para juzgar la salida usa "valor_estimado": la salida por nivel ocurre a media sesión, así que lo que cuenta es el valor
 del spread AHORA con SPX en ese nivel (valor_spread_ahora_en_nivel), no su valor intrínseco a vencimiento.
-Veta solo con una razón concreta y verificable en los datos (p. ej. entrar contra el flujo, nivel GEX demasiado cerca, evento
-de alto impacto inminente, movimiento ya agotado, rango esperado consumido). Si los datos no dan razón clara, aprueba.
+Veta solo con una razón concreta y verificable en los datos, y la razón DEBE citar el número que la sostiene: distancia en
+pts del precio al nivel que te preocupa, monto en $ del flujo que va en contra (de "tape"), hora del evento, o % del rango
+esperado ya recorrido. Pregúntate si esa misma razón aplicaría a casi cualquier entrada del día: si sí, no es razón.
+Una razón genérica o sin número no alcanza para vetar: en ese caso aprueba.
 Responde SOLO un JSON: {"decision":"aprobar"|"vetar","confianza":0-100,"razon":"una frase en español, máx 25 palabras"}"""
 
 # Herramienta forzada: la API devuelve el JSON ya estructurado (adiós JSONDecodeError por prosa o respuesta cortada).
@@ -621,8 +644,11 @@ def clasificar_reglas(f):
     return {"tipo": tipo, "conf": conf, "puntos": pts, "razones": rz}
 
 
-def etiquetar_dia(dia, mp_final=None):
-    """La "verdad" al cierre: tendencia / rango / pin."""
+def etiquetar_dia(dia, mp_final=None, cierre=None):
+    """La "verdad" al cierre: tendencia / rango / pin. cierre = minuto CDMX del cierre real (media sesión: 12:00);
+    las lecturas posteriores (precio congelado) no cuentan."""
+    cierre = cierre or PB["cierre"]
+    dia = [(t, x) for t, x in dia if mins(t) <= cierre]
     if len(dia) < 60:
         return None
     xs = [x["px"] for _, x in dia]
@@ -630,7 +656,7 @@ def etiquetar_dia(dia, mp_final=None):
     mitad = max(1.0, (em[1] - em[0]) / 2)
     mov, rng = xs[-1] - xs[0], max(xs) - min(xs)
     mp = mp_final or dia[-1][1].get("mp")
-    ult = [x["px"] for t, x in dia if mins(t) >= PB["cierre"] - 60]
+    ult = [x["px"] for t, x in dia if mins(t) >= cierre - 60]
     if mp and ult and max(abs(x - mp) for x in ult) <= 10:
         return {"tipo": "pin", "detalle": f"última hora a ≤10 pts del major + {mp}"}
     if abs(mov) >= 0.6 * rng and abs(mov) >= 0.5 * mitad:
@@ -641,7 +667,7 @@ def etiquetar_dia(dia, mp_final=None):
 # ------------------------------------------------------------------ el bot
 class Bot:
     def __init__(self, fecha, pb=PB):
-        self.f, self.pb = fecha, pb
+        self.f, self.pb = fecha, pb_del_dia(fecha, pb)
         self.abiertas, self.ops = [], []
         self.ult_cierre = {}            # dirección → minuto del último cierre
         self.ult_perdida = -999
@@ -793,7 +819,8 @@ class Bot:
         if gamma_vieja and self.usar_propia(c):
             gamma_vieja = False                     # lectura manual vieja → régimen del GEX propio
         # A · gamma negativa + tendencia alineada → débito a favor
-        if c["g"] == -1 and c["T"] != 0 and c["mom"] == c["T"] and m <= pb["ultima_tend"] and self.puede(m, c["T"]):
+        if c["g"] == -1 and c["T"] != 0 and c["mom"] == c["T"] and m <= pb["ultima_tend"] and self.puede(m, c["T"]) \
+                and not (pb["a_gamma_fresca"] and gamma_vieja):
             sd = "c" if c["T"] > 0 else "p"
             cand = [x for x in lad.get("c", []) if x[0] == sd and abs(x[1] - pb["deb_delta"]) < 1e-6
                     and abs(x[3] - x[2]) == pb["deb_ancho"] and 0 < x[5] <= pb["deb_max"] * pb["deb_ancho"]]
@@ -837,6 +864,8 @@ class Bot:
                     # el stop es el nivel más cercano que protege al corto (no el primero que toque el precio)
                     prot = [v for v in niv if (v >= x[2] + 5 if dire > 0 else v <= x[2] - 5)]
                     ancla = min(prot) if dire > 0 else max(prot)
+                    if pb["b_dist_min"] and abs(c["px"] - ancla) < pb["b_dist_min"]:
+                        continue                    # el ancla del stop quedó pegada al precio: un pinchazo la rompe
                     self.abrir(ts, r, c, "venta", dire, [(sd, x[2], -1), (sd, x[3], 1)], -cred, pb["ven_ancho"],
                                f"B · gamma positiva ({c['px']:.0f} > zero γ {c['zg']:.0f}) → vender "
                                f"{'debajo del soporte' if dire > 0 else 'arriba de la resistencia'} {ancla:.0f} "
@@ -954,8 +983,9 @@ class Bot:
                     roto = c["px"] < cortos[0] - pb["nivel_buf"] or c["px"] > cortos[1] + pb["nivel_buf"]
                     lim = f"{cortos[0]:.0f}/{cortos[1]:.0f}"
                 self.brk[p["id"]] = self.brk.get(p["id"], 0) + 1 if roto else 0
-                if self.brk[p["id"]] >= 2:
-                    self.cerrar(p, ts, v - pb["slip"], f"Stop por nivel: el precio rompió {lim} dos minutos seguidos"); continue
+                if self.brk[p["id"]] >= pb["nivel_min"]:
+                    self.cerrar(p, ts, v - pb["slip"], f"Stop por nivel: el precio rompió {lim} "
+                                f"{'dos' if pb['nivel_min'] == 2 else pb['nivel_min']} minutos seguidos"); continue
 
     def clasificar(self, ts, r, m):
         f = rasgos(self.dia, r)
@@ -1003,7 +1033,7 @@ class Bot:
                           "pnl_neto_nat": round(sum(o.get("pnl_neto_nat") or 0 for o in self.ops), 2),
                           "sin_natural": sum(1 for o in self.ops if o.get("pnl_natural") is None)},
                 "clasif": [{k: v for k, v in c.items() if k != "m"} for c in self.clasif],
-                "real": self.real or (etiquetar_dia(self.dia) if self.dia and (not self.avisar or mins(self.dia[-1][0]) >= self.pb["cierre"] - 5) else None),
+                "real": self.real or (etiquetar_dia(self.dia, cierre=self.pb["cierre"]) if self.dia and (not self.avisar or mins(self.dia[-1][0]) >= self.pb["cierre"] - 5) else None),
                 "abiertas": [{"estructura": self.estructura(p), "entra": et(p["t_in"]), "entrada": p["entrada"], "regla": p["regla"],
                               "clave": self.clave(p), "ia": p.get("ia"), "ctx": p["ctx"]} for p in self.abiertas]}
 
@@ -1056,14 +1086,14 @@ def correr_dia(fecha, pb=None):
         if mins(ts) < 8 * 60 + 30:
             continue
         b.paso(ts, r)
-        if mins(ts) >= PB["cierre"] - 1:
+        if mins(ts) >= b.pb["cierre"] - 1:
             break
     liq = json.loads((HERE / "liquidaciones.json").read_text(encoding="utf-8")) if (HERE / "liquidaciones.json").exists() else {}
-    if filas and mins(filas[-1][0]) < PB["cierre"] - 5:
+    if filas and mins(filas[-1][0]) < b.pb["cierre"] - 5:
         b.nota = f"El historial termina a las {et(filas[-1][0])} ET (el recolector se detuvo): sin lecturas después de esa hora."
-    if b.abiertas and filas:                 # el historial terminó antes de las 14:59
+    if b.abiertas and filas:                 # el historial terminó antes del cierre
         ts, r = filas[-1]
-        b.liquidar("14:59", liq.get(fecha, r["px"]))
+        b.liquidar(hhmm(b.pb["cierre"] - 1), liq.get(fecha, r["px"]))
     return b
 
 
@@ -1226,7 +1256,7 @@ def vivo():
           else:
               sin_datos = 0
           ahora_m = dt.datetime.now(dt.timezone(dt.timedelta(hours=-6)))
-          if 8 * 60 + 30 <= ahora_m.hour * 60 + ahora_m.minute <= PB["cierre"]:
+          if 8 * 60 + 30 <= ahora_m.hour * 60 + ahora_m.minute <= b.pb["cierre"]:
               tl.tick()
               b.tape = tl.ult
               b2.tape = tl.ult
@@ -1262,7 +1292,7 @@ def vivo():
               STATE.write_text(json.dumps({"fecha": hoy}), encoding="utf-8")
               publicar(armar([b], "vivo", [b2]))
           t = dt.datetime.now(dt.timezone(dt.timedelta(hours=-6)))
-          if t.hour * 60 + t.minute >= PB["cierre"] + 2:
+          if t.hour * 60 + t.minute >= b.pb["cierre"] + 2:
               if b.abiertas and filas:
                   b.liquidar(*[(filas[-1][0], filas[-1][1]["px"])][0])
               if b2.abiertas and filas:
